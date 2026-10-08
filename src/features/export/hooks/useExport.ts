@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { DEFAULT_SETTINGS } from '../../../domain/settings';
 import type { Format, Overlay, Trip } from '../../../domain/types';
 import { api } from '../../../services/api';
@@ -21,8 +21,8 @@ export interface ExportController {
   overlay: Overlay;
   error: ExportErrorCode | null;
   video: { url: string; file: File; canShare: boolean } | null;
-  /** element the offscreen map renders into */
-  hostRef: RefObject<HTMLDivElement | null>;
+  /** ref callback for the element the offscreen map renders into */
+  hostRef: (el: HTMLDivElement | null) => void;
   setFormat: (f: Format) => void;
   setOverlay: (o: Overlay) => void;
   render: () => void;
@@ -47,7 +47,7 @@ function canShareFile(file: File) {
 export function useExport(trip: Trip): ExportController {
   const { update } = useTripContext();
   const { format, overlay = DEFAULT_OVERLAY } = trip.data;
-  const hostRef = useRef<HTMLDivElement>(null);
+  const [host, setHost] = useState<HTMLDivElement | null>(null);
   const prepared = useRef<PreparedExport | null>(null);
   const rendering = useRef<AbortController | null>(null);
   const started = useRef(0);
@@ -69,8 +69,8 @@ export function useExport(trip: Trip): ExportController {
     setPhase('error');
   };
 
-  const prepare = useEffectEvent((signal: AbortSignal) =>
-    prepareExport({ host: hostRef.current!, trip, format, longSide: DEFAULT_SETTINGS.exportLongSide, onProgress: setProgress, signal }));
+  const prepare = useEffectEvent((el: HTMLDivElement, signal: AbortSignal) =>
+    prepareExport({ host: el, trip, format, longSide: DEFAULT_SETTINGS.exportLongSide, onProgress: setProgress, signal }));
   const onPrepareError = useEffectEvent((e: unknown) => fail(e, 'prepare'));
 
   useEffect(() => {
@@ -78,8 +78,9 @@ export function useExport(trip: Trip): ExportController {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (!host) return;
     const ctrl = new AbortController();
-    prepare(ctrl.signal).then((p) => {
+    prepare(host, ctrl.signal).then((p) => {
       if (ctrl.signal.aborted) { p.destroy(); return; }
       prepared.current = p;
       setJob({ width: p.width, height: p.height, hostWidth: p.hostWidth, hostHeight: p.hostHeight, frame: p.frame });
@@ -91,7 +92,7 @@ export function useExport(trip: Trip): ExportController {
       prepared.current?.destroy();
       prepared.current = null;
     };
-  }, [format, attempt]);
+  }, [host, format, attempt]);
 
   useEffect(() => () => {
     rendering.current?.abort();
@@ -120,7 +121,7 @@ export function useExport(trip: Trip): ExportController {
   };
 
   return {
-    trip, phase, progress, reloading, job, format, overlay, error, video, hostRef, render,
+    trip, phase, progress, reloading, job, format, overlay, error, video, hostRef: setHost, render,
     setFormat: (f) => {
       if (f === format) return;
       setReloading(true);
