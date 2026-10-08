@@ -35,8 +35,7 @@ export const route: Shape<Dict['route']> = {
   },
   segment: {
     label: '{mode} · {figure}',
-    stopRemoved: 'Точка «{name}» удалена.',
-  building: 'Строю…',
+    building: 'Строю…',
     straight: 'По прямой',
     pace: '×{pace}',
   },
@@ -52,6 +51,7 @@ export const route: Shape<Dict['route']> = {
     bannerTouch: 'Коснитесь карты, чтобы поставить «{name}»',
     cancel: 'Отмена',
   },
+  stopRemoved: 'Точка «{name}» удалена.',
   building: 'Строю маршрут…',
   markerTitle: '{name} · потяните, чтобы перенести',
 };

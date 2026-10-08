@@ -32,8 +32,7 @@ export const route = {
   },
   segment: {
     label: '{mode} · {figure}',
-    stopRemoved: 'Removed “{name}”.',
-  building: 'Building…',
+    building: 'Building…',
     straight: 'Straight line',
     pace: '×{pace}',
   },
@@ -49,6 +48,7 @@ export const route = {
     bannerTouch: 'Tap the map to place {name}',
     cancel: 'Cancel',
   },
+  stopRemoved: 'Removed “{name}”.',
   building: 'Building route…',
   markerTitle: '{name} · drag to move',
 };
