@@ -35,7 +35,8 @@ export const route: Shape<Dict['route']> = {
   },
   segment: {
     label: '{mode} · {figure}',
-    building: 'Строю…',
+    stopRemoved: 'Точка «{name}» удалена.',
+  building: 'Строю…',
     straight: 'По прямой',
     pace: '×{pace}',
   },

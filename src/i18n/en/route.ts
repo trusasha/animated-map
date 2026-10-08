@@ -32,7 +32,8 @@ export const route = {
   },
   segment: {
     label: '{mode} · {figure}',
-    building: 'Building…',
+    stopRemoved: 'Removed “{name}”.',
+  building: 'Building…',
     straight: 'Straight line',
     pace: '×{pace}',
   },
