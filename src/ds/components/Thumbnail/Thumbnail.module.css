@@ -41,6 +41,14 @@
   .tile[data-size='120'] { padding: var(--space-12); }
   .tile[data-size='120'] .main { flex-direction: column; align-items: stretch; padding: 0; }
 
+  .tile[data-size='60'] { min-height: 96px; border-radius: var(--radius-standard); }
+  .tile[data-size='60'] .main { flex: 1; flex-direction: column; align-items: stretch; gap: var(--space-6); padding: var(--space-6); }
+  .tile[data-size='60'] .name { font-size: var(--type-caption-size); line-height: var(--type-caption-lh); font-weight: var(--weight-medium); }
+  .tile[data-size='60'] .sub { font-size: var(--type-micro-size); color: var(--text-muted); }
+  .tile[data-size='60'][data-add] .main { align-items: center; justify-content: center; }
+  .tile[data-size='60'][data-add] .well { background: transparent; }
+  .tile[data-size='60'][data-add] .text { flex: none; align-items: center; }
+
   .tile[data-selected] { border: 1.5px solid var(--accent); }
   .tile[data-disabled] .well { opacity: 0.4; }
   .tile[data-disabled] .name,
@@ -59,7 +67,7 @@
   }
 
   .tile[data-size='40'] .well { width: 40px; height: 40px; }
-  .tile[data-size='60'] .well { width: 60px; height: 60px; }
+  .tile[data-size='60'] .well { width: 100%; height: 60px; }
   .tile[data-size='120'] .well { width: 100%; height: 120px; }
 
   .well img { width: 100%; height: 100%; object-fit: contain; }
