@@ -1,4 +1,6 @@
 @layer ds.components {
+  .button[hidden] { display: none; }
+
   .button {
     display: inline-flex;
     align-items: center;
