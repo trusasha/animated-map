@@ -176,7 +176,6 @@ const buildConfig = (root) => tseslint.config(
       'src/legacy/**',
       'src/animator.ts',
       'src/exporter.ts',
-      'src/ukiyoe.ts',
       'src/main.tsx',
       'server/db.ts',
     ],
@@ -192,7 +191,6 @@ const buildConfig = (root) => tseslint.config(
     // Temporary legacy quality debt (files as of 2026-10-08; new top-level files get full errors): demoted to warnings until each file is rewritten under the new layers
     files: [
       'src/App.tsx',
-      'src/animator.ts',
       'src/api.ts',
       'src/exporter.ts',
       'src/figures-gallery.ts',
@@ -205,7 +203,6 @@ const buildConfig = (root) => tseslint.config(
       'src/timeline.check.ts',
       'src/timeline.ts',
       'src/types.ts',
-      'src/ukiyoe.ts',
       'server/ai.ts',
       'server/db.ts',
       'server/index.ts',
