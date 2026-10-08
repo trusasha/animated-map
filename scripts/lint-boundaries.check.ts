@@ -48,6 +48,7 @@ try {
   for (const { fixture, virtualPath, rule } of cases) {
     const code = readFileSync(`${FIXTURES}/${fixture}`, 'utf8');
     const [result] = await eslint.lintText(code, { filePath: path.join(root, virtualPath) });
+    assert.equal(result.fatalErrorCount, 0, `${fixture} as ${virtualPath}: fatal parse error: ${result.messages.map((m) => m.message).join('; ')}`);
     const ids = result.messages.filter((m) => m.ruleId?.includes('no-restricted-')).map((m) => m.ruleId);
     if (rule) assert.ok(ids.includes(rule), `${fixture} as ${virtualPath}: expected ${rule}, got [${ids.join(', ')}]`);
     else assert.deepEqual(ids, [], `${fixture} as ${virtualPath}: expected clean, got [${ids.join(', ')}]`);
