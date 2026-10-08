@@ -1,0 +1,1 @@
+{ "version": 8, "name": "e2e-stub", "sources": {}, "layers": [{ "id": "bg", "type": "background", "paint": { "background-color": "#3c6e46" } }] }

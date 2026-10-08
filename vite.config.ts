@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   css: { modules: { localsConvention: 'camelCaseOnly' } },
   // maplibre v6 loads its worker relative to import.meta.url; pre-bundling breaks that path
+  server: { hmr: { port: Number(process.env.HMR_PORT ?? 24678) } },
   optimizeDeps: { exclude: ['maplibre-gl'] },
 });

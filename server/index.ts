@@ -11,12 +11,13 @@ process.env.FAL_KEY ||= process.env.FAL_AI_API_KEY;
 const { db } = await import('./db.ts');
 const ai = await import('./ai.ts');
 
-const UPLOADS = 'data/uploads';
+const DATA = process.env.DATA_DIR ?? 'data';
+const UPLOADS = `${DATA}/uploads`;
 mkdirSync(UPLOADS, { recursive: true });
-mkdirSync('data/logs', { recursive: true });
+mkdirSync(`${DATA}/logs`, { recursive: true });
 /** one JSON line per user action / server event, for debugging what happened */
 const logAction = (type: string, data: object = {}) =>
-  appendFileSync('data/logs/actions.jsonl', JSON.stringify({ t: new Date().toISOString(), type, ...data }) + '\n');
+  appendFileSync(`${DATA}/logs/actions.jsonl`, JSON.stringify({ t: new Date().toISOString(), type, ...data }) + '\n');
 
 const app = express();
 app.use(express.json({ limit: '5mb' }));

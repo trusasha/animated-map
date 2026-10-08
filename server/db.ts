@@ -12,8 +12,9 @@ async function connect(): Promise<Query> {
     return (sql, params) => pool.query(sql, params as any[]);
   }
   const { PGlite } = await import('@electric-sql/pglite');
-  mkdirSync('data', { recursive: true });
-  const db = new PGlite('data/pg');
+  const dir = process.env.DATA_DIR ?? 'data';
+  mkdirSync(dir, { recursive: true });
+  const db = new PGlite(`${dir}/pg`);
   return (sql, params) => db.query(sql, params);
 }
 
