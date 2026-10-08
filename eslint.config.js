@@ -56,6 +56,8 @@ const restrict = ({ packages = BASE_PACKAGES, groups = [], globals: extraGlobals
   'no-restricted-globals': restrictedGlobals([...(webcodecs ? WEBCODECS : []), ...extraGlobals]),
 });
 
+const SERVICE_GROUPS = [layer('features'), layer('app'), layer('ds')];
+
 const without = (...names) => BASE_PACKAGES.filter((p) => !names.includes(p));
 
 const dirs = (dir) => {
@@ -110,15 +112,15 @@ const buildConfig = (root) => tseslint.config(
   { files: ['src/**/*.{ts,tsx}'], rules: restrict() },
   {
     files: ['src/services/map/**'],
-    rules: restrict({ packages: without('maplibre-gl', 'maplibre-gl/*'), groups: [layer('services/scene3d')] }),
+    rules: restrict({ packages: [...without('maplibre-gl', 'maplibre-gl/*'), ...REACT], groups: [layer('services/scene3d'), ...SERVICE_GROUPS] }),
   },
   {
     files: ['src/services/scene3d/**'],
-    rules: restrict({ packages: without('three', 'three/*'), groups: [layer('services/map')] }),
+    rules: restrict({ packages: [...without('three', 'three/*'), ...REACT], groups: [layer('services/map'), ...SERVICE_GROUPS] }),
   },
   {
     files: ['src/services/video/**'],
-    rules: restrict({ packages: without('mp4-muxer'), webcodecs: false }),
+    rules: restrict({ packages: [...without('mp4-muxer'), ...REACT], groups: SERVICE_GROUPS, webcodecs: false }),
   },
   {
     files: ['src/ds/**'],
@@ -137,8 +139,8 @@ const buildConfig = (root) => tseslint.config(
   },
   {
     files: ['src/services/**'],
-    ignores: ['src/services/map/**', 'src/services/scene3d/**', 'src/services/video/**', 'src/services/routing/**'],
-    rules: restrict({ packages: [...BASE_PACKAGES, ...REACT], groups: [layer('features'), layer('app'), layer('ds')] }),
+    ignores: ['src/services/map/**', 'src/services/scene3d/**', 'src/services/video/**'],
+    rules: restrict({ packages: [...BASE_PACKAGES, ...REACT], groups: SERVICE_GROUPS }),
   },
   {
     files: ['src/features/**'],

@@ -26,6 +26,7 @@ const cases: { fixture: string; virtualPath: string; rule: string | null }[] = [
   { fixture: 'features-imports-maplibre.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: 'no-restricted-imports' },
   { fixture: 'ds-imports-domain.tsx', virtualPath: 'src/ds/fixture.tsx', rule: PATHS },
   { fixture: 'server-imports-pglite-outside-db.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-imports' },
+  { fixture: 'map-imports-react.ts', virtualPath: 'src/services/map/fixture.ts', rule: 'no-restricted-imports' },
   { fixture: 'map-imports-scene3d.ts', virtualPath: 'src/services/map/fixture.ts', rule: PATHS },
   { fixture: 'video-global-outside-video.ts', virtualPath: 'src/features/export/fixture.ts', rule: 'no-restricted-globals' },
   { fixture: 'features-deep-ds-import.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: PATHS },
