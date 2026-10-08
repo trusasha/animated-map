@@ -1,7 +1,7 @@
 import { useId, type CSSProperties, type ReactNode, type Ref } from 'react';
 import { Select as BaseSelect } from '@base-ui/react/select';
-import { Check, ChevronDown } from 'lucide-react';
 import { cx } from '../../lib/cx';
+import { Icon } from '../Icon';
 import styles from './Select.module.css';
 
 export interface SelectOption {
@@ -59,7 +59,7 @@ export function Select({ options, value, onChange, label, hint, placeholder, nat
               </option>
             ))}
           </select>
-          <ChevronDown size={16} aria-hidden="true" className={styles.icon} />
+          <Icon name="chevron-down" size={16} className={styles.icon} />
         </div>
       ) : (
         <BaseSelect.Root items={options} value={value} disabled={disabled} onValueChange={(v) => v !== null && onChange(v)}>
@@ -72,7 +72,7 @@ export function Select({ options, value, onChange, label, hint, placeholder, nat
           >
             <BaseSelect.Value className={styles.value} placeholder={placeholder} />
             <BaseSelect.Icon className={styles.icon}>
-              <ChevronDown size={16} aria-hidden="true" />
+              <Icon name="chevron-down" size={16} />
             </BaseSelect.Icon>
           </BaseSelect.Trigger>
           <BaseSelect.Portal>
@@ -83,7 +83,7 @@ export function Select({ options, value, onChange, label, hint, placeholder, nat
                     <BaseSelect.Item key={o.value} value={o.value} disabled={o.disabled} className={styles.item}>
                       <BaseSelect.ItemText>{o.label}</BaseSelect.ItemText>
                       <BaseSelect.ItemIndicator className={styles.check}>
-                        <Check size={14} aria-hidden="true" />
+                        <Icon name="check" size={16} />
                       </BaseSelect.ItemIndicator>
                     </BaseSelect.Item>
                   ))}

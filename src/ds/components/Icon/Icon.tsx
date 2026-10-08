@@ -1,7 +1,8 @@
 import type { CSSProperties, Ref } from 'react';
 import {
-  ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Car, Check, Download, Ellipsis, GripVertical, Loader, MapPin, Mic,
-  Pause, Pencil, Plane, Play, Plus, RotateCw, Settings, Share, Ship, Square, Trash2, TriangleAlert, X,
+  ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Car, Check, ChevronDown, ChevronRight, Download, Ellipsis, Globe, GripVertical,
+  House, Image, Loader, Lock, MapPin, Mic, Monitor, Moon, Pause, Pencil, Plane, Play, Plus, RotateCw, Search, Settings, Share,
+  Ship, Square, Sun, Trash2, TriangleAlert, Upload, X,
   type LucideIcon,
 } from 'lucide-react';
 import { cx } from '../../lib/cx';
@@ -33,6 +34,17 @@ const registry = {
   check: Check,
   pencil: Pencil,
   'rotate-cw': RotateCw,
+  'chevron-right': ChevronRight,
+  'chevron-down': ChevronDown,
+  upload: Upload,
+  image: Image,
+  lock: Lock,
+  search: Search,
+  home: House,
+  globe: Globe,
+  sun: Sun,
+  moon: Moon,
+  monitor: Monitor,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof registry;
