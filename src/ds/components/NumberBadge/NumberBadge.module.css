@@ -1,0 +1,34 @@
+@layer ds.components {
+  .badge {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border-dashed-color);
+    border-radius: var(--radius-circle);
+    background: var(--surface-card);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--type-micro-size);
+    line-height: 1;
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .badge[data-variant='filled'] {
+    border-color: var(--color-warm-dark);
+    background: var(--color-warm-dark);
+    color: var(--color-white);
+  }
+
+  .badge[data-variant='selected'] {
+    border: 2px solid var(--accent);
+  }
+
+  .badge[data-variant='approximate'] {
+    border: 2px dashed var(--status-warning);
+  }
+}

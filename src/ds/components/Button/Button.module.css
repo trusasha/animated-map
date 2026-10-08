@@ -1,0 +1,66 @@
+@layer ds.components {
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: var(--radius-micro);
+    font-family: var(--font-sans);
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-lh);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    padding: var(--space-8) var(--space-16);
+    transition:
+      transform var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+
+  .button[data-size='sm'] { padding: var(--space-4) var(--space-12); font-size: var(--type-ui-size); }
+  .button[data-size='lg'] { padding: var(--space-12) var(--space-20); font-size: 16px; }
+
+  .button[data-variant='primary'] { background: var(--accent-fill); color: var(--text-on-accent); }
+  .button[data-variant='secondary'] { background: var(--surface-secondary-button); color: var(--text-primary); }
+  .button[data-variant='ghost'] { background: transparent; color: var(--text-primary); }
+  .button[data-variant='dark'] { background: var(--surface-dark); color: var(--text-on-dark); }
+
+  .button:hover { text-decoration: none; }
+  .button[data-variant='primary']:hover { background: var(--accent-active); }
+  .button[data-variant='secondary']:hover { transform: scale(var(--scale-hover)); }
+  .button[data-variant='ghost']:hover { text-decoration: underline; }
+  .button[data-variant='dark']:hover { opacity: 0.85; }
+  .button:active { transform: scale(var(--scale-active)); }
+
+  .button:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .button:disabled,
+  .button[aria-disabled='true'],
+  .button[data-loading] {
+    cursor: not-allowed;
+    transform: none;
+    text-decoration: none;
+  }
+
+  .button:disabled:not([data-loading]) {
+    background: var(--surface-secondary-button);
+    color: var(--text-muted);
+  }
+
+  .button[data-variant='ghost']:disabled:not([data-loading]) { background: transparent; }
+  .button[data-loading] { cursor: progress; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button { transition: none; }
+    .button:hover,
+    .button:active { transform: none; }
+  }
+}
