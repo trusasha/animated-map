@@ -93,8 +93,7 @@ export async function captureDemClamp(page: Page) {
 export async function captureThumbs(page: Page) {
   return page.evaluate(async () => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { FIGURE_IDS } = await load('/src/figures.ts');
-    const { figureThumb } = await load('/src/thumbs.ts');
+    const { FIGURE_IDS, figureThumb } = await load('/src/services/scene3d/index.ts');
     const hex = async (s: string) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
     const out: Record<string, string> = {};
     for (const id of FIGURE_IDS as string[]) out[id] = await hex(await figureThumb(id));
