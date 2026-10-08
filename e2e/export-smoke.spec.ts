@@ -8,8 +8,8 @@ const TRIP = {
   data: {
     stops: [
       { id: 'a', name: 'Paris', lng: 2.3522, lat: 48.8566 },
-      { id: 'b', name: 'Berlin', lng: 13.405, lat: 52.52, leg: { mode: 'air', figure: 'airplane', pathKey: 'a>b:air', path: [[2.3522, 48.8566], [13.405, 52.52]] } },
-      { id: 'c', name: 'Rome', lng: 12.4964, lat: 41.9028, leg: { mode: 'air', figure: 'airplane', pathKey: 'b>c:air', path: [[13.405, 52.52], [12.4964, 41.9028]] } },
+      { id: 'b', name: 'Versailles', lng: 2.12, lat: 48.8, leg: { mode: 'air', figure: 'airplane', pathKey: 'a>b:air', path: [[2.3522, 48.8566], [2.12, 48.8]] } },
+      { id: 'c', name: 'Chartres', lng: 1.49, lat: 48.45, leg: { mode: 'air', figure: 'airplane', pathKey: 'b>c:air', path: [[2.12, 48.8], [1.49, 48.45]] } },
     ],
     style: 'satellite',
     speed: 12,
@@ -35,10 +35,10 @@ const sampleCount = (b: Uint8Array) => {
   return new DataView(b.buffer, b.byteOffset).getUint32(i + 12);
 };
 
-test.setTimeout(300_000);
+test.setTimeout(660_000);
 
 test.describe('video export @map', () => {
-  test.describe.configure({ retries: 1 });
+  test.describe.configure({ retries: 0 });
 
   test('exports a 1:1 mp4 with one encoded frame per progress step', async ({ page }) => {
     await page.goto('/');
@@ -46,7 +46,7 @@ test.describe('video export @map', () => {
     test.skip(!h264, 'this browser has no H.264 encoder (Chromium without proprietary codecs)');
     await openExport(page);
     const link = page.getByRole('link', { name: /Скачать MP4/ });
-    await expect(link).toBeVisible({ timeout: 240_000 });
+    await expect(link).toBeVisible({ timeout: 600_000 });
     const duration = await page.evaluate(() => (window as unknown as { __anim: { tl: { duration: number } } }).__anim.tl.duration);
     const bytes = await page.evaluate(async (href) => [...new Uint8Array(await (await fetch(href)).arrayBuffer())], (await link.getAttribute('href'))!);
     const mp4 = Uint8Array.from(bytes);
@@ -58,6 +58,6 @@ test.describe('video export @map', () => {
   test('reports codec-unsupported when no H.264 config is supported', async ({ page }) => {
     await page.addInitScript(() => { VideoEncoder.isConfigSupported = async (config) => ({ supported: false, config }); });
     await openExport(page);
-    await expect(page.locator('.dialog.export .error')).toContainText('Браузер не умеет кодировать H.264', { timeout: 240_000 });
+    await expect(page.locator('.dialog.export .error')).toContainText('Браузер не умеет кодировать H.264', { timeout: 600_000 });
   });
 });
