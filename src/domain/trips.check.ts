@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { removeStop, moveStop, moveStopTo, homePoints, isDefaultTripName, rangeWasReset, relativeTimeBucket, span, suggestTripName, tripSummary } from './trips';
+import { normalizeTrip, removeStop, moveStop, moveStopTo, homePoints, isDefaultTripName, rangeWasReset, relativeTimeBucket, span, suggestTripName, tripSummary } from './trips';
 import { legsOf } from './route';
 import type { Stop, TripData } from './types';
 
@@ -61,5 +61,11 @@ assert.ok(!('sub' in to.stops[1]), 'stale subtitle dropped');
 assert.deepEqual(to.stops.map((s) => s.leg?.pathKey), [undefined, undefined, undefined, 'kd'], 'both touching legs re-route');
 assert.equal(to.stops[3], withSub.stops[3]);
 assert.equal(moveStopTo(trip(), 0, [5, 5]).stops[1].leg!.pathKey, undefined, 'first stop: only its outgoing leg exists');
+
+const bare = normalizeTrip({ id: 't', title: 'x', data: { stops: [st('a'), st('b', 1)] } as unknown as TripData });
+assert.deepEqual([bare.data.style, bare.data.speed, bare.data.format, bare.data.overlay], ['satellite', 1, '9:16', { title: true, label: true, progress: true }], 'missing fields default');
+assert.ok(bare.data.stops[1].leg, 'chain still applied');
+const kept = normalizeTrip({ id: 't', title: 'x', data: trip({ format: '1:1', speed: 2, overlay: { title: false, label: true, progress: true } }) });
+assert.deepEqual([kept.data.style, kept.data.speed, kept.data.format, kept.data.overlay?.title], ['streets', 2, '1:1', false], 'valid fields kept');
 
 console.log('trips ok');
