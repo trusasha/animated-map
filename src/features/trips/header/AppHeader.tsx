@@ -8,7 +8,7 @@ import { HeaderOverflowMenu } from './HeaderOverflowMenu';
 import { SaveStatusLabel } from './SaveStatusLabel';
 import styles from './AppHeader.module.css';
 
-export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, onOpenSettings }: AppHeaderProps) {
+export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, onOpenSettings, onOpenFigures }: AppHeaderProps) {
   const { t } = useT();
   const { mode } = useViewportMode();
   const { trip, setTitle, discard, routing } = useTripContext();
@@ -60,7 +60,7 @@ export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, o
           <Button disabled={!canShow} onClick={onExport}>{t(desktop ? 'trips.header.exportVideo' : 'trips.header.export')}</Button>
         </>
       )}
-      {editing && <HeaderOverflowMenu onNewTrip={desktop ? undefined : newTrip} onDelete={() => setConfirmingDelete(true)} />}
+      {editing && <HeaderOverflowMenu onNewTrip={desktop ? undefined : newTrip} onDelete={() => setConfirmingDelete(true)} onOpenFigures={onOpenFigures} />}
       <IconButton icon="settings" label={t('trips.header.settings')} size={36} onClick={onOpenSettings} />
       <ConfirmDialog
         open={confirmingDelete}
