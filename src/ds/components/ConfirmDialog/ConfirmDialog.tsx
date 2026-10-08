@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, type CSSProperties, type ReactNode, type Ref, type RefObject } from 'react';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { cx } from '../../lib/cx';
 import { wrapFocusFromGuard } from '../../lib/focusGuard';
@@ -15,6 +15,11 @@ export interface ConfirmDialogProps {
   tone?: 'default' | 'danger';
   loading?: boolean;
   onConfirm: () => void;
+  /** Element to focus on open instead of the first tabbable one. */
+  initialFocus?: RefObject<HTMLElement | null>;
+  className?: string;
+  style?: CSSProperties;
+  ref?: Ref<HTMLDivElement>;
 }
 
 export function ConfirmDialog({
@@ -27,13 +32,26 @@ export function ConfirmDialog({
   tone = 'default',
   loading,
   onConfirm,
+  initialFocus,
+  className,
+  style,
+  ref,
 }: ConfirmDialogProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Portal onFocus={(event) => wrapFocusFromGuard(event, popupRef.current)}>
         <AlertDialog.Backdrop className={styles.backdrop} />
-        <AlertDialog.Popup ref={popupRef} className={styles.popup}>
+        <AlertDialog.Popup
+          ref={(node) => {
+            popupRef.current = node;
+            if (typeof ref === 'function') ref(node);
+            else if (ref) ref.current = node;
+          }}
+          className={cx(styles.popup, className)}
+          style={style}
+          initialFocus={initialFocus}
+        >
           <AlertDialog.Title className={styles.title}>{title}</AlertDialog.Title>
           {body && <AlertDialog.Description className={styles.body}>{body}</AlertDialog.Description>}
           <div className={styles.actions}>

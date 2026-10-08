@@ -9,6 +9,7 @@ export default function Demo() {
   return (
     <div data-testid="demo-Menu" style={{ display: 'flex', gap: 'var(--space-12)', alignItems: 'center' }}>
       <Menu
+        style={{ minWidth: 200 }}
         trigger={<IconButton icon="more-horizontal" label="Stop actions" size={28} />}
         items={[
           { key: 'up', label: 'Move up', icon: 'arrow-up', onSelect: () => setLast('Move up') },
