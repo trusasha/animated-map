@@ -54,6 +54,8 @@
   --danger-fill: #e38f54;
   --danger-fill-hover: #eda06a;
   --text-on-danger: #101418;
+  --ui-handle: var(--text-muted);
+  --ui-handle-hover: var(--text-secondary);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -113,5 +115,7 @@
     --danger-fill: #e38f54;
     --danger-fill-hover: #eda06a;
     --text-on-danger: #101418;
+    --ui-handle: var(--text-muted);
+    --ui-handle-hover: var(--text-secondary);
   }
 }

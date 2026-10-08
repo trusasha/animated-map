@@ -54,4 +54,6 @@
   --danger-fill: #b34a00;
   --danger-fill-hover: #993f00;
   --text-on-danger: #ffffff;
+  --ui-handle: var(--text-muted);
+  --ui-handle-hover: var(--text-secondary);
 }

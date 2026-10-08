@@ -1,7 +1,7 @@
 import { useRef, useState, type PointerEvent } from 'react';
 import { clampHeight, releaseSnap, type Snap } from './snap';
 
-const TAP_SLOP = 4;
+export const TAP_SLOP = 4;
 const VELOCITY_WINDOW = 100;
 
 interface Options {
@@ -16,32 +16,27 @@ export function useSheetDrag({ heights, height, onRelease }: Options) {
   const samples = useRef<{ t: number; y: number }[]>([]);
   const suppressClick = useRef(false);
 
-  const onPointerDown = (e: PointerEvent<HTMLElement>) => {
-    if (e.button !== 0) return;
+  const begin = (y: number, t: number) => {
     suppressClick.current = false;
-    start.current = { y: e.clientY, height, moved: false };
-    samples.current = [{ t: e.timeStamp, y: e.clientY }];
-    e.currentTarget.setPointerCapture(e.pointerId);
+    start.current = { y, height, moved: false };
+    samples.current = [{ t, y }];
   };
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
-    const dy = start.current.y - e.clientY;
+  const move = (y: number, t: number) => {
+    const dy = start.current.y - y;
     if (!start.current.moved && Math.abs(dy) < TAP_SLOP) return;
     start.current.moved = true;
-    samples.current = [...samples.current.filter((s) => e.timeStamp - s.t < VELOCITY_WINDOW), { t: e.timeStamp, y: e.clientY }];
+    samples.current = [...samples.current.filter((s) => t - s.t < VELOCITY_WINDOW), { t, y }];
     setDragHeight(clampHeight(start.current.height + dy, heights));
   };
 
-  const finish = (e: PointerEvent<HTMLElement>, cancelled: boolean) => {
-    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
-    e.currentTarget.releasePointerCapture(e.pointerId);
+  const end = (y: number, t: number, cancelled: boolean) => {
     if (!start.current.moved) return;
     suppressClick.current = true;
-    const first = samples.current[0];
-    const dt = e.timeStamp - first.t;
-    const velocity = dt > 0 ? (first.y - e.clientY) / dt : 0;
-    const final = clampHeight(start.current.height + (start.current.y - e.clientY), heights);
+    const first = samples.current[0]!;
+    const dt = t - first.t;
+    const velocity = dt > 0 ? (first.y - y) / dt : 0;
+    const final = clampHeight(start.current.height + (start.current.y - y), heights);
     setDragHeight(null);
     onRelease(cancelled ? releaseSnap(final, 0, heights) : releaseSnap(final, velocity, heights));
   };
@@ -52,12 +47,25 @@ export function useSheetDrag({ heights, height, onRelease }: Options) {
     return suppressed;
   };
 
+  const finish = (e: PointerEvent<HTMLElement>, cancelled: boolean) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    end(e.clientY, e.timeStamp, cancelled);
+  };
+
   return {
     dragHeight,
     consumeClick,
+    drag: { begin, move, end },
     handlers: {
-      onPointerDown,
-      onPointerMove,
+      onPointerDown: (e: PointerEvent<HTMLElement>) => {
+        if (e.button !== 0) return;
+        begin(e.clientY, e.timeStamp);
+        e.currentTarget.setPointerCapture(e.pointerId);
+      },
+      onPointerMove: (e: PointerEvent<HTMLElement>) => {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) move(e.clientY, e.timeStamp);
+      },
       onPointerUp: (e: PointerEvent<HTMLElement>) => finish(e, false),
       onPointerCancel: (e: PointerEvent<HTMLElement>) => finish(e, true),
     },
