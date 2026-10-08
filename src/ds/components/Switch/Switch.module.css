@@ -6,6 +6,9 @@
     cursor: pointer;
   }
 
+  .row[data-placement='start'] { gap: var(--space-10); }
+  .row[data-placement='start'] .track { order: -1; }
+
   .row[data-locked],
   .row[data-disabled] {
     cursor: default;

@@ -22,6 +22,9 @@ export default function Demo() {
       <Button variant="secondary" onClick={() => setOpen('locked')}>
         Not dismissible
       </Button>
+      <Button variant="secondary" onClick={() => setOpen('noclose')}>
+        No close button
+      </Button>
       <Button variant="secondary" onClick={() => setOpen('slots')}>
         Header slots
       </Button>
@@ -47,6 +50,18 @@ export default function Demo() {
         footer={<Button onClick={() => setOpen(null)}>Done</Button>}
       >
         <p>Only the close button and Done dismiss this dialog.</p>
+      </Dialog>
+      <Dialog
+        open={open === 'noclose'}
+        onOpenChange={close}
+        closeLabel="Close"
+        dismissible="escape"
+        closeButton={false}
+        title="Export video"
+        actions={<span>1. Prepare · 2. Captions</span>}
+        footer={<Button variant="ghost" onClick={() => setOpen(null)}>Cancel</Button>}
+      >
+        <p>No ✕ and no scrim close: Esc or Cancel only.</p>
       </Dialog>
       <Dialog
         open={open === 'slots'}

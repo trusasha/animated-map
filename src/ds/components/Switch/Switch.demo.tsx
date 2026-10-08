@@ -12,6 +12,8 @@ export default function Demo() {
       <Switch label="Segment label" sub="from → to" checked={segment} onChange={setSegment} />
       <Switch label="Map attribution" sub="Always on, required by the map license" checked locked />
       <Switch label="Disabled off" checked={false} disabled />
+      <Switch placement="start" label="Progress bar" checked={name} onChange={setName} />
+      <Switch placement="start" label="Map attribution" sub="Always on" checked locked />
     </div>
   );
 }

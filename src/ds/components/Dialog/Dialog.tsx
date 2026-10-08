@@ -14,8 +14,10 @@ export interface DialogProps {
   title: ReactNode;
   subtitle?: ReactNode;
   width?: DialogWidth;
-  /** When false, Esc and scrim clicks are ignored; the close button still calls onOpenChange(false). */
-  dismissible?: boolean;
+  /** false: Esc and scrim clicks are ignored; 'escape': only Esc closes. The close button still calls onOpenChange(false). */
+  dismissible?: boolean | 'escape';
+  /** false hides the ✕; the content must offer its own way out (Cancel / Done). */
+  closeButton?: boolean;
   /** Takes the whole screen (100dvh, no radius) below the phone breakpoint. */
   fullScreenBelow?: 'phone';
   closeLabel: string;
@@ -41,6 +43,7 @@ export function Dialog({
   subtitle,
   width = 640,
   dismissible = true,
+  closeButton = true,
   fullScreenBelow,
   closeLabel,
   leading,
@@ -59,7 +62,7 @@ export function Dialog({
   return (
     <BaseDialog.Root
       open={open}
-      disablePointerDismissal={!dismissible}
+      disablePointerDismissal={dismissible !== true}
       onOpenChange={(next, details) => {
         if (!dismissible && details.reason === 'escape-key') {
           details.cancel();
@@ -89,7 +92,7 @@ export function Dialog({
                 {subtitle && <BaseDialog.Description className={styles.subtitle}>{subtitle}</BaseDialog.Description>}
               </div>
               {actions}
-              <BaseDialog.Close render={<IconButton icon="x" label={closeLabel} size={28} />} />
+              {closeButton && <BaseDialog.Close render={<IconButton icon="x" label={closeLabel} size={28} />} />}
             </div>
             {headerExtra && <div className={styles.headerExtra}>{headerExtra}</div>}
           </header>

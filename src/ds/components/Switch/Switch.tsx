@@ -9,17 +9,19 @@ export interface SwitchProps {
   label: ReactNode;
   sub?: ReactNode;
   locked?: boolean;
+  /** Where the track sits: after the label (settings rows) or before it (checklists like export captions). */
+  placement?: 'end' | 'start';
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
   ref?: Ref<HTMLButtonElement>;
 }
 
-export function Switch({ checked, onChange, label, sub, locked = false, disabled = false, className, style, ref }: SwitchProps) {
+export function Switch({ checked, onChange, label, sub, locked = false, placement = 'end', disabled = false, className, style, ref }: SwitchProps) {
   const id = useId();
   const inert = locked || disabled;
   return (
-    <label className={cx(styles.row, className)} style={style} data-locked={locked ? '' : undefined} data-disabled={disabled ? '' : undefined}>
+    <label className={cx(styles.row, className)} style={style} data-placement={placement} data-locked={locked ? '' : undefined} data-disabled={disabled ? '' : undefined}>
       <span className={styles.text}>
         <span id={id} className={styles.label}>
           {label}
