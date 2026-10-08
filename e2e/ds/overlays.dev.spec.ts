@@ -163,7 +163,7 @@ test.describe('BottomSheet drag', () => {
     const readout = section.getByTestId('sheet-height');
     await expect(readout).toContainText('snap collapsed');
     await section.scrollIntoViewIfNeeded();
-    const box = (await section.getByRole('button', { name: 'Resize panel' }).boundingBox())!;
+    const box = (await section.getByRole('button', { name: /(Expand|Collapse) panel/ }).boundingBox())!;
     const x = box.x + box.width / 2;
     const y = box.y + box.height / 2;
     await flickUp(page, x, y, 60);
@@ -174,7 +174,7 @@ test.describe('BottomSheet drag', () => {
     const section = demoSection(page, 'BottomSheet');
     const readout = section.getByTestId('sheet-height');
     await section.scrollIntoViewIfNeeded();
-    const box = (await section.getByRole('button', { name: 'Resize panel' }).boundingBox())!;
+    const box = (await section.getByRole('button', { name: /(Expand|Collapse) panel/ }).boundingBox())!;
     const x = box.x + box.width / 2;
     const y = box.y + box.height / 2;
     await page.mouse.move(x, y);
