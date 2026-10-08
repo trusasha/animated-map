@@ -13,6 +13,7 @@ export const trips: Shape<Dict['trips']> = {
     exportVideo: 'Экспорт видео',
     export: 'Экспорт',
     settings: 'Настройки',
+    figures: 'Мои фигурки',
   },
   rename: { title: 'Переименовать путешествие', label: 'Название', placeholder: 'Название путешествия' },
   delete: {
