@@ -4,6 +4,7 @@ export const trips = {
     tripName: 'Trip name',
     saving: 'Saving…',
     saved: 'Saved',
+    saveFailed: 'Not saved',
     newTrip: 'New trip',
     preview: 'Preview',
     exportVideo: 'Export video',
