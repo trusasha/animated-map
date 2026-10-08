@@ -166,7 +166,6 @@ const buildConfig = (root) => tseslint.config(
       'src/figures-gallery.ts',
       'src/ukiyoe.ts',
       'src/main.tsx',
-      'server/db.ts',
     ],
     rules: {
       'no-restricted-imports': 'off',
