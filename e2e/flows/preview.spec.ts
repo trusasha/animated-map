@@ -45,8 +45,6 @@ test.setTimeout(180_000);
 
 test.describe('preview @map', () => {
   test.beforeEach(async ({ page }) => {
-    // the phone footer's Preview entry belongs to P3-11; until then only the desktop header starts it
-    test.skip((page.viewportSize()?.width ?? 0) < 700, 'no Preview entry on phone yet');
     await stubNet(page);
     await defaultSettings(page);
   });
