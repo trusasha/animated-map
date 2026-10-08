@@ -17,13 +17,15 @@ export interface ListRowProps extends Omit<ComponentProps<'div'>, 'ref' | 'title
   selected?: boolean;
   /** Outside the video range: dimmed to .45. */
   outOfRange?: boolean;
+  /** Secondary one-line row (route segments): 13px regular title, tight padding, semibold only when selected. */
+  compact?: boolean;
   /** Renders the main area as a button. */
   onSelect?: () => void;
   ref?: Ref<HTMLDivElement>;
 }
 
 export function ListRow({
-  leading, title, meta, trailing, actions, actionsVisible, actionsMenu, selected, outOfRange, onSelect, className, ref, ...rest
+  leading, title, meta, trailing, actions, actionsVisible, actionsMenu, selected, outOfRange, compact, onSelect, className, ref, ...rest
 }: ListRowProps) {
   const body = (
     <>
@@ -42,6 +44,7 @@ export function ListRow({
       className={cx(styles.row, className)}
       data-selected={selected || undefined}
       data-out-of-range={outOfRange || undefined}
+      data-compact={compact || undefined}
       data-actions-visible={actionsVisible || undefined}
       data-has-menu={actionsMenu != null || undefined}
     >

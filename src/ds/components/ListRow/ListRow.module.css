@@ -65,6 +65,16 @@
     color: var(--text-secondary);
   }
 
+  .row[data-compact] .main { padding-block: var(--space-2); }
+  .row[data-compact] .title {
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+    font-weight: var(--weight-regular);
+    color: var(--text-secondary);
+  }
+  .row[data-compact][data-selected] .title { font-weight: var(--weight-semibold); color: var(--accent-active); }
+  .row[data-compact] .trailing { color: var(--text-muted); }
+
   .actions {
     flex: none;
     display: inline-flex;
@@ -84,11 +94,13 @@
   .menu { display: none; flex: none; padding-right: var(--space-4); }
 
   @media (pointer: coarse) {
+    .row[data-compact] .main { padding-block: var(--hit-row-pad); }
     .actions { opacity: 1; pointer-events: auto; }
     .row[data-has-menu] .menu { display: inline-flex; }
     .row[data-has-menu]:not([data-actions-visible]) .actions { display: none; }
   }
 
+  :global(html[data-coarse]) .row[data-compact] .main { padding-block: var(--hit-row-pad); }
   :global(html[data-coarse]) .actions { opacity: 1; pointer-events: auto; }
   :global(html[data-coarse]) .row[data-has-menu] .menu { display: inline-flex; }
   :global(html[data-coarse]) .row[data-has-menu]:not([data-actions-visible]) .actions { display: none; }

@@ -22,9 +22,10 @@ export function SegmentRow({ mode, figure, color, building, straight, pace, sele
   return (
     <ListRow
       data-testid="segment-row"
-      leading={<span className={styles.sample} data-mode={mode} style={{ borderColor: color }} />}
+      leading={<span className={styles.sampleBox}><span className={styles.sample} data-mode={mode} style={{ borderColor: color }} /></span>}
       title={t('route.segment.label', { mode: t(`common.mode.${mode}`), figure })}
-      meta={meta}
+      trailing={meta}
+      compact
       selected={selected}
       outOfRange={outOfRange}
       onSelect={onSelect}
