@@ -85,6 +85,30 @@ export interface MapService {
   addDraggableMarker(p: LngLat, onDragEnd: (p: LngLat) => void): () => void;
   project(p: LngLat): [number, number];
   destroy(): void;
+
+  /** home: clears the trip and the editor route, shows saved trips; editor: shows the route being edited */
+  setMode(m: MapMode): void;
+  setEditorRoute(view: EditorRouteView): void;
+  onSegmentClick(cb: (i: number) => void): () => void;
+  /** a click in editing mode that hit no segment */
+  onEmptyClick(cb: () => void): () => void;
+  onStopDrag(cb: (i: number, p: LngLat) => void): () => void;
+  /** crosshair until the next map click, which goes to onPick instead of the click handlers; returns cancel */
+  startPick(onPick: (p: LngLat) => void): () => void;
+  setHomeTrips(trips: HomeTrip[]): void;
+  highlightTrip(id: string | null): void;
+  /** the Home globe turns slowly while nothing else moves it */
+  setSpin(on: boolean): void;
+
+  /** UI padding for editing; playback always runs with zero padding */
+  setPadding(p: Padding): void;
+  resetPadding(): void;
+  getPadding(): Padding;
+  /** resolve when the camera stops; no-ops during playback */
+  fitTo(points: LngLat[], o: FitOptions): Promise<void>;
+  flyTo(v: CameraView, o: { duration: number; curve?: number }): Promise<void>;
+  jumpTo(v: CameraView): void;
+  probe(): Promise<MapProbe>;
 }
 
 export interface OffscreenMap {
