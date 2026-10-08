@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { demoSection, openGallery } from './helpers';
+import { demoSection, flickUp, openGallery } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await openGallery(page);
@@ -132,5 +132,58 @@ test.describe('BottomSheet', () => {
     const section = demoSection(page, 'BottomSheet');
     await section.getByRole('button', { name: 'peek' }).click();
     await expect(section.getByRole('button', { name: 'Resize panel' })).toHaveAttribute('aria-expanded', 'false');
+  });
+});
+
+test.describe('ConfirmDialog', () => {
+  type P = import('@playwright/test').Page;
+  const openDialog = async (page: P, name: string) => {
+    await demoSection(page, 'ConfirmDialog').getByRole('button', { name, exact: true }).click();
+    const dialog = page.getByRole('alertdialog').or(page.getByRole('dialog'));
+    await expect(dialog).toBeVisible();
+    return dialog;
+  };
+
+  test('Cancel closes without confirming', async ({ page }) => {
+    const dialog = await openDialog(page, 'Confirm');
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(dialog).toBeHidden();
+  });
+
+  test('the confirm button closes the dialog', async ({ page }) => {
+    const dialog = await openDialog(page, 'Confirm');
+    await dialog.getByRole('button', { name: 'Start over' }).click();
+    await expect(dialog).toBeHidden();
+  });
+});
+
+test.describe('BottomSheet drag', () => {
+  test('a fast upward flick settles on full even after a short drag', async ({ page }) => {
+    const section = demoSection(page, 'BottomSheet');
+    const readout = section.getByTestId('sheet-height');
+    await expect(readout).toContainText('snap collapsed');
+    await section.scrollIntoViewIfNeeded();
+    const box = (await section.getByRole('button', { name: 'Resize panel' }).boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await flickUp(page, x, y, 60);
+    await expect(readout).toContainText('snap full');
+  });
+
+  test('a slow short drag stays on the nearest snap', async ({ page }) => {
+    const section = demoSection(page, 'BottomSheet');
+    const readout = section.getByTestId('sheet-height');
+    await section.scrollIntoViewIfNeeded();
+    const box = (await section.getByRole('button', { name: 'Resize panel' }).boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    for (let i = 1; i <= 4; i++) {
+      await page.mouse.move(x, y - i * 10);
+      await page.waitForTimeout(80);
+    }
+    await page.mouse.up();
+    await expect(readout).toContainText('snap collapsed');
   });
 });
