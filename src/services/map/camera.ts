@@ -29,9 +29,14 @@ export function createCamera(map: maplibregl.Map) {
   };
 
   return {
-    setPadding(p: Padding, zoom?: number) {
+    setPadding(p: Padding) {
       padding = { ...p };
-      if (!suspended && !map.isMoving()) map.easeTo({ padding, zoom, duration: PADDING_MS });
+      if (!suspended && !map.isMoving()) map.easeTo({ padding, duration: PADDING_MS });
+    },
+    /** like setPadding, but also zooms and supersedes a move in flight, so the last call always lands */
+    setPaddingAndZoom(p: Padding, zoom: number) {
+      padding = { ...p };
+      if (!suspended) map.easeTo({ padding, zoom, duration: PADDING_MS });
     },
     resetPadding() { this.setPadding(ZERO); },
     getPadding(): Padding {

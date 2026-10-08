@@ -154,7 +154,7 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
       if (!spin) { stopSpin?.(); stopSpin = undefined; }
     },
 
-    setHomePadding: (p) => camera.setPadding(p, homeZoom(map, p)),
+    setHomePadding: (p) => camera.setPaddingAndZoom(p, homeZoom(map, p)),
     setPadding: (p) => camera.setPadding(p),
     resetPadding: () => camera.resetPadding(),
     getPadding: () => camera.getPadding(),
