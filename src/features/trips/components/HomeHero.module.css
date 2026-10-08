@@ -1,0 +1,35 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--type-hero-size);
+  line-height: var(--type-hero-lh);
+  letter-spacing: var(--type-hero-ls);
+  font-weight: var(--weight-bold);
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--type-lead-size);
+  line-height: var(--type-lead-lh);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+[data-mode='phone'] .title {
+  font-size: var(--type-title-size);
+  line-height: var(--type-title-lh);
+  letter-spacing: var(--type-title-ls);
+}
+
+[data-mode='phone'] .lead {
+  font-size: var(--type-nav-size);
+  line-height: var(--type-nav-lh);
+}
