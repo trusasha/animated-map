@@ -3,18 +3,15 @@ import { Button, ConfirmDialog, IconButton, InlineTitleInput, useViewportMode } 
 import { useT } from '../../../i18n/react';
 import { useTripActions } from '../hooks/useTripActions';
 import { useTripContext } from '../hooks/useTripContext';
-import type { AppHeaderProps, SaveStatus } from '../types';
+import type { AppHeaderProps } from '../types';
 import { HeaderOverflowMenu } from './HeaderOverflowMenu';
+import { SaveStatusLabel } from './SaveStatusLabel';
 import styles from './AppHeader.module.css';
-
-const STATUS_KEY = { saving: 'trips.header.saving', saved: 'trips.header.saved', error: 'trips.header.saveFailed' } as const;
-
-const statusText = (status: SaveStatus) => (status === 'idle' ? '' : STATUS_KEY[status]);
 
 export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, onOpenSettings }: AppHeaderProps) {
   const { t } = useT();
   const { mode } = useViewportMode();
-  const { trip, setTitle, discard, saveStatus, routing } = useTripContext();
+  const { trip, setTitle, discard, routing } = useTripContext();
   const actions = useTripActions();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
@@ -22,7 +19,6 @@ export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, o
   const phone = mode === 'phone';
   const desktop = mode === 'desktop';
   const canShow = !!trip && trip.data.stops.length >= 2 && !routing;
-  const status = statusText(saveStatus);
 
   const newTrip = async () => {
     const id = await actions.create(trip ? { style: trip.data.style, format: trip.data.format } : undefined);
@@ -53,7 +49,7 @@ export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, o
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => { if (trip && !trip.title.trim()) setTitle(t('trips.defaultName')); }}
           />
-          {!phone && <span className={styles.status} role="status">{status && t(status)}</span>}
+          {!phone && <SaveStatusLabel />}
         </>
       )}
       <div className={styles.spacer} />

@@ -1,0 +1,7 @@
+.status {
+  flex: none;
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-lh);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
