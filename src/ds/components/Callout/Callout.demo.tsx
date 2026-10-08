@@ -9,6 +9,10 @@ export default function Demo() {
       <Callout tone="warning" title="Keep this tab open and visible.">
         Rendering stops if you switch tabs or minimize the window.
       </Callout>
+      <Callout tone="error" live title="Couldn’t read the photo.">
+        Try a sharper image.
+      </Callout>
+      <Callout tone="success">Figure ready. You can place it on the route.</Callout>
       <Callout tone="info">This turns on with an OpenAI key. Search works without it.</Callout>
     </div>
   );

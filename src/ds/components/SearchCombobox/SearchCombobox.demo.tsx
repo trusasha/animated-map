@@ -45,6 +45,9 @@ export default function Demo() {
           onValueChange={onQuery}
           items={query.trim() ? items : []}
           loading={loading}
+          loadingLabel="Searching…"
+          hint={items.length === 0 && query.trim() ? 'Press Enter to add it as typed.' : undefined}
+          onSubmitText={(text) => setPicked((p) => [...p, `“${text}”`])}
           emptyLabel={`No places match “${query.trim()}”.`}
           onSelect={(item) => {
             setPicked((p) => [...p, item.title]);

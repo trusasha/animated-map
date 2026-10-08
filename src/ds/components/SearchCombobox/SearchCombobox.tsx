@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useState, type CSSProperties, type KeyboardEvent, type ReactNode, type Ref } from 'react';
 import { Autocomplete } from '@base-ui/react/autocomplete';
 import { cx } from '../../lib/cx';
 import { Input } from '../Input';
@@ -21,11 +21,19 @@ export interface SearchComboboxProps {
   label: string;
   placeholder?: string;
   loading?: boolean;
-  loadingLabel?: string;
+  loadingLabel: string;
   /** Shown when a non-empty query has no items. */
-  emptyLabel?: ReactNode;
+  emptyLabel: ReactNode;
+  hint?: ReactNode;
+  error?: ReactNode;
+  /** Enter pressed with free text while there are no items to pick. */
+  onSubmitText?: (query: string) => void;
   disabled?: boolean;
+  id?: string;
+  /** Applied to the field wrapper around the input. */
   className?: string;
+  style?: CSSProperties;
+  ref?: Ref<HTMLInputElement>;
 }
 
 export function SearchCombobox({
@@ -36,16 +44,26 @@ export function SearchCombobox({
   label,
   placeholder,
   loading = false,
-  loadingLabel = 'Searching…',
-  emptyLabel = 'No results.',
+  loadingLabel,
+  emptyLabel,
+  hint,
+  error,
+  onSubmitText,
   disabled,
+  id,
   className,
+  style,
+  ref,
 }: SearchComboboxProps) {
   const [open, setOpen] = useState(false);
   const active = open && value.trim() !== '';
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape' && value) onValueChange('');
+    else if (e.key === 'Enter' && value.trim() && items.length === 0 && !loading && onSubmitText) {
+      e.preventDefault();
+      onSubmitText(value.trim());
+    }
   };
 
   return (
@@ -60,7 +78,20 @@ export function SearchCombobox({
       onOpenChange={setOpen}
     >
       <Autocomplete.Input
-        render={<Input size="search" aria-label={label} placeholder={placeholder} disabled={disabled} className={className} />}
+        ref={ref}
+        id={id}
+        render={
+          <Input
+            size="search"
+            aria-label={label}
+            placeholder={placeholder}
+            disabled={disabled}
+            hint={hint}
+            error={error}
+            className={className}
+            style={style}
+          />
+        }
         onKeyDown={onKeyDown}
       />
       <Autocomplete.Portal>

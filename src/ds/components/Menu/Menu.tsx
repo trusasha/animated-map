@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement, Ref } from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { cx } from '../../lib/cx';
 import { Icon, type IconName } from '../Icon';
@@ -23,15 +23,17 @@ export interface MenuProps {
   align?: 'start' | 'center' | 'end';
   side?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
+  style?: CSSProperties;
+  ref?: Ref<HTMLDivElement>;
 }
 
-export function Menu({ trigger, items, align = 'end', side = 'bottom', className }: MenuProps) {
+export function Menu({ trigger, items, align = 'end', side = 'bottom', className, style, ref }: MenuProps) {
   return (
     <BaseMenu.Root>
       <BaseMenu.Trigger render={trigger} />
       <BaseMenu.Portal>
         <BaseMenu.Positioner className={styles.positioner} side={side} align={align} sideOffset={4}>
-          <BaseMenu.Popup className={cx(styles.popup, className)}>
+          <BaseMenu.Popup ref={ref} style={style} className={cx(styles.popup, className)}>
             {items.map((entry) =>
               entry.type === 'separator' ? (
                 <BaseMenu.Separator key={entry.key} className={styles.separator} />

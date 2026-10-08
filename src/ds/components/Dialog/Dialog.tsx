@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, type CSSProperties, type ReactNode, type Ref, type RefObject } from 'react';
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { cx } from '../../lib/cx';
 import { wrapFocusFromGuard } from '../../lib/focusGuard';
@@ -18,9 +18,19 @@ export interface DialogProps {
   dismissible?: boolean;
   /** Takes the whole screen (100dvh, no radius) below the phone breakpoint. */
   fullScreenBelow?: 'phone';
-  closeLabel?: string;
+  closeLabel: string;
+  /** Rendered before the title, e.g. a "Back" button. */
+  leading?: ReactNode;
+  /** Header controls placed next to the close button. */
+  actions?: ReactNode;
+  /** Full-width row under the title, e.g. step pills. */
+  headerExtra?: ReactNode;
+  /** Element to focus on open instead of the first tabbable one. */
+  initialFocus?: RefObject<HTMLElement | null>;
   footer?: ReactNode;
   className?: string;
+  style?: CSSProperties;
+  ref?: Ref<HTMLDivElement>;
   children?: ReactNode;
 }
 
@@ -32,9 +42,15 @@ export function Dialog({
   width = 640,
   dismissible = true,
   fullScreenBelow,
-  closeLabel = 'Close',
+  closeLabel,
+  leading,
+  actions,
+  headerExtra,
+  initialFocus,
   footer,
   className,
+  style,
+  ref,
   children,
 }: DialogProps) {
   const { mode } = useViewportMode();
@@ -55,17 +71,27 @@ export function Dialog({
       <BaseDialog.Portal onFocus={(event) => wrapFocusFromGuard(event, popupRef.current)}>
         <BaseDialog.Backdrop className={styles.backdrop} />
         <BaseDialog.Popup
-          ref={popupRef}
+          ref={(node) => {
+            popupRef.current = node;
+            if (typeof ref === 'function') ref(node);
+            else if (ref) ref.current = node;
+          }}
           className={cx(styles.popup, className)}
-          style={{ '--dialog-width': `${width}px` } as React.CSSProperties}
+          style={{ ...style, '--dialog-width': `${width}px` } as CSSProperties}
+          initialFocus={initialFocus}
           data-fullscreen={fullScreen || undefined}
         >
           <header className={styles.header}>
-            <div className={styles.heading}>
-              <BaseDialog.Title className={styles.title}>{title}</BaseDialog.Title>
-              {subtitle && <BaseDialog.Description className={styles.subtitle}>{subtitle}</BaseDialog.Description>}
+            <div className={styles.headerRow}>
+              {leading}
+              <div className={styles.heading}>
+                <BaseDialog.Title className={styles.title}>{title}</BaseDialog.Title>
+                {subtitle && <BaseDialog.Description className={styles.subtitle}>{subtitle}</BaseDialog.Description>}
+              </div>
+              {actions}
+              <BaseDialog.Close render={<IconButton icon="x" label={closeLabel} size={28} />} />
             </div>
-            <BaseDialog.Close render={<IconButton icon="x" label={closeLabel} size={28} />} />
+            {headerExtra && <div className={styles.headerExtra}>{headerExtra}</div>}
           </header>
           <div className={styles.body}>{children}</div>
           {footer && <footer className={styles.footer}>{footer}</footer>}

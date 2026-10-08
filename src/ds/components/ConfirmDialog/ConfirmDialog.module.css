@@ -59,16 +59,6 @@
     margin-top: var(--space-20);
   }
 
-  .actions .danger[data-variant] {
-    background: var(--status-warning);
-    color: var(--text-on-accent);
-  }
-
-  .actions .danger[data-variant]:hover {
-    background: var(--status-warning);
-    opacity: 0.88;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .backdrop,
     .popup {

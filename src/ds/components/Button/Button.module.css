@@ -31,11 +31,13 @@
   .button[data-variant='secondary'] { background: var(--surface-secondary-button); color: var(--text-primary); }
   .button[data-variant='ghost'] { background: transparent; color: var(--text-primary); }
   .button[data-variant='dark'] { background: var(--surface-dark); color: var(--text-on-dark); }
+  .button[data-variant='danger'] { background: var(--danger-fill); color: var(--text-on-danger); }
 
   .button:hover { text-decoration: none; }
   .button[data-variant='primary']:hover { background: var(--accent-active); }
   .button[data-variant='secondary']:hover { transform: scale(var(--scale-hover)); }
   .button[data-variant='ghost']:hover { text-decoration: underline; }
+  .button[data-variant='danger']:hover { background: var(--danger-fill-hover); }
   .button[data-variant='dark']:hover { opacity: 0.85; }
   .button:active { transform: scale(var(--scale-active)); }
 

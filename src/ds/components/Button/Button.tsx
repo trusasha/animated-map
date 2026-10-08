@@ -3,7 +3,7 @@ import { cx } from '../../lib/cx';
 import { Spinner } from '../Spinner';
 import styles from './Button.module.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'dark';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'dark' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends Omit<ComponentProps<'button'>, 'ref' | 'type'> {
@@ -37,7 +37,6 @@ export function Button({
   ref,
   ...rest
 }: ButtonProps) {
-  const blocked = disabled || loading;
   const content = (
     <>
       {loading ? <Spinner size={16} /> : icon}
@@ -80,8 +79,12 @@ export function Button({
       {...common}
       ref={ref as Ref<HTMLButtonElement>}
       type={type}
-      disabled={blocked}
-      onClick={onClick}
+      disabled={disabled}
+      aria-disabled={loading || undefined}
+      onClick={(event) => {
+        if (loading) event.preventDefault();
+        else onClick?.(event);
+      }}
     >
       {content}
     </button>
