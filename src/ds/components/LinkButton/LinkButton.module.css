@@ -1,0 +1,32 @@
+@layer ds.components {
+  .link {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-micro);
+    background: none;
+    color: var(--text-link);
+    font-family: var(--font-sans);
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .link[data-size='sm'] { font-size: var(--type-caption-size); line-height: var(--type-caption-lh); }
+
+  .link:hover { text-decoration: underline; }
+
+  .link:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .link:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+}

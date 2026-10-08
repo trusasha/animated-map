@@ -1,0 +1,26 @@
+@layer ds.components {
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-6);
+    min-height: 32px;
+    margin: 0;
+    padding: 0 var(--space-4);
+    border: 0;
+    border-radius: var(--radius-micro);
+    background: none;
+    color: var(--accent);
+    font-family: var(--font-sans);
+    font-size: var(--type-ui-size);
+    line-height: var(--type-ui-lh);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+  }
+
+  .back:hover { text-decoration: underline; }
+
+  .back:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
