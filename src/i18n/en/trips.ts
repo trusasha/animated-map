@@ -10,6 +10,7 @@ export const trips = {
     exportVideo: 'Export video',
     export: 'Export',
     settings: 'Settings',
+    figures: 'Your figures',
   },
   rename: { title: 'Rename trip', label: 'Name', placeholder: 'Trip name' },
   delete: {
