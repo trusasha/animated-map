@@ -29,7 +29,9 @@ const projects: Project[] = Object.entries(sizes).flatMap(([size, device]) =>
     };
   }),
 );
-projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: process.env.RECORD ? undefined : /@record/, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
+// @pending-p1-05/06 specs target components not merged yet; the lead drops the tag after merging P1-05/P1-06
+const devGrepInvert = new RegExp(['@pending-p1-0[56]', process.env.RECORD ? '' : '@record'].filter(Boolean).join('|'));
+projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: devGrepInvert, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
 
 export default defineConfig({
   testDir: 'e2e',
