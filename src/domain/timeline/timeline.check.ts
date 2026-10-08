@@ -93,3 +93,9 @@ assert.deepEqual(painted.legs.map((l) => l.color), ['#ff0000', '#00ff00', '#0000
 assert.equal(painted.duration, tl.duration);
 for (let t = 0; t <= tl.duration; t += 0.25) assert.deepEqual(sample(painted, t), sample(tl, t), `frame @${t}`);
 console.log('timeline ok, duration', tl.duration.toFixed(1), 's, max turn', maxTurn.toFixed(1), '°/frame');
+
+// colour is paint only: it must not move a single frame
+const colored = buildTimeline(stops, legs.map((l, i) => ({ ...l, color: ['#ff0000', '#00ff00', '#0000ff'][i] })), 1, fit);
+assert.deepEqual(colored.legs.map((l) => l.color), ['#ff0000', '#00ff00', '#0000ff'], 'colour carried to the timeline legs');
+assert.equal(colored.duration, tl.duration);
+for (let t = 0; t <= tl.duration; t += 0.25) assert.deepEqual(sample(colored, t), sample(tl, t), `colour does not change frame @${t}`);

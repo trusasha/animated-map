@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { greatCircle } from './geo';
-import { applyColorToAll, changeMode, LINE_PALETTE, legMeta, resetColor, segColor } from './legs';
+import { applyColorToAll, changeMode, LINE_PALETTE, legMeta, resetColor, segColor, withColors } from './legs';
 import { pathKey } from './route';
 import { DEFAULT_SETTINGS } from './settings';
 import type { CustomModel, Stop, TripData } from './types';
@@ -50,3 +50,6 @@ stale.stops[1].leg!.pathKey = 'x>y:ground';
 assert.equal(legMeta(stale, 0).building, true, 'path of other stops is not valid');
 
 console.log('legs ok');
+
+const colored = withColors([d.stops[1].leg!, d.stops[2].leg!], { ...DEFAULT_SETTINGS, colors: { ...DEFAULT_SETTINGS.colors, air: '#abcdef' } });
+assert.deepEqual(colored.map((l) => l.color), ['#112233', '#abcdef'], 'withColors resolves own colour, then the mode default');

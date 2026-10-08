@@ -53,10 +53,20 @@ test.describe('segment inspector @map', () => {
     await t.done();
   });
 
-  test('line colour controls stay hidden while the flag is off', async ({ page, request }) => {
+  test('a picked line colour persists; the editor and the player paint use it', async ({ page, request }) => {
     const t = await open(page, request);
-    await t.select(0);
-    await expect(page.getByRole('radiogroup', { name: 'Цвет линии' })).toHaveCount(0);
+    const colors = () => page.evaluate(async () => {
+      const { map } = (window as unknown as { __ta: { map: { probe(): Promise<{ colors: Record<string, string[]> }> } } }).__ta;
+      return (await map.probe()).colors;
+    });
+    await t.select(1);
+    await page.getByRole('radiogroup', { name: 'Цвет линии' }).getByRole('radio', { name: 'Зелёный' }).check({ force: true });
+    await expect.poll(() => t.leg(1)).toMatchObject({ mode: 'ground', color: '#1aae39' });
+    await expect.poll(async () => (await colors())['editor-route']).toContain('#1aae39');
+    await expect.poll(async () => (await colors()).route).toEqual(['#1aae39']);
+    await page.reload();
+    await page.getByTestId('segment-row').nth(1).click();
+    await expect(page.getByRole('radio', { name: 'Зелёный' })).toBeChecked();
     await t.done();
   });
 

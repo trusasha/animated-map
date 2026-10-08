@@ -71,7 +71,7 @@ export function useExport(trip: Trip): ExportController {
   };
 
   const prepare = useEffectEvent((el: HTMLDivElement, signal: AbortSignal) =>
-    prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, onProgress: setProgress, signal }));
+    prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, settings, onProgress: setProgress, signal }));
   const onPrepareError = useEffectEvent((e: unknown) => fail(e, 'prepare'));
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { legMeta } from '../../../domain/legs';
+import { legMeta, withColors } from '../../../domain/legs';
 import { legsOf } from '../../../domain/route';
 import { span } from '../../../domain/trips';
 import type { LngLat, TripData } from '../../../domain/types';
@@ -48,7 +48,7 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
   }, [map]);
 
   const fitted = useRef('');
-  const stops = data?.stops, speed = data?.speed, range = data?.range;
+  const stops = data?.stops, speed = data?.speed, range = data?.range, colors = settings.colors;
   useEffect(() => {
     if (!map || !data || !stops || poseKey === null) return;
     if (stops.length < 2) {
@@ -61,7 +61,7 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
     (async () => {
       const [s0, s1] = span(data);
       map.player.stop();
-      await map.player.setTrip(stops.slice(s0, s1 + 1), legs.slice(s0, s1).map((l) => ({ ...l, path: l.path! })), data.speed);
+      await map.player.setTrip(stops.slice(s0, s1 + 1), withColors(legs.slice(s0, s1), settings).map((l) => ({ ...l, path: l.path! })), data.speed);
       if (cancelled) return;
       map.setContext(legs.flatMap((l, i) => (i < s0 || i >= s1) && l.path ? [l.path] : []));
       map.player.setFrame(null);
@@ -72,8 +72,8 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
       }
     })().catch(reportError);
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- legs live on the stops; selection and colours must not rebuild the player
-  }, [map, stops, speed, range, poseKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- legs live on the stops; selection must not rebuild the player
+  }, [map, stops, speed, range, poseKey, colors]);
 
   const shown = useRef<number | null>(null);
   useEffect(() => {

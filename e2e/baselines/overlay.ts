@@ -8,8 +8,8 @@ export interface Sample { name: string; x: number; y: number; rgba: number[] }
  * export-like path: a second map with preserveDrawingBuffer, since the main map's canvas reads back transparent.
  * `times` are looked up from the fixture timeline when null (recorder) and replayed from the baseline otherwise.
  */
-export async function captureOverlay(page: Page, times: { ground: number; air: number } | null) {
-  return page.evaluate(async ({ stops, legs, speed, times }) => {
+export async function captureOverlay(page: Page, times: { ground: number; air: number } | null, colors?: Record<string, string>) {
+  return page.evaluate(async ({ stops, legs, speed, times, colors }) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
     const { Animator } = await load('/src/legacy/animator.ts');
     const { idle } = await load('/src/services/map/createOffscreenMap.ts');
@@ -28,7 +28,7 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
     try {
       const anim = new Animator(map);
       await new Promise((r) => map.once('load', r));
-      await anim.setTrip(stops, legs, speed);
+      await anim.setTrip(stops, colors ? legs.map((l: any) => ({ ...l, color: colors[l.mode] })) : legs, speed);
       const tl = anim.tl;
       const at = (leg: any, progress: number) => leg.start + ((leg.end - leg.start) * Math.acos(1 - 2 * progress)) / Math.PI;
       const airIdx = tl.legs.findIndex((l: any) => l.mode === 'air');
@@ -62,13 +62,14 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
       const canvas = document.createElement('canvas');
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
-      const patch = (x: number, y: number) => {
+      const patch = (x: number, y: number, r = 2) => {
         const px = Math.round(x), py = Math.round(y);
         if (px < 2 || py < 2 || px > W - 3 || py > H - 3) throw new Error(`sample point (${x}, ${y}) is outside the canvas`);
-        const d = ctx.getImageData(px - 2, py - 2, 5, 5).data;
+        const n = 2 * r + 1;
+        const d = ctx.getImageData(px - r, py - r, n, n).data;
         const sum = [0, 0, 0, 0];
         for (let i = 0; i < d.length; i += 4) for (let k = 0; k < 4; k++) sum[k] += d[i + k];
-        return { x: px, y: py, rgba: sum.map((s) => s / 25) };
+        return { x: px, y: py, rgba: sum.map((s) => s / (n * n)) };
       };
       const render = async (t: number) => {
         anim.setFrame(t);
@@ -89,6 +90,8 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
           { name: 'trail', ...patch(...(project(trailPt[0], trailPt[1], 0) as [number, number])) },
           { name: 'background', ...patch(24, 24) },
         ],
+        // the 5x5 average mixes the line with its casing; the centre pixel is the line colour
+        core: patch(...(project(trailPt[0], trailPt[1], 0) as [number, number]), 0).rgba,
         png: bytes(),
       };
       await render(T.air);
@@ -102,6 +105,12 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
           { name: 'arc-mid', ...patch(...(project(midPt[0], midPt[1], midAlt) as [number, number])) },
           { name: 'background', ...patch(24, 24) },
         ],
+        // the arc is a thin 3D line over its casing; the projected point can land a pixel off its centre
+        core: (() => {
+          const [x, y] = project(midPt[0], midPt[1], midAlt).map(Math.round);
+          const d = ctx.getImageData(x - 3, y - 3, 7, 7).data;
+          return Array.from({ length: 49 }, (_, i) => Array.from(d.slice(i * 4, i * 4 + 3)));
+        })(),
         png: bytes(),
       };
       return out;
@@ -109,7 +118,7 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
       map.remove();
       host.remove();
     }
-  }, { stops: THREE_LEGS.stops, legs: THREE_LEGS.legs, speed: THREE_LEGS.speed, times });
+  }, { stops: THREE_LEGS.stops, legs: THREE_LEGS.legs, speed: THREE_LEGS.speed, times, colors });
 }
 
 /** a figure that renders nothing would make the pixel baseline meaningless */

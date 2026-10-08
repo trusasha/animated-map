@@ -45,6 +45,8 @@ export interface MapProbe {
   visible: Record<string, boolean>;
   /** feature count of each GeoJSON source */
   features: Record<string, number>;
+  /** `color` property of each GeoJSON source's features */
+  colors: Record<string, string[]>;
   /** stop markers currently shown */
   markers: number;
   center: LngLat;

@@ -1,7 +1,7 @@
 import { Button, Dialog } from '../../../ds';
 import { DEFAULT_SETTINGS } from '../../../domain/settings';
 import { useT } from '../../../i18n/react';
-import { SHOW_EXPORT_QUALITY, SHOW_LINE_COLORS } from '../flags';
+import { SHOW_EXPORT_QUALITY } from '../flags';
 import { useFigureRows } from '../hooks/useFigureRows';
 import { useSettings } from '../hooks/useSettings';
 import type { SettingsDialogProps } from '../types';
@@ -43,9 +43,7 @@ export function SettingsDialog({ open, onClose, models = NO_MODELS }: SettingsDi
         value={settings.figures}
         onChange={(mode, figure) => update({ figures: { ...settings.figures, [mode]: figure } })}
       />
-      {SHOW_LINE_COLORS && (
-        <LineColorsSection value={settings.colors} onChange={(mode, color) => update({ colors: { ...settings.colors, [mode]: color } })} />
-      )}
+      <LineColorsSection value={settings.colors} onChange={(mode, color) => update({ colors: { ...settings.colors, [mode]: color } })} />
       <NewSegmentsSection flyKm={settings.flyKm} onChange={(flyKm) => update({ flyKm })} />
       {SHOW_EXPORT_QUALITY && <ExportQualitySection value={settings.exportLongSide} onChange={(exportLongSide) => update({ exportLongSide })} />}
     </Dialog>
