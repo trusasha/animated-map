@@ -11,7 +11,7 @@ export function useHomePadding(globe: HomeGlobe | undefined, column: RefObject<H
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
       const sheet = r.left <= 0 && r.width >= window.innerWidth - 1;
-      globe.setPadding(sheet ? { ...ZERO, bottom: r.height } : { ...ZERO, left: r.right });
+      globe.setHomePadding(sheet ? { ...ZERO, bottom: r.height } : { ...ZERO, left: r.right });
     });
     ro.observe(el);
     return () => { ro.disconnect(); globe.setPadding(ZERO); };

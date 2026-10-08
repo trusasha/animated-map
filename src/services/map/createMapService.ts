@@ -4,6 +4,7 @@ import type { LngLat, MapStyle } from '../../domain/types';
 import { createCamera } from './camera';
 import { installTripsLayer, setTrips } from './home/tripsLayer';
 import { startSpin } from './home/spin';
+import { homeZoom } from './home/zoom';
 import { installEditorLayers, setEditorSegments } from './layers/editorLayers';
 import { applyVisibility } from './layers/visibility';
 import { createMarkers } from './markers';
@@ -153,6 +154,7 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
       if (!spin) { stopSpin?.(); stopSpin = undefined; }
     },
 
+    setHomePadding: (p) => camera.setPadding(p, homeZoom(map, p)),
     setPadding: (p) => camera.setPadding(p),
     resetPadding: () => camera.resetPadding(),
     getPadding: () => camera.getPadding(),

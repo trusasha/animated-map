@@ -99,6 +99,8 @@ export interface MapService {
   highlightTrip(id: string | null): void;
   /** the Home globe turns slowly while nothing else moves it */
   setSpin(on: boolean): void;
+  /** padding plus the zoom that sizes the Home globe to the area the padding leaves free */
+  setHomePadding(p: Padding): void;
 
   /** UI padding for editing; playback always runs with zero padding */
   setPadding(p: Padding): void;
