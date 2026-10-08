@@ -31,8 +31,8 @@ const projects: Project[] = Object.entries(sizes).flatMap(([size, device]) =>
     const name = `${size}-${colorScheme}`;
     return {
       name,
-      // server routes don't depend on viewport or theme: run them in one project only
-      testIgnore: name === 'desktop-light' ? '**/*.dev.spec.ts' : ['**/*.dev.spec.ts', '**/server.spec.ts'],
+      // server routes and the ~6 min software-GL export run don't depend on viewport or theme: one project only
+      testIgnore: name === 'desktop-light' ? '**/*.dev.spec.ts' : ['**/*.dev.spec.ts', '**/server.spec.ts', '**/export-smoke.spec.ts'],
       grepInvert: MAP_PROJECTS.includes(name) ? undefined : /@map/,
       use: { ...device, colorScheme, baseURL: PROD },
     };
