@@ -25,11 +25,6 @@
   .iconButton[data-size='36'] { width: 36px; height: 36px; }
   .iconButton[data-size='touch'] { width: var(--hit-icon-touch); height: var(--hit-icon-touch); }
 
-  :global(html[data-coarse]) .iconButton {
-    min-width: var(--hit-icon-touch);
-    min-height: var(--hit-icon-touch);
-  }
-
   .iconButton:hover { background: var(--surface-hover); }
 
   .iconButton[data-active] {

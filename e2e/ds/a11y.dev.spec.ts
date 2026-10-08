@@ -1,18 +1,23 @@
-import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { openGallery, THEMES } from './helpers';
-
-// @axe-core/playwright resolves its own playwright-core; the runtime Page is compatible
-type AxePage = ConstructorParameters<typeof AxeBuilder>[0]['page'];
+import { axeSummary, demoSection, openGallery, THEMES } from './helpers';
 
 for (const theme of THEMES) {
   test(`gallery has no axe violations in ${theme} theme`, async ({ page }) => {
     await openGallery(page, { theme });
-    const { violations } = await new AxeBuilder({ page: page as unknown as AxePage }).withTags(['wcag2a', 'wcag2aa']).analyze();
-    const summary = violations.map((v) => ({
-      rule: v.id,
-      targets: v.nodes.map((n) => `${n.target.join(' ')} :: ${n.failureSummary?.split('\n').slice(0, 2).join(' ')}`),
-    }));
-    expect(summary).toEqual([]);
+    expect(await axeSummary(page)).toEqual([]);
+  });
+
+  test(`an open Dialog has no axe violations in ${theme} theme`, async ({ page }) => {
+    await openGallery(page, { theme });
+    await demoSection(page, 'Dialog').getByRole('button', { name: 'Open 640' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    expect(await axeSummary(page)).toEqual([]);
+  });
+
+  test(`an open danger ConfirmDialog has no axe violations in ${theme} theme`, { tag: '@needs-p1-10a' }, async ({ page }) => {
+    await openGallery(page, { theme });
+    await demoSection(page, 'ConfirmDialog').getByRole('button', { name: 'Danger confirm' }).click();
+    await expect(page.getByRole('alertdialog').or(page.getByRole('dialog'))).toBeVisible();
+    expect(await axeSummary(page)).toEqual([]);
   });
 }

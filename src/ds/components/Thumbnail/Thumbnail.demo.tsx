@@ -21,10 +21,10 @@ export default function Demo() {
     <div data-testid="demo-Thumbnail" style={{ display: 'grid', gap: 'var(--space-16)', maxWidth: 640 }}>
       <ThumbnailGrid columns={3}>
         {figures.map((f) => (
-          <ThumbnailTile key={f.id} size={60} src={f.src} name={f.name} sub={f.sub} selected={picked === f.id} onClick={() => setPicked(f.id)} />
+          <ThumbnailTile key={f.id} size={60} src={f.src} name={f.name} sub={f.sub} selected={picked === f.id} onSelect={() => setPicked(f.id)} />
         ))}
-        <ThumbnailTile size={60} name="Add" sub="Upload a model" add onClick={() => undefined} />
-        <ThumbnailTile size={60} src={swatch('#a39e98')} name="Locked" sub="Not for this segment" disabled onClick={() => undefined} />
+        <ThumbnailTile size={60} name="Add" sub="Upload a model" add onSelect={() => undefined} />
+        <ThumbnailTile size={60} src={swatch('#a39e98')} name="Locked" sub="Not for this segment" disabled onSelect={() => undefined} />
       </ThumbnailGrid>
       <ThumbnailGrid>
         {figures.slice(0, 2).map((f, i) => (

@@ -24,6 +24,17 @@
     transition: width 100ms linear;
   }
 
+  .root[data-indeterminate] .fill {
+    width: 40%;
+    transition: none;
+    animation: indeterminate 1.2s var(--ease-standard) infinite;
+  }
+
+  @keyframes indeterminate {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(250%); }
+  }
+
   .value {
     min-width: 3ch;
     text-align: right;

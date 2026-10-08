@@ -28,6 +28,28 @@
   --color-warning-text: #b34a00;
   --color-success-text: #1f7a77;
 
+  /* dark-theme neutrals and tints */
+  --color-dark-text: #dbdbdb;
+  --color-dark-text-input: #e6e6e6;
+  --color-dark-gray-500: #9e9a97;
+  --color-dark-gray-400: #8f8a86;
+  --color-dark-gray-300: #6a6662;
+  --color-dark-ink: #101418;
+  --color-dark-page: #191919;
+  --color-dark-alt: #222120;
+  --color-dark-light: #c0bfbe;
+  --color-dark-brand: #2a3a8f;
+  --color-dark-selected: #1a1f24;
+  --color-dark-input-border: #343434;
+  --color-dark-warning-text: #e38f54;
+  --color-dark-warning-bg: #2d221b;
+  --color-dark-error-bg: #231d19;
+  --color-dark-success-text: #5fc6c2;
+  --color-dark-success-bg: #17292a;
+  --color-dark-link-on-dark: #004a94;
+  --color-dark-blue-hover: #6db4f8;
+  --color-dark-focus: #3c9bef;
+
   /* line palette (data colours, identical in both themes) */
   --line-charcoal: #31302e;
   --line-blue: #0075de;
@@ -72,12 +94,10 @@
   --bp-phone: 700px;
   --bp-desktop: 1100px;
 
-  /* hit sizes */
-  --hit-icon: 26px;
+  /* hit sizes: fixed touch sizes; the adaptive --hit-* live in hit.css */
   --hit-icon-touch: 40px;
-  --hit-rail: 16px;
   --hit-rail-touch: 24px;
-  --hit-swatch: 22px;
+  --hit-handle-touch: 20px;
   --hit-swatch-touch: 32px;
 
   /* typography */
@@ -88,6 +108,7 @@
   --weight-semibold: 600;
   --weight-bold: 700;
 
+  --type-input-touch-size: 16px;
   --type-ui-size: 14px;
   --type-ui-lh: 1.43;
   --type-hero-size: clamp(34px, 5vw, 48px);

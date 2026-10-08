@@ -12,6 +12,8 @@ export interface ListRowProps extends Omit<ComponentProps<'div'>, 'ref' | 'title
   /** End actions; revealed on hover/focus (or always when `actionsVisible`, e.g. touch or picking). */
   actions?: ReactNode;
   actionsVisible?: boolean;
+  /** Touch fallback: a menu node (trigger included) shown instead of `actions` on coarse pointers, so every action stays reachable without hover. */
+  actionsMenu?: ReactNode;
   selected?: boolean;
   /** Outside the video range: dimmed to .45. */
   outOfRange?: boolean;
@@ -21,7 +23,7 @@ export interface ListRowProps extends Omit<ComponentProps<'div'>, 'ref' | 'title
 }
 
 export function ListRow({
-  leading, title, meta, trailing, actions, actionsVisible, selected, outOfRange, onSelect, className, ref, ...rest
+  leading, title, meta, trailing, actions, actionsVisible, actionsMenu, selected, outOfRange, onSelect, className, ref, ...rest
 }: ListRowProps) {
   const body = (
     <>
@@ -41,6 +43,7 @@ export function ListRow({
       data-selected={selected || undefined}
       data-out-of-range={outOfRange || undefined}
       data-actions-visible={actionsVisible || undefined}
+      data-has-menu={actionsMenu != null || undefined}
     >
       {onSelect ? (
         <button type="button" className={styles.main} onClick={onSelect} aria-pressed={selected}>
@@ -50,6 +53,7 @@ export function ListRow({
         <div className={styles.main}>{body}</div>
       )}
       {actions != null && <span className={styles.actions}>{actions}</span>}
+      {actionsMenu != null && <span className={styles.menu}>{actionsMenu}</span>}
     </div>
   );
 }

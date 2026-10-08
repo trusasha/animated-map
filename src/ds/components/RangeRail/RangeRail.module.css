@@ -1,17 +1,12 @@
 @layer ds.components {
   .root {
     --rail-w: var(--hit-rail);
-    --handle: var(--hit-rail);
+    --handle: var(--hit-handle);
     position: absolute;
     inset: 0 auto auto 0;
     width: var(--rail-w);
     touch-action: none;
     user-select: none;
-  }
-
-  :global(html[data-coarse]) .root {
-    --rail-w: var(--hit-rail-touch);
-    --handle: calc(var(--hit-rail) + 4px);
   }
 
   .cell {
