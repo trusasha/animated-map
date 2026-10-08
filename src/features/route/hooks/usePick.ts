@@ -37,7 +37,13 @@ export function usePick(map: MapService | undefined, stops: Stop[], onPickChange
   }, [pickingId, stop]);
 
   const exists = pickingId !== null && stops.some((s) => s.id === pickingId);
-  useEffect(() => { if (pickingId !== null && !exists) stop(); }, [pickingId, exists, stop]);
+  if (pickingId !== null && !exists) setPickingId(null);
+  useEffect(() => {
+    if (pickingId !== null || !cancelPick.current) return;
+    cancelPick.current();
+    cancelPick.current = null;
+    host.current.onPickChange(false);
+  }, [pickingId]);
   useEffect(() => () => cancelPick.current?.(), []);
 
   return { pickingId, start, stop, canPick: !!map };

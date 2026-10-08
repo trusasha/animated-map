@@ -8,20 +8,14 @@ const DEBOUNCE_MS = 250;
 const MAX_ITEMS = 6;
 
 export function usePlaceSearch(onAdd: (place: Place) => void) {
-  const [query, setQuery] = useState('');
+  const [query, setRawQuery] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     const q = query.trim();
-    if (!q) {
-      setPlaces([]);
-      setLoading(false);
-      setFailed(false);
-      return;
-    }
-    setLoading(true);
+    if (!q) return;
     const ctrl = new AbortController();
     const timer = setTimeout(() => {
       api.geocode(q, ctrl.signal)
@@ -34,6 +28,16 @@ export function usePlaceSearch(onAdd: (place: Place) => void) {
       ctrl.abort();
     };
   }, [query]);
+
+  const setQuery = (value: string) => {
+    const typed = value.trim() !== '';
+    setRawQuery(value);
+    setLoading(typed);
+    if (!typed) {
+      setPlaces([]);
+      setFailed(false);
+    }
+  };
 
   const items = useMemo<SearchItem[]>(() => places.map((p, i) => ({ id: String(i), title: p.name, sub: placeSub(p) })), [places]);
 
