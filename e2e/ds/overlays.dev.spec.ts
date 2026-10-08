@@ -17,9 +17,11 @@ test.describe('Dialog', () => {
     await open(page, 'Open 640');
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
+    await expect(dialog.locator(':focus')).toHaveCount(1);
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
-      expect(await dialog.evaluate((d) => d.contains(document.activeElement))).toBe(true);
+      const where = await dialog.evaluate((d) => `${d.contains(document.activeElement)} ${document.activeElement?.tagName} ${document.activeElement?.getAttribute('aria-label') ?? document.activeElement?.textContent?.slice(0, 20)}`);
+      expect(where, `tab ${i}`).toMatch(/^true/);
     }
   });
 
