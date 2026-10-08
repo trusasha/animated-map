@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { test } from '@playwright/test';
-import { assertFigureVisible, BASELINES, boot, captureDemClamp, captureFigures, captureFrames, captureMercator, captureMigrate, captureOverlay, capturePreload, captureThumbs } from './capture';
+import { BASELINES, boot, captureDemClamp, captureFigures, captureFrames, captureMercator, captureMigrate, capturePreload, captureThumbs } from './capture';
+import { assertFigureVisible, captureOverlay } from './overlay';
 
 // Run once on the pre-refactor tree: RECORD=1 npm run test:e2e -- --project=dev --grep @record
 test.describe.configure({ mode: 'serial' });
