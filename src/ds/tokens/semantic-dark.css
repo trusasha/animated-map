@@ -9,6 +9,7 @@
   --text-input: #e6e6e6;
   --text-on-accent: #101418;
   --text-on-dark: #1a1a1a;
+  --text-on-brand: #ffffff;
   --text-link: #45a3f7;
   --text-link-on-dark: #004a94;
   --text-warning: #e38f54;
@@ -63,6 +64,7 @@
     --text-input: #e6e6e6;
     --text-on-accent: #101418;
     --text-on-dark: #1a1a1a;
+    --text-on-brand: #ffffff;
     --text-link: #45a3f7;
     --text-link-on-dark: #004a94;
     --text-warning: #e38f54;

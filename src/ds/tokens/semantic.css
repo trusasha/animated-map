@@ -9,6 +9,7 @@
   --text-input: rgba(0, 0, 0, 0.9);
   --text-on-accent: var(--color-white);
   --text-on-dark: var(--color-white);
+  --text-on-brand: var(--color-white);
   --text-link: var(--color-blue);
   --text-link-on-dark: #62aef0;
   --text-warning: var(--color-warning-text);
