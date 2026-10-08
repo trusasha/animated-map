@@ -22,26 +22,16 @@ const DATA = {
 const probe = (page: Page) => page.evaluate(() => (window as any).__ta.map.probe());
 const time = (page: Page) => page.evaluate(() => (window as any).__ta.player.time as number);
 
-/** until P3-04 pushes the trip to the player and draws the editor route, the test does both */
 async function openTrip(page: Page, request: any) {
   const trip = await (await request.post('/api/trips', { data: { title: 'Preview trip', data: DATA } })).json();
   await page.goto(`/trip/${trip.id}?ui=next&e2e`);
   await expect(page.getByRole('textbox', { name: 'Название путешествия' })).toHaveValue('Preview trip');
-  await page.evaluate(async ({ stops, legs }) => {
-    const { map, player } = (window as any).__ta;
-    
-    map.setEditorRoute({
-      selected: null,
-      segments: legs.map((l: any) => ({ mode: l.mode, path: l.path, color: '#0075de', inRange: true, pending: false })),
-      stops: stops.map((s: any, i: number) => ({ lngLat: [s.lng, s.lat], label: String(i + 1), title: s.name, end: false, approx: false, active: false, inRange: true, draggable: false })),
-    });
-    await player.setTrip(stops, legs.map((l: any) => ({ mode: l.mode, figure: l.figure, path: l.path })), 1);
-  }, { stops: STOPS, legs: DATA.stops.slice(1).map((s: any) => s.leg) });
+  await expect.poll(() => page.evaluate(() => (window as any).__ta.player.duration as number)).toBeGreaterThan(0);
   await expect.poll(() => probe(page).then((p) => p.markers)).toBe(3);
   return trip.id as string;
 }
 
-test.setTimeout(180_000);
+test.setTimeout(300_000);
 
 test.describe('preview @map', () => {
   test.beforeEach(async ({ page }) => {
@@ -55,7 +45,7 @@ test.describe('preview @map', () => {
     const logs: string[] = [];
     page.on('request', (r) => { if (r.url().endsWith('/api/log') && r.method() === 'POST') logs.push(r.postData() ?? ''); });
     const id = await openTrip(page, request);
-    slowTiles(page, 150);
+    slowTiles(page, 400);
     await page.getByRole('button', { name: 'Превью' }).click();
     await expect(page.getByTestId('preload-card')).toContainText('Подгружаю карту');
     const transport = page.getByTestId('preview-transport');
@@ -93,11 +83,11 @@ test.describe('preview @map', () => {
 
   test('buffering hold: the label shows and the time stops while tiles are late', async ({ page, request }) => {
     const id = await openTrip(page, request);
-    slowTiles(page, 300);
+    slowTiles(page, 800);
     await page.getByRole('button', { name: 'Превью' }).click();
-    await expect(page.getByTestId('preview-transport')).toBeVisible({ timeout: 120_000 });
+    await expect(page.getByTestId('preview-transport')).toBeVisible({ timeout: 200_000 });
     const label = page.getByRole('status').filter({ hasText: 'Буферизация…' });
-    await expect(label).toBeVisible({ timeout: 90_000 });
+    await expect(label).toBeVisible({ timeout: 150_000 });
     // held: playback never runs past the buffered stretch
     for (let i = 0; i < 4; i++) {
       const { t, b } = await page.evaluate(() => { const p = (window as any).__ta.player; return { t: p.time as number, b: p.buffered as number }; });
