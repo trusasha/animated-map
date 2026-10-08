@@ -1,0 +1,25 @@
+@layer ds.components {
+  .positioner {
+    z-index: var(--z-popover);
+  }
+
+  .popup {
+    max-width: 240px;
+    padding: var(--space-4) var(--space-8);
+    border-radius: var(--radius-micro);
+    background: var(--surface-dark);
+    color: var(--text-on-dark);
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-lh);
+    transition: opacity var(--duration-fast) var(--ease-standard);
+  }
+
+  .popup[data-starting-style],
+  .popup[data-ending-style] {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .popup { transition: none; }
+  }
+}
