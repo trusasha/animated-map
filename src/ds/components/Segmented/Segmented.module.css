@@ -44,7 +44,7 @@
   }
 
   .option[data-disabled] {
-    opacity: 0.45;
+    color: var(--text-muted);
     cursor: not-allowed;
   }
 

@@ -30,8 +30,13 @@
   }
 
   .card[data-disabled] {
-    opacity: 0.45;
+    background: var(--surface-alt);
     cursor: not-allowed;
+  }
+
+  .card[data-disabled] .label,
+  .card[data-disabled] .sub {
+    color: var(--text-muted);
   }
 
   .radio {
