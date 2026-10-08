@@ -47,6 +47,8 @@ export interface MapProbe {
   features: Record<string, number>;
   /** stop markers currently shown */
   markers: number;
+  center: LngLat;
+  zoom: number;
 }
 
 export interface TripPlayer {
