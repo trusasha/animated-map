@@ -4,3 +4,7 @@ data
 .env
 .omc/
 **/.omc/
+.e2e-data*
+.data-*
+test-results
+playwright-report
