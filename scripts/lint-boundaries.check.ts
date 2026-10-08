@@ -12,6 +12,7 @@ const PATHS = 'import-x/no-restricted-paths';
 // resolver-based rules need real targets, so the fixtures are linted inside a throwaway tree
 const STUBS = [
   'src/domain/route.ts',
+  'src/lib/index.ts',
   'src/services/map/index.ts',
   'src/services/scene3d/scene.ts',
   'src/features/route/index.ts',
@@ -26,6 +27,7 @@ const cases: { fixture: string; virtualPath: string; rule: string | null }[] = [
   { fixture: 'features-imports-maplibre.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: 'no-restricted-imports' },
   { fixture: 'ds-imports-domain.tsx', virtualPath: 'src/ds/fixture.tsx', rule: PATHS },
   { fixture: 'server-imports-pglite-outside-db.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-imports' },
+  { fixture: 'lib-imports-domain.ts', virtualPath: 'src/lib/fixture.ts', rule: PATHS },
   { fixture: 'map-imports-react.ts', virtualPath: 'src/services/map/fixture.ts', rule: 'no-restricted-imports' },
   { fixture: 'map-imports-scene3d.ts', virtualPath: 'src/services/map/fixture.ts', rule: PATHS },
   { fixture: 'video-global-outside-video.ts', virtualPath: 'src/features/export/fixture.ts', rule: 'no-restricted-globals' },

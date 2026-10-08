@@ -75,6 +75,7 @@ const boundaryZones = (root) => {
   return [
     ...forbid(['src/domain'], ['src/services', 'src/features', 'src/app', 'src/ds', 'src/i18n']),
     ...forbid(['src/ds'], ['src/domain', 'src/services', 'src/features', 'src/app', 'src/i18n']),
+    ...forbid(['src/lib'], ['src/domain', 'src/services', 'src/features', 'src/app', 'src/ds', 'src/i18n']),
     ...forbid(['src/services'], ['src/features', 'src/app', 'src/ds']),
     ...forbid(['src/services/map'], ['src/services/scene3d']),
     ...forbid(['src/services/scene3d'], ['src/services/map']),
