@@ -22,14 +22,3 @@
   color: var(--text-secondary);
   text-wrap: pretty;
 }
-
-[data-mode='phone'] .title {
-  font-size: var(--type-title-size);
-  line-height: var(--type-title-lh);
-  letter-spacing: var(--type-title-ls);
-}
-
-[data-mode='phone'] .lead {
-  font-size: var(--type-nav-size);
-  line-height: var(--type-nav-lh);
-}

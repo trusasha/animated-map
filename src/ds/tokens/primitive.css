@@ -113,8 +113,8 @@
   --type-input-touch-size: 16px;
   --type-ui-size: 14px;
   --type-ui-lh: 1.43;
-  --type-hero-size: clamp(34px, 5vw, 48px);
-  --type-hero-lh: 1;
+  --type-hero-size: clamp(34px, 6.2vh, 48px);
+  --type-hero-lh: 1.05;
   --type-hero-ls: -1.5px;
   --type-title-size: 22px;
   --type-title-lh: 1.27;
