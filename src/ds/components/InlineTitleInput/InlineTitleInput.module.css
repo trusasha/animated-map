@@ -1,0 +1,31 @@
+@layer ds.components {
+  .input {
+    min-width: 0;
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-lh);
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-micro);
+    padding: var(--space-4) var(--space-6);
+    outline: none;
+    text-overflow: ellipsis;
+    transition: background var(--duration-fast) var(--ease-standard);
+  }
+
+  .input:hover:not(:disabled) {
+    background: var(--surface-hover);
+  }
+
+  .input:focus-visible {
+    background: var(--surface-input);
+    border: var(--border-input);
+    outline: var(--focus-ring);
+    outline-offset: 0;
+  }
+
+  .input::placeholder {
+    color: var(--text-muted);
+  }
+}
