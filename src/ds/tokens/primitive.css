@@ -108,6 +108,7 @@
   --weight-semibold: 600;
   --weight-bold: 700;
 
+  --type-input-touch-size: 16px;
   --type-ui-size: 14px;
   --type-ui-lh: 1.43;
   --type-hero-size: clamp(34px, 5vw, 48px);
