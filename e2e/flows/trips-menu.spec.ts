@@ -48,7 +48,8 @@ test.describe('trips menu @map', () => {
     const phone = (page.viewportSize()?.width ?? 0) < 700;
     if (!phone) await expect(page.getByRole('status').filter({ hasText: 'Сохранение…' })).toBeVisible();
     expect((await put).postDataJSON().title).toBe('Autosave renamed');
-    expect(Date.now() - t0).toBeLessThan(1000);
+    // the 700 ms debounce lands at ~0.75 s with a GPU; software GL starves timers, so 2.5 s still catches a save-only-on-blur regression
+    expect(Date.now() - t0).toBeLessThan(2500);
     if (!phone) await expect(page.getByRole('status').filter({ hasText: 'Сохранено' })).toBeVisible();
     await request.delete(`/api/trips/${trip.id}`);
   });

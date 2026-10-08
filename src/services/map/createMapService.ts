@@ -26,8 +26,12 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
   const map = new maplibregl.Map({
     container, style: placeholder, center: [20, 30], zoom: 1.4,
     maxTileCacheZoomLevels: TILE_CACHE_ZOOM_LEVELS, canvasContextAttributes: { antialias: true },
+    attributionControl: false,
   });
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+  // compact attribution opens itself on first render and then covers the panels' tap targets on phones
+  map.once('load', () => container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'));
   installImageResolver(map);
   const player = new MapPlayer(map, overlay);
   const camera = createCamera(map);
