@@ -13,7 +13,7 @@
     white-space: nowrap;
   }
 
-  .badge[data-tone='blue'] { background: var(--surface-selected); color: var(--focus); }
+  .badge[data-tone='blue'] { background: var(--surface-selected); color: var(--accent-active); }
   .badge[data-tone='neutral'] { background: var(--surface-alt); color: var(--text-secondary); }
   .badge[data-tone='success'] { background: var(--surface-success); color: var(--text-success); }
   .badge[data-tone='warning'] { background: var(--surface-warning); color: var(--text-warning); }
