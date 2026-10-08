@@ -84,6 +84,8 @@ const pairs: Array<[fg: string, bg: string, min: number]> = [
   ['--text-success', '--surface-success', BODY],
   ['--text-on-accent', '--accent-fill', BODY],
   ['--text-on-dark', '--surface-dark', BODY],
+  ['--text-on-danger', '--danger-fill', BODY],
+  ['--text-on-danger', '--danger-fill-hover', BODY],
   ['--text-link-on-dark', '--surface-dark', BODY],
   ['--text-on-brand', '--surface-brand-dark', BODY],
   ['--focus', '--surface-page', LARGE],

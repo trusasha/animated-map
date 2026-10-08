@@ -39,7 +39,7 @@ export function ConfirmDialog({
           <div className={styles.actions}>
             <AlertDialog.Close render={<Button variant="ghost" />}>{cancelLabel}</AlertDialog.Close>
             <Button
-              className={cx(tone === 'danger' && styles.danger)}
+              variant={tone === 'danger' ? 'danger' : 'primary'}
               loading={loading}
               onClick={onConfirm}
             >

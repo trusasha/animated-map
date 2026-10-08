@@ -3,7 +3,7 @@ import { Button, type ButtonSize, type ButtonVariant } from './Button';
 
 export const title = 'Button';
 
-const variants: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'dark'];
+const variants: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'dark', 'danger'];
 const sizes: ButtonSize[] = ['sm', 'md', 'lg'];
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--space-12)', alignItems: 'center' } as const;
 
