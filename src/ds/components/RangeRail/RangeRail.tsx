@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
 import { cx } from '../../lib/cx';
 import { clampRange, dragTo, keyStep, nearestHandle, type Handle } from './range';
 import styles from './RangeRail.module.css';
@@ -27,7 +27,7 @@ const EMPTY: Geometry = { ys: [], tops: [], height: 0 };
 
 function useRowGeometry(containerRef: RefObject<HTMLElement | null>, count: number, nodeY: number): Geometry {
   const [geo, setGeo] = useState<Geometry>(EMPTY);
-  useLayoutEffect(() => {
+  useEffect(() => {
     const box = containerRef.current;
     if (!box) return;
     const measure = () => {
