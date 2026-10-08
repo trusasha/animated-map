@@ -2,14 +2,15 @@ import * as maplibregl from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { clampBathymetry } from '../../../domain/dem';
 
+// the production bundle doesn't emit maplibre's default sibling worker file; must run before the first Map is constructed
+if (import.meta.env.PROD) maplibregl.setWorkerUrl(workerUrl);
+
 let registered = false;
 
 /** `dem://` = the https tile with bathymetry flattened (see domain/dem) */
 export function registerDemProtocol() {
   if (registered) return;
   registered = true;
-  // the production bundle doesn't emit maplibre's default sibling worker file
-  if (import.meta.env.PROD) maplibregl.setWorkerUrl(workerUrl);
   maplibregl.addProtocol('dem', async ({ url }, ctrl) => {
     const res = await fetch(url.replace('dem://', 'https://'), { signal: ctrl.signal });
     if (!res.ok) throw new Error(`${url} → ${res.status}`);

@@ -23,5 +23,9 @@ const pf2: Prefetch<string> = { tl: 'tl', buffered: -1 };
 await fetchTiles(pf2, 3.5, { ...plan, urls: ['a', 'hung', 'b', 'b2'] }, () => false, undefined, 50);
 assert.equal(pf2.buffered, -1, 'a dead prefetch fetches nothing');
 
+const pf3: Prefetch<string> = { tl: 'tl', buffered: -1 };
+await fetchTiles(pf3, 3.5, { times: [], cuts: [], urls: [] }, () => true);
+assert.equal(pf3.buffered, 3.5, 'an empty plan is fully buffered');
+
 clearInterval(keepAlive);
 console.log('preload fetch ok');

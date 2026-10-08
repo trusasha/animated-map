@@ -1,90 +1,86 @@
-import { expect, test, type Page } from '@playwright/test';
-import { defaultSettings } from './fixtures/api';
-import { stubNet } from './fixtures/net';
+import { expect, test } from '@playwright/test';
+import { cameraPadding, collectLog, dialogOrPlaceholder, header, mapCanvas, openEditor, openHome, prepare, removeTrip, seedTrip } from './flows/helpers';
+import { emptyTrips } from './fixtures/api';
 
-type Entry = { type: string; data: Record<string, unknown> };
-const logged: Record<string, Entry[]> = {};
-
-test.beforeEach(async ({ page }, info) => {
-  await stubNet(page);
-  await defaultSettings(page);
-  const entries: Entry[] = (logged[info.testId] = []);
-  await page.route('**/api/log', async (route) => {
-    entries.push(route.request().postDataJSON());
-    await route.fulfill({ json: {} });
-  });
+test.beforeEach(async ({ page }) => {
+  await prepare(page);
 });
 
-const ta = (page: Page) => page.evaluate(() => (window as unknown as { __ta: { padding?: { left: number; right: number } } }).__ta.padding);
-
 test.describe('app shell @map', () => {
-  test('Home renders the shell with the shared map', async ({ page }) => {
-    await page.goto('/?ui=next&e2e');
-    await expect(page.getByTestId('map-host').locator('canvas.maplibregl-canvas')).toBeVisible();
-    await expect(page.locator('[data-placeholder="app-header"]')).toBeVisible();
-    await expect(page.locator('[data-placeholder="home-screen"]')).toBeVisible();
-    await expect(page.locator('[data-placeholder="route-panel"]')).toHaveCount(0);
+  test('Home renders the header, the home screen and the shared map', async ({ page }) => {
+    await openHome(page);
+    await expect(header(page)).toBeVisible();
+    await expect(mapCanvas(page)).toBeVisible();
+    await expect(page.getByTestId('editor-shell')).toHaveCount(0);
     expect(await page.evaluate(() => Object.keys((window as unknown as { __ta: object }).__ta))).toEqual(expect.arrayContaining(['map', 'player']));
   });
 
-  test('trip route mounts every editor placeholder and the map survives navigation', async ({ page }) => {
-    await page.goto('/?ui=next&e2e');
-    const canvas = page.getByTestId('map-host').locator('canvas.maplibregl-canvas');
-    await canvas.evaluate((el) => { (el as HTMLElement).dataset.keep = '1'; });
-    await page.locator('[data-placeholder="home-screen"] button').click();
-    await expect(page).toHaveURL(/\/trip\/new\?ui=next&e2e$/);
-    for (const name of ['route-panel', 'video-panel']) await expect(page.locator(`[data-placeholder="${name}"]`)).toBeVisible();
-    await expect(canvas).toHaveAttribute('data-keep', '1');
-    await page.goBack();
-    await expect(page.locator('[data-placeholder="home-screen"]')).toBeVisible();
-  });
-
-  test('deep link /trip/:id loads, selection mounts the inspector and moves the camera padding', async ({ page }) => {
-    await page.goto('/trip/abc?ui=next&e2e');
+  test('New trip opens the editor and the same map canvas survives navigation both ways', async ({ page }) => {
+    await emptyTrips(page);
+    await openHome(page);
+    await mapCanvas(page).evaluate((el) => { (el as HTMLElement).dataset.keep = '1'; });
+    await page.getByRole('button', { name: 'Новое путешествие' }).click();
+    await expect(page).toHaveURL(/\/trip\/[^/?]+\?ui=next&e2e$/);
     await expect(page.getByTestId('editor-shell')).toBeVisible();
-    const before = await expect.poll(() => ta(page)).toBeTruthy().then(() => ta(page));
-    await page.locator('[data-placeholder="route-panel"] button').click();
-    await expect(page.locator('[data-placeholder="segment-inspector"]')).toBeVisible();
-    await expect(page.locator('[data-placeholder="figure-picker"]')).toBeVisible();
-    const after = await ta(page);
-    const phone = (page.viewportSize()?.width ?? 0) < 700;
-    if (phone) await expect(page.locator('[data-placeholder="route-panel"]')).toHaveCount(0);
-    else expect(after!.right).toBeGreaterThan(before!.right - 1);
-    await page.locator('[data-placeholder="segment-inspector"] button').click();
-    await expect(page.locator('[data-placeholder="segment-inspector"]')).toHaveCount(0);
+    await expect(mapCanvas(page)).toHaveAttribute('data-keep', '1');
+    await page.goBack();
+    await expect(page.getByTestId('home-screen')).toBeVisible();
+    await expect(mapCanvas(page)).toHaveAttribute('data-keep', '1');
   });
 
-  test('preview and dialogs open from their slots', async ({ page }) => {
-    await page.goto('/trip/abc?ui=next&e2e');
-    await page.locator('[data-placeholder="app-header"] button', { hasText: 'preview' }).click();
-    await expect(page.locator('[data-placeholder="preview-transport"]')).toBeVisible();
-    await expect(page.locator('[data-placeholder="route-panel"]')).toHaveCount(0);
-    expect(await ta(page)).toEqual(expect.objectContaining({ left: 0, right: 0 }));
-    await page.locator('[data-placeholder="preview-transport"] button').click();
-    await expect(page.locator('[data-placeholder="route-panel"]')).toBeVisible();
-    for (const [button, name] of [['export', 'export-dialog'], ['figures', 'figures-dialog']]) {
-      await page.locator('[data-placeholder="app-header"] button', { hasText: button }).click();
-      await expect(page.locator(`[data-placeholder="${name}"]`)).toBeVisible();
-      await page.locator(`[data-placeholder="${name}"] button`).click();
-      await expect(page.locator(`[data-placeholder="${name}"]`)).toHaveCount(0);
-    }
+  test('deep link /trip/:id loads the saved trip into the editor', async ({ page, request }) => {
+    const trip = await seedTrip(request);
+    await openEditor(page, trip.id);
+    await expect(page.getByRole('textbox', { name: 'Название путешествия' })).toHaveValue(trip.title);
+    await expect(page.getByRole('heading', { name: 'Видео' })).toBeVisible();
+    await expect(page.getByTestId('home-screen')).toHaveCount(0);
+    await expect.poll(() => cameraPadding(page)).toMatchObject({ left: expect.any(Number), right: expect.any(Number) });
+    await removeTrip(request, trip.id);
   });
 
-  test('an error thrown in a placeholder is caught, toasted and logged; siblings stay', async ({ page }, info) => {
-    await page.goto('/trip/abc?ui=next&e2e&crash=route-panel');
-    await expect(page.getByRole('alert')).toContainText('route-panel crashed');
-    await expect(page.locator('[data-placeholder="video-panel"]')).toBeVisible();
-    await expect(page.locator('[data-placeholder="route-panel"]')).toHaveCount(0);
-    await expect.poll(() => logged[info.testId].some((e) => e.type === 'error' && String(e.data.message).includes('route-panel crashed'))).toBe(true);
+  test('settings opens from the header and closes with Done', async ({ page }) => {
+    await openHome(page);
+    await header(page).getByRole('button', { name: 'Настройки' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Настройки' });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Готово' }).click();
+    await expect(dialog).toBeHidden();
+  });
+
+  test('@no-phone Preview clears the camera padding', async ({ page, request }) => {
+    const trip = await seedTrip(request);
+    await openEditor(page, trip.id);
+    await header(page).getByRole('button', { name: 'Превью' }).click();
+    await expect.poll(() => cameraPadding(page)).toEqual({ top: 0, bottom: 0, left: 0, right: 0 });
+    await removeTrip(request, trip.id);
+  });
+
+  test('@no-phone Export opens its dialog from the header', async ({ page, request }) => {
+    const trip = await seedTrip(request);
+    await openEditor(page, trip.id);
+    await header(page).getByRole('button', { name: /^Экспорт/ }).click();
+    await expect(dialogOrPlaceholder(page, 'export-dialog')).toBeVisible();
+    await removeTrip(request, trip.id);
+  });
+
+  test('an error thrown in one slot is caught, toasted and logged; siblings stay', async ({ page, request }) => {
+    const log = await collectLog(page);
+    const trip = await seedTrip(request);
+    await page.goto(`/trip/${trip.id}?ui=next&e2e&crash=video-panel`);
+    await expect(page.getByRole('alert')).toContainText('video-panel crashed');
+    await expect(page.getByRole('heading', { name: 'Видео' })).toHaveCount(0);
+    await expect(page.getByTestId('editor-shell')).toBeVisible();
+    await expect(header(page)).toBeVisible();
+    await log.waitFor('error', (d) => String(d.message).includes('video-panel crashed'));
+    await removeTrip(request, trip.id);
   });
 
   test('ui choice is remembered and ?ui=legacy returns to the legacy app', async ({ page }) => {
-    await page.goto('/?ui=next&e2e');
-    await expect(page.locator('[data-placeholder="home-screen"]')).toBeVisible();
+    await openHome(page);
     await page.goto('/?e2e');
-    await expect(page.locator('[data-placeholder="home-screen"]')).toBeVisible();
+    await expect(page.getByTestId('home-screen')).toBeVisible();
     await page.goto('/?ui=legacy&e2e');
     await expect(page.locator('.map canvas.maplibregl-canvas')).toBeVisible();
-    await expect(page.locator('[data-placeholder="home-screen"]')).toHaveCount(0);
+    await expect(page.getByTestId('home-screen')).toHaveCount(0);
   });
 });

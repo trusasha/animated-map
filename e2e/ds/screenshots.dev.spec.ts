@@ -27,7 +27,7 @@ for (const viewport of Object.keys(VIEWPORTS) as ViewportName[]) {
 }
 
 for (const theme of THEMES) {
-  test(`open Dialog matches baseline in ${theme}`, { tag: '@needs-p1-10a' }, async ({ page }) => {
+  test(`open Dialog matches baseline in ${theme}`, async ({ page }) => {
     await openGallery(page, { theme });
     await demoSection(page, 'Dialog').getByRole('button', { name: 'Open 640' }).click();
     const dialog = page.getByRole('dialog');

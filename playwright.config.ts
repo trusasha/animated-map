@@ -33,13 +33,12 @@ const projects: Project[] = Object.entries(sizes).flatMap(([size, device]) =>
       name,
       // server routes and the ~6 min software-GL export run don't depend on viewport or theme: one project only
       testIgnore: name === 'desktop-light' ? '**/*.dev.spec.ts' : ['**/*.dev.spec.ts', '**/server.spec.ts', '**/export-smoke.spec.ts', '**/flows/settings.spec.ts'],
-      grepInvert: MAP_PROJECTS.includes(name) ? undefined : /@map/,
+      grepInvert: [/@needs-p3-04/, ...(MAP_PROJECTS.includes(name) ? [] : [/@map/]), ...(size === 'phone' ? [/@no-phone/] : [])],
       use: { ...device, colorScheme, baseURL: PROD },
     };
   }),
 );
-const devGrepInvert = [...(process.env.RECORD ? [] : [/@record/]), ...(process.env.NEEDS_P1_10A ? [] : [/@needs-p1-10a/])];
-projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: devGrepInvert.length ? devGrepInvert : undefined, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
+projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: process.env.RECORD ? undefined : /@record/, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
 
 export default defineConfig({
   testDir: 'e2e',

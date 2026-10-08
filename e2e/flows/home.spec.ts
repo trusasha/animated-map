@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { defaultSettings, emptyTrips } from '../fixtures/api';
-import { stubNet } from '../fixtures/net';
+import { emptyTrips } from '../fixtures/api';
+import { prepare } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  await stubNet(page);
-  await defaultSettings(page);
+  await prepare(page);
 });
 
 test.describe('home @map', () => {
