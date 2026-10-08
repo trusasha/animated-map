@@ -1,5 +1,7 @@
 export const preview = {
   play: '▶ Preview',
+  resume: 'Play',
+  position: 'Playback position',
   pause: 'Pause',
   exit: 'Exit preview',
   loadingMap: 'Loading the map… {percent}%',
