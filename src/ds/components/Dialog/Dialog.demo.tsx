@@ -26,13 +26,15 @@ export default function Demo() {
       {widths.map((w) => (
         <Dialog key={w} open={open === `w${w}`} onOpenChange={close} title={`Dialog ${w}`} subtitle="Subtitle explains the purpose.">
           <p>Body copy. Press Esc or click the scrim to close.</p>
-          <div style={{ height: 600 }} />
+          <Button size="sm" variant="secondary">Action</Button>
+          <div style={{ height: 900 }} />
           <p>End of scrolling body.</p>
         </Dialog>
       ))}
       <Dialog
         open={open === 'locked'}
         onOpenChange={close}
+        dismissible={false}
         title="Exporting video"
         subtitle="Esc and scrim clicks are ignored."
         footer={<Button onClick={() => setOpen(null)}>Done</Button>}
