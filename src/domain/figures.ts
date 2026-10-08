@@ -37,16 +37,19 @@ const poseOf = (m: CustomModel) => m.pose ?? NO_POSE;
 export const poseKey = (models: CustomModel[]) =>
   models.filter(isUsable).map((m) => { const p = poseOf(m); return `${m.url}|${p.rx},${p.ry},${p.rz},${p.scale}`; }).join(';');
 
-const exists = (figure: string, mode: Mode, models: CustomModel[]) =>
-  figure.startsWith('model:') ? models.some((m) => isUsable(m) && modelFigure(m) === figure) : FIGURES[mode].includes(figure);
+const hasModel = (figure: string, models: CustomModel[]) => models.some((m) => isUsable(m) && modelFigure(m) === figure);
+
+/** a built-in of the mode, or a ready model offered for it */
+export const figureFits = (figure: string, mode: Mode, models: CustomModel[]) =>
+  figure.startsWith('model:') ? fittingModels(models, mode).some((m) => modelFigure(m) === figure) : FIGURES[mode].includes(figure);
 
 /** the default figure for a mode, if the model it points at still exists */
-const defaultFigure = (mode: Mode, models: CustomModel[], settings: UserSettings) =>
-  exists(settings.figures[mode], mode, models) ? settings.figures[mode] : FIGURES[mode][0];
+export const defaultFigure = (mode: Mode, models: CustomModel[], settings: UserSettings) =>
+  figureFits(settings.figures[mode], mode, models) ? settings.figures[mode] : FIGURES[mode][0];
 
 /** segments whose custom model is gone fall back to the default of their mode (only call with a successfully loaded model list) */
 export function resolveFigures(d: TripData, models: CustomModel[], settings: UserSettings = DEFAULT_SETTINGS): TripData {
-  const gone = (f: string) => f.startsWith('model:') && !exists(f, 'ground', models);
+  const gone = (f: string) => f.startsWith('model:') && !hasModel(f, models);
   if (!d.stops.some((s) => s.leg && gone(s.leg.figure))) return d;
   return { ...d, stops: d.stops.map((s) => (s.leg && gone(s.leg.figure) ? { ...s, leg: { ...s.leg, figure: defaultFigure(s.leg.mode, models, settings) } } : s)) };
 }
