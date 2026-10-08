@@ -1,6 +1,6 @@
-import { createOffscreenMap } from './services/map';
-import { createOverlay3D } from './services/scene3d';
-import { attributionOf, DEFAULT_OVERLAY, drawOverlay, isVideoError, renderVideo } from './services/video';
+import { createOffscreenMap } from '../services/map';
+import { createOverlay3D } from '../services/scene3d';
+import { attributionOf, DEFAULT_OVERLAY, drawOverlay, isVideoError, renderVideo } from '../services/video';
 import type { Format, LngLat, MapStyle, Mode, Overlay, Stop } from './types';
 
 export { attributionOf, DEFAULT_OVERLAY, drawOverlay };
