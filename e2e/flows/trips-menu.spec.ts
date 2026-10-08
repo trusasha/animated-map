@@ -1,10 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { defaultSettings } from '../fixtures/api';
-import { stubNet } from '../fixtures/net';
+import { prepare } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  await stubNet(page);
-  await defaultSettings(page);
+  await prepare(page);
 });
 
 const EMPTY = { stops: [], style: 'satellite', speed: 1, format: '9:16' };

@@ -7,6 +7,8 @@
   --hit-row-pad: var(--space-8);
   --hit-slop-x: 0px;
   --hit-slop-y: 0px;
+  --hit-target-min: 0px;
+  --hit-grabber: 28px;
 }
 
 @media (pointer: coarse) {
@@ -19,6 +21,8 @@
     --hit-row-pad: var(--space-10);
     --hit-slop-x: var(--space-4);
     --hit-slop-y: var(--space-8);
+    --hit-target-min: var(--hit-target-touch);
+    --hit-grabber: var(--hit-grabber-touch);
   }
 }
 
@@ -32,4 +36,6 @@
   --hit-row-pad: var(--space-10);
   --hit-slop-x: var(--space-4);
   --hit-slop-y: var(--space-8);
+  --hit-target-min: var(--hit-target-touch);
+  --hit-grabber: var(--hit-grabber-touch);
 }

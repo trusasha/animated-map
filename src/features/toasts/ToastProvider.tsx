@@ -1,4 +1,5 @@
 import { useEffect, useMemo, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Toaster, useToasts as useToastQueue, useViewportMode } from '../../ds';
 import { useT } from '../../i18n/react';
 import { registerErrorSink } from './reportError';
@@ -18,7 +19,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext value={api}>
       {children}
-      <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel={t('common.actions.close')} placement={mode === 'phone' ? 'top' : 'bottom'} />
+      {createPortal(
+        <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel={t('common.actions.close')} placement={mode === 'phone' ? 'top' : 'bottom'} />,
+        document.body,
+      )}
     </ToastContext>
   );
 }

@@ -99,6 +99,8 @@
   --hit-rail-touch: 24px;
   --hit-handle-touch: 20px;
   --hit-swatch-touch: 32px;
+  --hit-target-touch: 44px;
+  --hit-grabber-touch: 36px;
 
   /* typography */
   --font-sans: "Inter Variable", Inter, -apple-system, system-ui, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
