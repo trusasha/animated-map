@@ -1,6 +1,6 @@
 import { useId, type CSSProperties, type ReactNode, type Ref } from 'react';
-import { Lock } from 'lucide-react';
 import { cx } from '../../lib/cx';
+import { Icon } from '../Icon';
 import styles from './Switch.module.css';
 
 export interface SwitchProps {
@@ -26,7 +26,7 @@ export function Switch({ checked, onChange, label, sub, locked = false, disabled
         </span>
         {sub && <span className={styles.sub}>{sub}</span>}
       </span>
-      {locked && <Lock size={12} aria-hidden="true" className={styles.lock} />}
+      {locked && <Icon name="lock" size={16} className={styles.lock} />}
       <button
         ref={ref}
         type="button"

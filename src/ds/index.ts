@@ -1,6 +1,3 @@
-// index.css must load before any component CSS, or the reset layer overrides components
-import './index.css';
-
 export * from './components/BackLink';
 export * from './components/Badge';
 export * from './components/BottomSheet';

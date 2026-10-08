@@ -1,0 +1,22 @@
+.ta-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--marker-border);
+  border-radius: var(--radius-circle);
+  background: var(--color-white);
+  color: var(--color-black);
+  box-shadow: var(--shadow-marker);
+  font-family: var(--font-sans);
+  font-size: var(--type-micro-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+}
+.ta-marker--end { background: var(--color-warm-dark); color: var(--color-white); }
+.ta-marker--active { border-color: var(--color-blue); }
+.ta-marker--approx { border-style: dashed; border-color: var(--color-orange); }
+.ta-marker--out { opacity: 0.45; }
+.ta-marker--drag { cursor: grab; }

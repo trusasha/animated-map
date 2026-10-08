@@ -1,0 +1,28 @@
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding: var(--space-14);
+  background: var(--surface-alt);
+  border-radius: var(--radius-large);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hint,
+.status {
+  margin: 0;
+  font-size: var(--type-ui-size);
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-8);
+  justify-content: space-between;
+}

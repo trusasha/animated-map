@@ -21,10 +21,18 @@ test.describe('Segmented', () => {
   });
 
   test('arrows skip a disabled option', async ({ page }) => {
-    const group = demoSection(page, 'Segmented').getByRole('radiogroup', { name: 'Two options, one disabled' });
+    const group = demoSection(page, 'Segmented').getByRole('radiogroup', { name: 'Three options, middle disabled' });
     await group.getByRole('radio', { name: 'Fast' }).focus();
     await page.keyboard.press('ArrowRight');
-    await expect(group.getByRole('radio', { name: 'Fast' })).toBeChecked();
+    await expect(group.getByRole('radio', { name: 'Balanced' })).toBeChecked();
+    await expect(group.getByRole('radio', { name: 'Balanced' })).toBeFocused();
+    await expect(group.getByRole('radio', { name: 'Precise' })).not.toBeChecked();
+  });
+
+  test('a disabled group has no selectable radio', async ({ page }) => {
+    const group = demoSection(page, 'Segmented').getByRole('radiogroup', { name: 'Whole group disabled' });
+    await expect(group.getByRole('radio', { name: 'Land' })).toBeDisabled();
+    await expect(group.getByRole('radio', { name: 'Air' })).toBeDisabled();
   });
 });
 
@@ -75,6 +83,20 @@ test.describe('Switch', () => {
     await sw.focus();
     await page.keyboard.press('Space');
     await expect(sw).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('clicking the label toggles the switch', async ({ page }) => {
+    const section = demoSection(page, 'Switch');
+    const sw = section.getByRole('switch', { name: 'Trip name' });
+    await expect(sw).toHaveAttribute('aria-checked', 'true');
+    await section.getByText('Trip name', { exact: true }).click();
+    await expect(sw).toHaveAttribute('aria-checked', 'false');
+  });
+
+  test('clicking the label of a locked switch changes nothing', async ({ page }) => {
+    const section = demoSection(page, 'Switch');
+    await section.getByText('Map attribution', { exact: true }).click({ force: true });
+    await expect(section.getByRole('switch', { name: 'Map attribution' })).toHaveAttribute('aria-checked', 'true');
   });
 
   test('a locked switch stays focusable', async ({ page }) => {
@@ -146,6 +168,19 @@ test.describe('RangeRail', () => {
     await handle(page, END).focus();
     await page.keyboard.press('End');
     await expect(handle(page, END)).toHaveAttribute('aria-valuetext', 'Lisbon');
+  });
+
+  test('dragging the start handle with the pointer moves it to the row under the cursor', async ({ page }) => {
+    const section = demoSection(page, 'RangeRail');
+    await section.scrollIntoViewIfNeeded();
+    const box = (await handle(page, START).boundingBox())!;
+    const row = (await section.locator('[data-idx="3"]').boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2, row.y + row.height / 2, { steps: 6 });
+    await page.mouse.up();
+    await expect(handle(page, START)).toHaveAttribute('aria-valuetext', 'Nairobi');
+    await expect(handle(page, END)).toHaveAttribute('aria-valuetext', 'Cape Town');
   });
 
   test('the start handle cannot pass the end handle', async ({ page }) => {

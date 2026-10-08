@@ -7,7 +7,7 @@ export type RangeRailLabels = {
   from: string;
   to: string;
   rowClick: string;
-  valueText?: (idx: number, count: number) => string;
+  valueText: (idx: number, count: number) => string;
 };
 
 export type RangeRailProps = {
@@ -98,7 +98,7 @@ export function RangeRail({ count, from, to, onChange, containerRef, labels, nod
     emit(next);
   };
 
-  const text = (i: number) => labels.valueText?.(i, count) ?? `${i + 1} / ${count}`;
+  const text = (i: number) => labels.valueText(i, count);
   const handle = (h: Handle, label: string) => {
     const i = range[h];
     return (

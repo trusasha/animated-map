@@ -1,5 +1,7 @@
+import { TripContext } from '../hooks/useTripContext';
+import { useTripController } from '../hooks/useTrip';
 import type { TripProviderProps } from '../types';
 
-export function TripProvider({ children }: TripProviderProps) {
-  return children;
+export function TripProvider({ tripId, children }: TripProviderProps) {
+  return <TripContext value={useTripController(tripId)}>{children}</TripContext>;
 }

@@ -10,10 +10,6 @@
     --swatch: var(--hit-swatch-touch);
   }
 
-  html[data-coarse] .root {
-    --swatch: var(--hit-swatch-touch);
-  }
-
   .swatch {
     position: relative;
     display: block;

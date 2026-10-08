@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { applyTheme, type ThemeMode } from '../ds/lib/theme.ts';
-import { useViewportMode } from '../ds/hooks/useViewportMode.ts';
+import { forceCoarse as applyForceCoarse, useViewportMode } from '../ds/hooks/useViewportMode.ts';
 import { demos } from './demos.ts';
 import { Swatches } from './Swatches.tsx';
 import { Toolbar, WIDTHS } from './Toolbar.tsx';
@@ -12,11 +12,7 @@ export function Gallery() {
   const { mode, coarse } = useViewportMode();
 
   useEffect(() => applyTheme(theme), [theme]);
-  useEffect(() => {
-    const root = document.documentElement;
-    if (forceCoarse) root.dataset.coarse = '';
-    else if (!coarse) delete root.dataset.coarse;
-  }, [forceCoarse, coarse]);
+  useEffect(() => applyForceCoarse(forceCoarse), [forceCoarse]);
 
   return (
     <div className="gallery">

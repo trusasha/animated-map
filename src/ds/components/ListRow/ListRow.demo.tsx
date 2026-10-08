@@ -32,6 +32,7 @@ export default function Demo() {
             outOfRange={i === 3}
             onSelect={() => setSelected(i)}
             actions={<><IconButton icon="arrow-up" label="Move up" /><IconButton icon="trash-2" label="Delete stop" /></>}
+            actionsMenu={<IconButton icon="more-horizontal" label="Stop actions" />}
           />
         ))}
       </div>
