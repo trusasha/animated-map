@@ -6,8 +6,9 @@ import { SegmentInspector } from '../features/inspector';
 import { PreviewTransport } from '../features/preview';
 import { RoutePanel } from '../features/route';
 import { SettingsDialog } from '../features/settings';
-import { AppHeader, HomeScreen, TripProvider } from '../features/trips';
+import { AppHeader, HomeScreen, SaveStatusLabel, TripProvider, VideoActions } from '../features/trips';
 import { ConnectedVideoPanel } from './ConnectedVideoPanel';
+import { TripMapStyle } from './TripMapStyle';
 import { ErrorBoundary as Boundary } from './ErrorBoundary';
 import { useServices } from './providers/ServicesProvider';
 import { navigate } from './router';
@@ -21,7 +22,7 @@ export function Session({ tripId }: { tripId: string | null }) {
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [previewing, setPreviewing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
-  const [, setPicking] = useState(false);
+  const [picking, setPicking] = useState(false);
 
   useEffect(() => { if (tripId === null) map.setMode('home'); }, [map, tripId]);
 
@@ -29,6 +30,7 @@ export function Session({ tripId }: { tripId: string | null }) {
   const openTrip = (id: string) => navigate({ name: 'trip', id });
   const onPreview = () => setPreviewing(true);
   const onExport = () => setDialog('export');
+  const onOpenFigures = () => setDialog('figures');
 
   return (
     <TripProvider tripId={tripId}>
@@ -41,22 +43,26 @@ export function Session({ tripId }: { tripId: string | null }) {
             onPreview={onPreview}
             onExport={onExport}
             onOpenSettings={() => setDialog('settings')}
-            onOpenFigures={() => setDialog('figures')}
+            onOpenFigures={onOpenFigures}
           />
         </Boundary>
       </div>
       <div className={styles.layer}>
         {tripId === null ? (
           <Boundary name="home-screen"><HomeScreen onOpenTrip={openTrip} globe={map} /></Boundary>
-        ) : (
+        ) : (<>
+          <TripMapStyle map={map} />
           <EditorShell
             routePanel={<Boundary name="route-panel"><RoutePanel selected={selected} onSelect={setSelected} onPickChange={setPicking} map={map} /></Boundary>}
             videoPanel={<Boundary name="video-panel"><ConnectedVideoPanel onPreview={onPreview} onExport={onExport} /></Boundary>}
-            inspector={selected === null ? null : <Boundary name="segment-inspector"><SegmentInspector index={selected} onClose={() => setSelected(null)} onManageFigures={() => setDialog('figures')} /></Boundary>}
+            inspector={selected === null ? null : <Boundary name="segment-inspector"><SegmentInspector index={selected} onClose={() => setSelected(null)} onManageFigures={onOpenFigures} /></Boundary>}
             transport={previewing ? <Boundary name="preview-transport"><PreviewTransport player={map.player} onExit={() => setPreviewing(false)} /></Boundary> : null}
+            footer={<Boundary name="sheet-footer"><SaveStatusLabel /><VideoActions onPreview={onPreview} onExport={onExport} short /></Boundary>}
+            picking={picking}
             onPaddingChange={setPadding}
+            onControlsInsetChange={map.setControlsInset}
           />
-        )}
+        </>)}
         <div className={styles.dialogs}>
           <Boundary name="settings-dialog"><SettingsDialog open={dialog === 'settings'} onClose={close} /></Boundary>
           <Boundary name="figures-dialog"><FiguresDialog open={dialog === 'figures'} onClose={close} /></Boundary>

@@ -1,11 +1,11 @@
 .shell {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 .column,
 .right,
-.sheet,
 .transport {
   position: absolute;
   display: flex;
@@ -17,39 +17,73 @@
 
 .column > *,
 .right > *,
-.sheet > *,
-.transport > * {
+.transport > *,
+.sheet {
   pointer-events: auto;
 }
 
 .column {
   top: var(--space-16);
+  bottom: var(--space-16);
   left: var(--space-16);
   width: 356px;
-  max-height: calc(100% - var(--space-16));
 }
 
 .right {
   top: var(--space-16);
+  bottom: var(--space-16);
   right: var(--space-16);
   width: 336px;
 }
 
+.card {
+  padding: var(--space-16);
+  animation: rise var(--duration-slow) var(--ease-standard) backwards;
+}
+
+.route,
+.inspector {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.video {
+  flex: none;
+  animation-delay: 40ms;
+}
+
 .sheet {
-  left: 0;
-  right: 0;
-  bottom: 0;
-  max-height: 46dvh;
-  padding: var(--space-12) var(--space-16);
-  background: var(--surface-card);
+  z-index: var(--z-sheet);
+}
+
+.divider {
+  flex: none;
+  margin: var(--space-20) 0;
   border-top: var(--border-whisper);
-  border-radius: var(--radius-large) var(--radius-large) 0 0;
-  box-shadow: var(--elevation-deep);
-  pointer-events: auto;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.footer > :first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .transport {
   left: var(--space-16);
   right: var(--space-16);
   bottom: var(--space-16);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
 }
