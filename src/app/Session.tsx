@@ -52,7 +52,7 @@ export function Session({ tripId }: { tripId: string | null }) {
           <EditorShell
             routePanel={<Boundary name="route-panel"><RoutePanel selected={selected} onSelect={setSelected} onPickChange={setPicking} map={map} /></Boundary>}
             videoPanel={<Boundary name="video-panel"><ConnectedVideoPanel onPreview={onPreview} onExport={onExport} /></Boundary>}
-            inspector={selected === null ? null : <Boundary name="segment-inspector"><SegmentInspector index={selected} onClose={() => setSelected(null)} /></Boundary>}
+            inspector={selected === null ? null : <Boundary name="segment-inspector"><SegmentInspector index={selected} onClose={() => setSelected(null)} onManageFigures={() => setDialog('figures')} /></Boundary>}
             transport={previewing ? <Boundary name="preview-transport"><PreviewTransport player={map.player} onExit={() => setPreviewing(false)} /></Boundary> : null}
             onPaddingChange={setPadding}
           />

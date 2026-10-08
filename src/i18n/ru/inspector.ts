@@ -25,6 +25,7 @@ export const inspector: Shape<Dict['inspector']> = {
     defaultFor: 'По умолчанию для типа «{mode}»',
     useDefault: 'Как по умолчанию',
     applyAll: 'Применить ко всем участкам',
+    appliedAll: 'Цвет применён ко всем участкам ({count}).',
     custom: 'Свой цвет',
     names: {
       charcoal: 'Графит', blue: 'Синий', teal: 'Бирюзовый', green: 'Зелёный',
