@@ -13,6 +13,7 @@ export interface Prefetch<T = unknown> { tl: T; buffered: number }
 export function fetchTiles<T>(pf: Prefetch<T>, duration: number, { times, cuts, urls }: TilePlan, alive: () => boolean, signal?: AbortSignal, timeoutMs = TILE_TIMEOUT_MS) {
   const done = new Uint8Array(urls.length);
   let next = 0, prefix = 0, k = -1;
+  if (!urls.length && alive()) pf.buffered = duration;
   const worker = async () => {
     while (next < urls.length && alive()) {
       const i = next++;
