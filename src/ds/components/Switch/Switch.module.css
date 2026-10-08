@@ -71,8 +71,18 @@
 
   .row[data-locked] .track,
   .row[data-disabled] .track {
-    opacity: 0.5;
+    background: var(--text-decorative);
     cursor: not-allowed;
+  }
+
+  .row[data-locked] .track[aria-checked='true'],
+  .row[data-disabled] .track[aria-checked='true'] {
+    background: var(--text-muted);
+  }
+
+  .row[data-disabled] .label,
+  .row[data-disabled] .sub {
+    color: var(--text-muted);
   }
 
   html[data-coarse] .track::after {
