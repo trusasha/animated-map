@@ -10,7 +10,6 @@ import { createMarkers } from './markers';
 import { installPointer } from './pick';
 import { MapPlayer, OVERLAY_LAYER } from './player';
 import { probe } from './probe';
-import { registerDemProtocol } from './styles/dem';
 import { GLYPHS, TILE_CACHE_ZOOM_LEVELS } from './styles/hosts';
 import { installImageResolver } from './styles/imageResolver';
 import { loadStyle } from './styles/loadStyle';
@@ -24,8 +23,6 @@ const subscribe = <T>(set: Set<T>, cb: T) => { set.add(cb); return () => { set.d
 export function createMapService(container: HTMLElement, overlay: MapOverlay3D): MapService {
   // glyphs: the player's label layer is installed on this placeholder style too
   const placeholder: maplibregl.StyleSpecification = { version: 8, glyphs: GLYPHS, sources: {}, layers: [] };
-  // sets the production worker URL: workers spawned before it never answer, for this map and every later one
-  registerDemProtocol();
   const map = new maplibregl.Map({
     container, style: placeholder, center: [20, 30], zoom: 1.4,
     maxTileCacheZoomLevels: TILE_CACHE_ZOOM_LEVELS, canvasContextAttributes: { antialias: true },
