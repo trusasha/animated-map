@@ -12,6 +12,7 @@ const PATHS = 'import-x/no-restricted-paths';
 // resolver-based rules need real targets, so the fixtures are linted inside a throwaway tree
 const STUBS = [
   'src/domain/route.ts',
+  'src/lib/index.ts',
   'src/services/map/index.ts',
   'src/services/scene3d/scene.ts',
   'src/features/route/index.ts',
@@ -26,14 +27,20 @@ const cases: { fixture: string; virtualPath: string; rule: string | null }[] = [
   { fixture: 'features-imports-maplibre.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: 'no-restricted-imports' },
   { fixture: 'ds-imports-domain.tsx', virtualPath: 'src/ds/fixture.tsx', rule: PATHS },
   { fixture: 'server-imports-pglite-outside-db.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-imports' },
+  { fixture: 'lib-imports-domain.ts', virtualPath: 'src/lib/fixture.ts', rule: PATHS },
+  { fixture: 'map-imports-react.ts', virtualPath: 'src/services/map/fixture.ts', rule: 'no-restricted-imports' },
   { fixture: 'map-imports-scene3d.ts', virtualPath: 'src/services/map/fixture.ts', rule: PATHS },
   { fixture: 'video-global-outside-video.ts', virtualPath: 'src/features/export/fixture.ts', rule: 'no-restricted-globals' },
   { fixture: 'features-deep-ds-import.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: PATHS },
   { fixture: 'features-deep-feature-import.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: PATHS },
+  { fixture: 'features-dynamic-import-three.ts', virtualPath: 'src/features/trips/fixture.ts', rule: 'no-restricted-syntax' },
+  { fixture: 'server-dynamic-import-pglite.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-syntax' },
+  { fixture: 'new-top-level-any.ts', virtualPath: 'src/newtop.ts', rule: '@typescript-eslint/no-explicit-any' },
   // the same code is legal in the layer that owns it
   { fixture: 'features-imports-feature-index.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: null },
   { fixture: 'video-global-outside-video.ts', virtualPath: 'src/services/video/fixture.ts', rule: null },
   { fixture: 'server-imports-pglite-outside-db.ts', virtualPath: 'server/db/fixture.ts', rule: null },
+  { fixture: 'server-dynamic-import-pglite.ts', virtualPath: 'server/db/fixture.ts', rule: null },
 ];
 
 // realpath: the resolver returns real paths and tmpdir() is a symlink on macOS
@@ -48,7 +55,8 @@ try {
   for (const { fixture, virtualPath, rule } of cases) {
     const code = readFileSync(`${FIXTURES}/${fixture}`, 'utf8');
     const [result] = await eslint.lintText(code, { filePath: path.join(root, virtualPath) });
-    const ids = result.messages.filter((m) => m.ruleId?.includes('no-restricted-')).map((m) => m.ruleId);
+    assert.equal(result.fatalErrorCount, 0, `${fixture} as ${virtualPath}: fatal parse error: ${result.messages.map((m) => m.message).join('; ')}`);
+    const ids = result.messages.filter((m) => (m.ruleId?.includes('no-restricted-') || m.ruleId === '@typescript-eslint/no-explicit-any')).map((m) => m.ruleId);
     if (rule) assert.ok(ids.includes(rule), `${fixture} as ${virtualPath}: expected ${rule}, got [${ids.join(', ')}]`);
     else assert.deepEqual(ids, [], `${fixture} as ${virtualPath}: expected clean, got [${ids.join(', ')}]`);
     console.log(`ok ${fixture} @ ${virtualPath} -> ${rule ?? 'clean'}`);
