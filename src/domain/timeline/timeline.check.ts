@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { greatCircle, simplify, distance } from './geo';
-import { buildTimeline, sample, slicePath, HOLD, INTRO, SWAP } from './timeline';
-import type { LngLat } from './types';
+import { greatCircle, simplify, distance } from '../geo';
+import { buildTimeline, sample, slicePath, HOLD, INTRO, SWAP } from './index';
+import type { LngLat } from '../types';
 
 const fit = (b: [number, number, number, number]) => ({ zoom: 10 - Math.log2(1 + Math.max(b[2] - b[0], b[3] - b[1])), center: [(b[0] + b[2]) / 2, (b[1] + b[3]) / 2] as LngLat });
 const stops = [
@@ -85,4 +85,11 @@ for (let t = r0.end; t <= r1.start; t += 1 / 30) {
   prevH = f.heading;
 }
 assert.ok(Math.abs(sample(twoRides, r1.start - 1e-6).heading - sample(twoRides, r1.start + 1e-6).heading) < 2, 'leaves facing the next leg');
+// colour is data only: it must not move a single frame
+const painted = buildTimeline(stops, legs.map((l, i) => ({ ...l, color: ['#ff0000', '#00ff00', '#0000ff'][i] })), 1, fit);
+const uncoloured = (t: typeof tl) => t.legs.map((l) => { const c = { ...l }; delete c.color; return c; });
+assert.deepEqual(uncoloured(painted), uncoloured(tl), 'colour does not change the timeline');
+assert.deepEqual(painted.legs.map((l) => l.color), ['#ff0000', '#00ff00', '#0000ff'], 'colour is passed through to the legs');
+assert.equal(painted.duration, tl.duration);
+for (let t = 0; t <= tl.duration; t += 0.25) assert.deepEqual(sample(painted, t), sample(tl, t), `frame @${t}`);
 console.log('timeline ok, duration', tl.duration.toFixed(1), 's, max turn', maxTurn.toFixed(1), '°/frame');
