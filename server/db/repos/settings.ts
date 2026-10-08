@@ -2,7 +2,7 @@ import { normalizeSettings } from '../../../src/domain/settings.ts';
 import type { Query, SettingsRepo } from '../types.ts';
 
 export const settingsRepo = (query: Query): SettingsRepo => ({
-  get: async () => normalizeSettings((await query("select data from settings where id = 'default'")).rows[0]?.data ?? {}),
+  get: async () => normalizeSettings((await query<{ data: unknown }>("select data from settings where id = 'default'")).rows[0]?.data ?? {}),
   save: async (raw) => {
     const settings = normalizeSettings(raw);
     await query(

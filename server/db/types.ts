@@ -1,6 +1,6 @@
 import type { CustomModel, LngLat, TripData, TripSummary, Trip, UserSettings } from '../../src/domain/types.ts';
 
-export type Query = (sql: string, params?: unknown[]) => Promise<{ rows: any[] }>;
+export type Query = <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<{ rows: T[] }>;
 
 /** what Home needs per trip: no paths, no full data */
 export interface TripListItem { id: string; title: string; updated_at: string; summary: TripSummary; points: LngLat[] }

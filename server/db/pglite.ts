@@ -5,5 +5,5 @@ import type { Query } from './types.ts';
 export function connectPglite(dir: string): Query {
   mkdirSync(dir, { recursive: true });
   const pg = new PGlite(`${dir}/pg`);
-  return (sql, params) => pg.query(sql, params);
+  return <T,>(sql: string, params?: unknown[]) => pg.query<T>(sql, params);
 }
