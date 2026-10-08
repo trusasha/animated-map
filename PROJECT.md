@@ -40,8 +40,10 @@ npm run build && npm start
 
 ```
 server/                 Express (в dev — с Vite middleware, один порт)
-  index.ts              REST: trips, models (+ PUT имя/тип/поза), voice, parse, geocode, reverse, log; /uploads; HEIC→JPEG
-  db.ts                 один query(): PGlite локально или pg по DATABASE_URL
+  index.ts              сборка: Vite middleware (dev) / dist (prod), /uploads, роуты
+  routes/               trips (GET /api/trips — лёгкие сводки), models, ai (config, voice, parse, geocode, reverse), settings (GET/PUT), log
+  db/                   DbService: query + репозитории trips/models/settings; провайдеры pglite (локально) / postgres (DATABASE_URL); миграции
+  log.ts, files.ts      actions.jsonl; uploads и HEIC→JPEG (sips)
   ai.ts                 OpenAI (transcribe, structured parse), Nominatim + Photon geocode/reverse, fal.ai photo→3D
 src/
   route.ts              цепочка маршрута: chain() / migrate() / legsOf(); self-check в route.check.ts

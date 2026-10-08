@@ -178,7 +178,6 @@ const buildConfig = (root) => tseslint.config(
       'src/exporter.ts',
       'src/ukiyoe.ts',
       'src/main.tsx',
-      'server/db.ts',
     ],
     rules: {
       'no-restricted-imports': 'off',
@@ -207,8 +206,6 @@ const buildConfig = (root) => tseslint.config(
       'src/types.ts',
       'src/ukiyoe.ts',
       'server/ai.ts',
-      'server/db.ts',
-      'server/index.ts',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
