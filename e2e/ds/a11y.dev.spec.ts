@@ -14,7 +14,7 @@ for (const theme of THEMES) {
     expect(await axeSummary(page)).toEqual([]);
   });
 
-  test(`an open danger ConfirmDialog has no axe violations in ${theme} theme`, { tag: '@needs-p1-10a' }, async ({ page }) => {
+  test(`an open danger ConfirmDialog has no axe violations in ${theme} theme`, async ({ page }) => {
     await openGallery(page, { theme });
     await demoSection(page, 'ConfirmDialog').getByRole('button', { name: 'Danger confirm' }).click();
     await expect(page.getByRole('alertdialog').or(page.getByRole('dialog'))).toBeVisible();

@@ -25,6 +25,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-8);
+    min-height: var(--hit-target-min);
     padding: var(--space-6) var(--space-8);
     border-radius: var(--radius-micro);
     font-size: var(--type-ui-size);
@@ -33,10 +34,6 @@
     cursor: pointer;
     outline: none;
     user-select: none;
-  }
-
-  :global(html[data-coarse]) .item {
-    min-height: 44px;
   }
 
   .item[data-highlighted] {

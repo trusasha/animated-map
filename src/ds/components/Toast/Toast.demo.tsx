@@ -8,6 +8,7 @@ export const title = 'Toast';
 export default function Demo() {
   const { toasts, push, dismiss } = useToasts();
   const [placement, setPlacement] = useState<ToastPlacement>('bottom');
+  const [log, setLog] = useState('');
   return (
     <div data-testid="demo-Toast" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)' }}>
       <Button variant="secondary" size="sm" onClick={() => push({ tone: 'info', message: 'Route replaced with 4 stops.' })}>
@@ -16,7 +17,7 @@ export default function Demo() {
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => push({ tone: 'info', message: 'Stop deleted.', action: { label: 'Undo', onAction: () => undefined } })}
+        onClick={() => push({ tone: 'info', message: 'Stop deleted.', action: { label: 'Undo', onAction: () => setLog('Undo') } })}
       >
         With Undo
       </Button>
@@ -30,6 +31,7 @@ export default function Demo() {
       <Button variant="ghost" size="sm" onClick={() => setPlacement(placement === 'bottom' ? 'top' : 'bottom')}>
         Placement: {placement}
       </Button>
+      {log && <span data-testid="toast-action-log">{log}</span>}
       <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel="Dismiss" placement={placement} topInset={56} />
     </div>
   );

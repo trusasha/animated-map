@@ -21,7 +21,7 @@ test.describe('Toaster', () => {
     await expect(toaster(page).getByText('Route replaced with 4 stops.')).toHaveCount(2);
   });
 
-  test('Undo runs its callback and dismisses the toast', { tag: '@needs-p1-10a' }, async ({ page }) => {
+  test('Undo runs its callback and dismisses the toast', async ({ page }) => {
     const section = demoSection(page, 'Toast');
     await section.getByRole('button', { name: 'With Undo' }).click();
     await toaster(page).getByRole('button', { name: 'Undo' }).click();
@@ -29,7 +29,7 @@ test.describe('Toaster', () => {
     await expect(section.getByTestId('toast-action-log')).toHaveText('Undo');
   });
 
-  test('hovering a toast pauses its timer', { tag: '@needs-p1-10a' }, async ({ page }) => {
+  test('hovering a toast pauses its timer', async ({ page }) => {
     await demoSection(page, 'Toast').getByRole('button', { name: 'Info toast' }).click();
     const toast = toaster(page).getByRole('status');
     await toast.hover();
