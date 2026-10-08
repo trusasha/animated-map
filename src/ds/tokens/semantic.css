@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light;
+
+  --text-primary: var(--color-black);
+  --text-body: var(--color-black);
+  --text-secondary: var(--color-warm-gray-500);
+  --text-muted: var(--color-warm-gray-400);
+  --text-decorative: var(--color-warm-gray-300);
+  --text-input: rgba(0, 0, 0, 0.9);
+  --text-on-accent: var(--color-white);
+  --text-on-dark: var(--color-white);
+  --text-link: var(--color-blue);
+  --text-link-on-dark: #62aef0;
+  --text-warning: var(--color-warning-text);
+  --text-error: var(--color-warning-text);
+  --text-success: var(--color-success-text);
+
+  --surface-root: var(--color-white);
+  --surface-page: var(--color-white);
+  --surface-card: var(--color-white);
+  --surface-input: var(--color-white);
+  --surface-alt: var(--color-warm-white);
+  --surface-dark: var(--color-warm-dark);
+  --surface-brand-dark: var(--color-navy);
+  --surface-secondary-button: var(--color-translucent);
+  --surface-hover: rgba(0, 0, 0, 0.05);
+  --surface-selected: var(--color-badge-bg);
+  --surface-warning: rgba(221, 91, 0, 0.1);
+  --surface-error: #fff7f2;
+  --surface-success: rgba(42, 157, 153, 0.1);
+  --surface-scrim: rgba(0, 0, 0, 0.2);
+  --surface-frame: var(--color-frame-placeholder);
+
+  --accent: var(--color-blue);
+  --accent-active: var(--color-blue-active);
+  --accent-fill: var(--color-blue);
+  --focus: var(--color-focus);
+  --status-success: var(--color-teal);
+  --status-complete: var(--color-green);
+  --status-warning: var(--color-orange);
+
+  --border-whisper-color: rgba(0, 0, 0, 0.1);
+  --border-input-color: var(--color-input-border);
+  --border-error-color: rgba(221, 91, 0, 0.3);
+  --border-dashed-color: var(--marker-border);
+  --border-whisper: 1px solid var(--border-whisper-color);
+  --border-input: 1px solid var(--border-input-color);
+  --focus-ring: 2px solid var(--focus);
+
+  --elevation-card: var(--shadow-card);
+  --elevation-deep: var(--shadow-deep);
+}
