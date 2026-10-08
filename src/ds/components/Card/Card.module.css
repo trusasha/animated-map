@@ -1,0 +1,53 @@
+@layer ds.components {
+  .card {
+    box-sizing: border-box;
+    background: var(--surface-card);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    border-radius: var(--radius-large);
+    border: var(--border-whisper);
+  }
+
+  .card[data-variant='floating'] { box-shadow: var(--elevation-deep); }
+  .card[data-variant='flat'] { box-shadow: var(--elevation-card); }
+
+  .card[data-scroll] {
+    overflow-y: auto;
+    max-height: 100%;
+    scrollbar-width: none;
+  }
+
+  .card[data-scroll]::-webkit-scrollbar { display: none; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-8);
+    min-width: 0;
+  }
+
+  .title {
+    margin: 0;
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-lh);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .meta {
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-lh);
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .action {
+    margin-left: auto;
+    flex: none;
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+  }
+}

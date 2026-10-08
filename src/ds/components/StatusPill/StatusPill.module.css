@@ -1,0 +1,26 @@
+@layer ds.components {
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: var(--space-6) var(--space-12);
+    border-radius: var(--radius-pill);
+    background: var(--surface-card);
+    box-shadow: var(--elevation-card);
+    font-family: var(--font-sans);
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+  }
+
+  .pill[data-tone='info'] {
+    background: var(--surface-selected);
+    color: var(--accent-active);
+    box-shadow: var(--elevation-deep);
+  }
+
+  .text { min-width: 0; }
+}
