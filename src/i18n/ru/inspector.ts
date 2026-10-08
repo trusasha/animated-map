@@ -4,7 +4,7 @@ import type { Shape } from '../keys';
 export const inspector: Shape<Dict['inspector']> = {
   caption: 'Участок {index} из {total} · потяните маркер финиша, чтобы перенести его',
   captionShort: 'Участок {index} из {total}',
-  allStops: '← Все точки',
+  allStops: 'Все точки',
   deselect: 'Снять выделение',
   title: '{from} → {to}',
   travelBy: 'Как добираемся',
