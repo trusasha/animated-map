@@ -14,8 +14,7 @@ const openDialog = async (page: Page) => {
   return dialog;
 };
 
-test.beforeEach(async ({ page }, info) => {
-  test.skip(info.project.name !== 'desktop-light', 'one viewport is enough for persistence');
+test.beforeEach(async ({ page }) => {
   await stubNet(page);
   await resetServer(page);
 });
