@@ -65,7 +65,7 @@
 
   .native {
     appearance: none;
-    font-size: 16px;
+    font-size: var(--type-input-touch-size);
     padding-right: var(--space-32);
   }
 
@@ -140,5 +140,13 @@
     font-size: var(--type-caption-size);
     line-height: var(--type-caption-lh);
     color: var(--text-muted);
+  }
+
+  .hint[data-error] {
+    color: var(--text-error);
+  }
+
+  .trigger[aria-invalid='true'] {
+    border-color: var(--border-error-color);
   }
 }

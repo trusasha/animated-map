@@ -16,6 +16,7 @@ export interface SelectProps {
   onChange: (value: string) => void;
   label?: ReactNode;
   hint?: ReactNode;
+  error?: ReactNode;
   placeholder?: string;
   native?: boolean;
   disabled?: boolean;
@@ -25,11 +26,11 @@ export interface SelectProps {
   ref?: Ref<HTMLElement>;
 }
 
-export function Select({ options, value, onChange, label, hint, placeholder, native, disabled, id, className, style, ref }: SelectProps) {
+export function Select({ options, value, onChange, label, hint, error, placeholder, native, disabled, id, className, style, ref }: SelectProps) {
   const auto = useId();
   const controlId = id ?? auto;
   const labelId = `${controlId}-label`;
-  const hintId = hint ? `${controlId}-hint` : undefined;
+  const noteId = error || hint ? `${controlId}-note` : undefined;
   return (
     <div className={cx(styles.field, className)} style={style}>
       {label && (
@@ -45,7 +46,8 @@ export function Select({ options, value, onChange, label, hint, placeholder, nat
             className={cx(styles.trigger, styles.native)}
             value={value}
             disabled={disabled}
-            aria-describedby={hintId}
+            aria-describedby={noteId}
+            aria-invalid={error ? true : undefined}
             onChange={(e) => onChange(e.target.value)}
           >
             {placeholder && (
@@ -68,7 +70,8 @@ export function Select({ options, value, onChange, label, hint, placeholder, nat
             id={controlId}
             className={styles.trigger}
             aria-labelledby={label ? labelId : undefined}
-            aria-describedby={hintId}
+            aria-describedby={noteId}
+            aria-invalid={error ? true : undefined}
           >
             <BaseSelect.Value className={styles.value} placeholder={placeholder} />
             <BaseSelect.Icon className={styles.icon}>
@@ -93,9 +96,9 @@ export function Select({ options, value, onChange, label, hint, placeholder, nat
           </BaseSelect.Portal>
         </BaseSelect.Root>
       )}
-      {hint && (
-        <div id={hintId} className={styles.hint}>
-          {hint}
+      {(error || hint) && (
+        <div id={noteId} className={styles.hint} data-error={error ? '' : undefined}>
+          {error || hint}
         </div>
       )}
     </div>

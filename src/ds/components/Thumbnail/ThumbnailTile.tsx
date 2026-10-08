@@ -20,13 +20,13 @@ export interface ThumbnailTileProps {
   /** Actions under a 120 tile (Edit / Delete); lives outside the selectable area. */
   footer?: ReactNode;
   /** Makes the tile selectable; it renders as a button. */
-  onClick?: () => void;
+  onSelect?: () => void;
   className?: string;
   ref?: Ref<HTMLDivElement>;
 }
 
 export function ThumbnailTile({
-  src, name, sub, size = 60, selected, disabled, add, badge, footer, onClick, className, ref,
+  src, name, sub, size = 60, selected, disabled, add, badge, footer, onSelect, className, ref,
 }: ThumbnailTileProps) {
   const content = (
     <>
@@ -51,8 +51,8 @@ export function ThumbnailTile({
       data-disabled={disabled || undefined}
       data-add={add || undefined}
     >
-      {onClick ? (
-        <button type="button" className={styles.main} onClick={onClick} disabled={disabled} aria-pressed={selected}>
+      {onSelect ? (
+        <button type="button" className={styles.main} onClick={onSelect} disabled={disabled} aria-pressed={selected}>
           {content}
         </button>
       ) : (
