@@ -48,6 +48,7 @@ export const route = {
     bannerTouch: 'Tap the map to place {name}',
     cancel: 'Cancel',
   },
+  stopRemoved: 'Removed “{name}”.',
   building: 'Building route…',
   markerTitle: '{name} · drag to move',
 };

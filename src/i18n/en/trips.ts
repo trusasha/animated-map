@@ -4,11 +4,13 @@ export const trips = {
     tripName: 'Trip name',
     saving: 'Saving…',
     saved: 'Saved',
+    saveFailed: 'Not saved',
     newTrip: 'New trip',
     preview: 'Preview',
     exportVideo: 'Export video',
     export: 'Export',
     settings: 'Settings',
+    figures: 'Your figures',
   },
   rename: { title: 'Rename trip', label: 'Name', placeholder: 'Trip name' },
   delete: {

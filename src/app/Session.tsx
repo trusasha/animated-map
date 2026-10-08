@@ -31,7 +31,7 @@ export function Session({ tripId }: { tripId: string | null }) {
   return (
     <TripProvider tripId={tripId}>
       <div className={styles.header}>
-        <Boundary>
+        <Boundary name="app-header">
           <AppHeader
             tripId={tripId}
             onGoHome={() => navigate({ name: 'home' })}
@@ -45,20 +45,20 @@ export function Session({ tripId }: { tripId: string | null }) {
       </div>
       <div className={styles.layer}>
         {tripId === null ? (
-          <Boundary><HomeScreen onOpenTrip={openTrip} /></Boundary>
+          <Boundary name="home-screen"><HomeScreen onOpenTrip={openTrip} /></Boundary>
         ) : (
           <EditorShell
-            routePanel={<Boundary><RoutePanel selected={selected} onSelect={setSelected} onPickChange={setPicking} /></Boundary>}
-            videoPanel={<Boundary><VideoPanel onPreview={onPreview} onExport={onExport} /></Boundary>}
-            inspector={selected === null ? null : <Boundary><SegmentInspector index={selected} onClose={() => setSelected(null)} /></Boundary>}
-            transport={previewing ? <Boundary><PreviewTransport onExit={() => setPreviewing(false)} /></Boundary> : null}
+            routePanel={<Boundary name="route-panel"><RoutePanel selected={selected} onSelect={setSelected} onPickChange={setPicking} /></Boundary>}
+            videoPanel={<Boundary name="video-panel"><VideoPanel onPreview={onPreview} onExport={onExport} /></Boundary>}
+            inspector={selected === null ? null : <Boundary name="segment-inspector"><SegmentInspector index={selected} onClose={() => setSelected(null)} /></Boundary>}
+            transport={previewing ? <Boundary name="preview-transport"><PreviewTransport onExit={() => setPreviewing(false)} /></Boundary> : null}
             onPaddingChange={setPadding}
           />
         )}
         <div className={styles.dialogs}>
-          <Boundary><SettingsDialog open={dialog === 'settings'} onClose={close} /></Boundary>
-          <Boundary><FiguresDialog open={dialog === 'figures'} onClose={close} /></Boundary>
-          <Boundary><ExportDialog open={dialog === 'export'} onClose={close} /></Boundary>
+          <Boundary name="settings-dialog"><SettingsDialog open={dialog === 'settings'} onClose={close} /></Boundary>
+          <Boundary name="figures-dialog"><FiguresDialog open={dialog === 'figures'} onClose={close} /></Boundary>
+          <Boundary name="export-dialog"><ExportDialog open={dialog === 'export'} onClose={close} /></Boundary>
         </div>
       </div>
     </TripProvider>

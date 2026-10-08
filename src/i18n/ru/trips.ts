@@ -5,13 +5,15 @@ export const trips: Shape<Dict['trips']> = {
   meta: '{stops} · {modes}',
   header: {
     tripName: 'Название путешествия',
-    saving: 'Сохраняю…',
+    saving: 'Сохранение…',
     saved: 'Сохранено',
+    saveFailed: 'Не сохранено',
     newTrip: 'Новое путешествие',
     preview: 'Превью',
     exportVideo: 'Экспорт видео',
     export: 'Экспорт',
     settings: 'Настройки',
+    figures: 'Мои фигурки',
   },
   rename: { title: 'Переименовать путешествие', label: 'Название', placeholder: 'Название путешествия' },
   delete: {
