@@ -42,7 +42,7 @@ const ranged = trip({ range: { from: 'b', to: 'd' } });
 assert.deepEqual(removeStop(ranged, 2).range, { from: 'b', to: 'd' }, 'range kept while it stays valid');
 assert.equal(removeStop(ranged, 3).range, undefined, 'range end removed');
 assert.ok(rangeWasReset(ranged, removeStop(ranged, 3)));
-assert.equal(removeStop(trip({ stops: trip().stops.slice(0, 3), range: { from: 'a', to: 'c' } }), 1).range, undefined, 'under three stops');
+assert.equal(removeStop(trip({ stops: trip().stops.slice(0, 3), range: { from: 'a', to: 'c' } }), 1).range, undefined, 'under 3 stops');
 assert.ok(!rangeWasReset(trip(), removeStop(trip(), 1)));
 
 const mv = moveStop(trip(), 1, 1);

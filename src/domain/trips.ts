@@ -32,7 +32,7 @@ export const isDefaultTripName = (name: string) => DEFAULT_NAMES.has(name.trim()
 
 export const suggestTripName = (stops: Pick<Stop, 'name'>[]) => (stops.length < 2 ? '' : `${stops[0].name} → ${stops.at(-1)!.name}`);
 
-/** fewer than three stops cannot have a sub-range: it would be the whole route */
+/** with under 3 stops a sub-range would be the whole route */
 const fixRange = (d: TripData): TripData => (d.stops.length < 3 && d.range ? { ...d, range: undefined } : d);
 
 /** removes the stop with its incoming leg; the neighbours re-join */
@@ -54,8 +54,9 @@ export function moveStopTo(d: TripData, i: number, [lng, lat]: LngLat): TripData
     ...d,
     stops: d.stops.map((s, k) => {
       if (k !== i) return k === i + 1 ? stale(s) : s;
-      const { sub: _old, ...rest } = s;
-      return stale({ ...rest, lng, lat, approx: undefined });
+      const moved: Stop = { ...s, lng, lat, approx: undefined };
+      delete moved.sub;
+      return stale(moved);
     }),
   };
 }

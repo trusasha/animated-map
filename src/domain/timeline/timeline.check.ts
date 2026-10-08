@@ -87,7 +87,8 @@ for (let t = r0.end; t <= r1.start; t += 1 / 30) {
 assert.ok(Math.abs(sample(twoRides, r1.start - 1e-6).heading - sample(twoRides, r1.start + 1e-6).heading) < 2, 'leaves facing the next leg');
 // colour is data only: it must not move a single frame
 const painted = buildTimeline(stops, legs.map((l, i) => ({ ...l, color: ['#ff0000', '#00ff00', '#0000ff'][i] })), 1, fit);
-assert.deepEqual(painted.legs.map(({ color: _c, ...l }) => l), tl.legs.map(({ color: _c, ...l }) => l), 'colour does not change the timeline');
+const uncoloured = (t: typeof tl) => t.legs.map((l) => { const c = { ...l }; delete c.color; return c; });
+assert.deepEqual(uncoloured(painted), uncoloured(tl), 'colour does not change the timeline');
 assert.deepEqual(painted.legs.map((l) => l.color), ['#ff0000', '#00ff00', '#0000ff'], 'colour is passed through to the legs');
 assert.equal(painted.duration, tl.duration);
 for (let t = 0; t <= tl.duration; t += 0.25) assert.deepEqual(sample(painted, t), sample(tl, t), `frame @${t}`);

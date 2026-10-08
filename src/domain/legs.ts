@@ -19,7 +19,7 @@ export const applyColorToAll = (d: TripData, color: string): TripData => mapLegs
 
 /** back to the default of the mode: the key is removed, not set to undefined */
 export const resetColor = (d: TripData, i: number): TripData =>
-  mapLegs(d, (l, k) => { if (k !== i) return l; const { color: _drop, ...rest } = l; return rest; });
+  mapLegs(d, (l, k) => { if (k !== i) return l; const rest = { ...l }; delete rest.color; return rest; });
 
 /** the figure stays when it also suits the new mode, else the mode's default figure takes over */
 export function changeMode(leg: Leg, mode: Mode, models: CustomModel[], settings: UserSettings = DEFAULT_SETTINGS): Leg {
