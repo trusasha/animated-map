@@ -1,0 +1,35 @@
+:root {
+  --hit-icon: 26px;
+  --hit-rail: 16px;
+  --hit-handle: 16px;
+  --hit-swatch: 22px;
+  --hit-option-pad: var(--space-6);
+  --hit-row-pad: var(--space-8);
+  --hit-slop-x: 0px;
+  --hit-slop-y: 0px;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --hit-icon: var(--hit-icon-touch);
+    --hit-rail: var(--hit-rail-touch);
+    --hit-handle: var(--hit-handle-touch);
+    --hit-swatch: var(--hit-swatch-touch);
+    --hit-option-pad: var(--space-10);
+    --hit-row-pad: var(--space-10);
+    --hit-slop-x: var(--space-4);
+    --hit-slop-y: var(--space-8);
+  }
+}
+
+/* gallery force toggle: same values as the coarse media query */
+:root[data-coarse] {
+  --hit-icon: var(--hit-icon-touch);
+  --hit-rail: var(--hit-rail-touch);
+  --hit-handle: var(--hit-handle-touch);
+  --hit-swatch: var(--hit-swatch-touch);
+  --hit-option-pad: var(--space-10);
+  --hit-row-pad: var(--space-10);
+  --hit-slop-x: var(--space-4);
+  --hit-slop-y: var(--space-8);
+}
