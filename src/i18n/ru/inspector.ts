@@ -17,7 +17,7 @@ export const inspector: Shape<Dict['inspector']> = {
   figure: 'Фигурка',
   yours: 'Ваша',
   generating: 'Создаётся…',
-  addOwn: '+ Своя',
+  addOwn: 'Своя',
   manageFigures: 'Управлять фигурками →',
   color: {
     label: 'Цвет линии',

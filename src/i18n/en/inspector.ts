@@ -14,7 +14,7 @@ export const inspector = {
   figure: 'Figure',
   yours: 'Yours',
   generating: 'Generating…',
-  addOwn: '+ Your own',
+  addOwn: 'Your own',
   manageFigures: 'Manage your figures →',
   color: {
     label: 'Line color',

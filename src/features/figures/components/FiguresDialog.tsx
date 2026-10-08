@@ -1,4 +1,4 @@
-import { Button, Dialog } from '../../../ds';
+import { Button, Dialog, useViewportMode } from '../../../ds';
 import { useT } from '../../../i18n/react';
 import type { CustomModel } from '../../../domain/types';
 import { useAddFigure } from '../hooks/useAddFigure';
@@ -39,6 +39,7 @@ function EditFigure({ model, models, onDone }: { model: CustomModel; models: Mod
 
 export function FiguresDialog({ open, onClose }: FiguresDialogProps) {
   const { t } = useT();
+  const { mode } = useViewportMode();
   const models = useModels();
   const dialog = useFiguresDialog(models.models, onClose);
   const thumb = useFigureThumbs(models.models.filter((m) => m.url).map((m) => ({ id: `model:${m.url}`, pose: m.pose })));
@@ -54,7 +55,11 @@ export function FiguresDialog({ open, onClose }: FiguresDialogProps) {
       fullScreenBelow="phone"
       closeLabel={t('common.aria.close')}
       leading={view.name === 'list' ? undefined : <Button variant="ghost" size="sm" onClick={dialog.toList}>{t('figures.add.back')}</Button>}
-      actions={view.name === 'list' ? <Button size="sm" onClick={dialog.toAdd}>{t('figures.list.add')}</Button> : undefined}
+      actions={view.name === 'list' ? (
+        <Button size="sm" onClick={dialog.toAdd} aria-label={t('figures.list.add')}>
+          {t(mode === 'phone' ? 'figures.list.addShort' : 'figures.list.add')}
+        </Button>
+      ) : undefined}
     >
       {view.name === 'add' && <AddFigure models={models} onDone={dialog.toList} />}
       {view.name === 'edit' && dialog.editing && <EditFigure key={view.id} model={dialog.editing} models={models} onDone={dialog.toList} />}

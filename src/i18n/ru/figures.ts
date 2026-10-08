@@ -10,6 +10,7 @@ export const figures: Shape<Dict['figures']> = {
     title: 'Ваши фигурки',
     subtitle: 'Общие для всех ваших путешествий.',
     add: 'Добавить фигурку',
+    addShort: 'Добавить',
     empty: 'Фигурок пока нет. Загрузите модель .glb или фото.',
     travelsBy: 'Перемещается: {mode}',
     generatingMeta: 'Около 2 минут. Можно продолжать работу.',
