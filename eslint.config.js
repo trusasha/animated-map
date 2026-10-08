@@ -192,8 +192,27 @@ const buildConfig = (root) => tseslint.config(
     },
   },
   {
-    // Temporary legacy quality debt (added 2026-10-08): demoted to warnings until each file is rewritten under the new layers
-    files: ['src/*.{ts,tsx}', 'server/*.ts'],
+    // Temporary legacy quality debt (files as of 2026-10-08; new top-level files get full errors): demoted to warnings until each file is rewritten under the new layers
+    files: [
+      'src/App.tsx',
+      'src/animator.ts',
+      'src/api.ts',
+      'src/exporter.ts',
+      'src/figures-gallery.ts',
+      'src/figures.ts',
+      'src/geo.ts',
+      'src/main.tsx',
+      'src/route.check.ts',
+      'src/route.ts',
+      'src/thumbs.ts',
+      'src/timeline.check.ts',
+      'src/timeline.ts',
+      'src/types.ts',
+      'src/ukiyoe.ts',
+      'server/ai.ts',
+      'server/db.ts',
+      'server/index.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-expressions': 'warn',

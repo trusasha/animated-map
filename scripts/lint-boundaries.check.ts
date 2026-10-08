@@ -35,6 +35,7 @@ const cases: { fixture: string; virtualPath: string; rule: string | null }[] = [
   { fixture: 'features-deep-feature-import.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: PATHS },
   { fixture: 'features-dynamic-import-three.ts', virtualPath: 'src/features/trips/fixture.ts', rule: 'no-restricted-syntax' },
   { fixture: 'server-dynamic-import-pglite.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-syntax' },
+  { fixture: 'new-top-level-any.ts', virtualPath: 'src/newtop.ts', rule: '@typescript-eslint/no-explicit-any' },
   // the same code is legal in the layer that owns it
   { fixture: 'features-imports-feature-index.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: null },
   { fixture: 'video-global-outside-video.ts', virtualPath: 'src/services/video/fixture.ts', rule: null },
@@ -55,7 +56,7 @@ try {
     const code = readFileSync(`${FIXTURES}/${fixture}`, 'utf8');
     const [result] = await eslint.lintText(code, { filePath: path.join(root, virtualPath) });
     assert.equal(result.fatalErrorCount, 0, `${fixture} as ${virtualPath}: fatal parse error: ${result.messages.map((m) => m.message).join('; ')}`);
-    const ids = result.messages.filter((m) => m.ruleId?.includes('no-restricted-')).map((m) => m.ruleId);
+    const ids = result.messages.filter((m) => (m.ruleId?.includes('no-restricted-') || m.ruleId === '@typescript-eslint/no-explicit-any')).map((m) => m.ruleId);
     if (rule) assert.ok(ids.includes(rule), `${fixture} as ${virtualPath}: expected ${rule}, got [${ids.join(', ')}]`);
     else assert.deepEqual(ids, [], `${fixture} as ${virtualPath}: expected clean, got [${ids.join(', ')}]`);
     console.log(`ok ${fixture} @ ${virtualPath} -> ${rule ?? 'clean'}`);
