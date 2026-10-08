@@ -50,7 +50,7 @@ async function stubServer(page: Page, initial: Model[], figures?: Record<string,
 
 const openFigures = async (page: Page) => {
   await page.goto('/?ui=next&e2e');
-  await page.locator('[data-placeholder="app-header"] button', { hasText: 'figures' }).click();
+  await page.getByRole('button', { name: 'Figures', exact: true }).click();
   return page.getByRole('dialog');
 };
 
@@ -153,7 +153,7 @@ test.describe('figures library', () => {
     });
     const calls = () => page.evaluate(() => (window as unknown as { __setTripCalls: number }).__setTripCalls);
     const before = await calls();
-    await page.locator('[data-placeholder="app-header"] button', { hasText: 'figures' }).click();
+    await page.getByRole('button', { name: 'Figures', exact: true }).click();
     const dialog = page.getByRole('dialog');
     await card(dialog, 'Truck').getByRole('button', { name: 'Edit' }).click();
     await dialog.getByRole('button', { name: 'Turn 90°' }).click();
