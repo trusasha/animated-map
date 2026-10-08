@@ -1,4 +1,6 @@
 @layer ds.components {
+  .back[hidden] { display: none; }
+
   .back {
     display: inline-flex;
     align-items: center;

@@ -1,4 +1,6 @@
 @layer ds.components {
+  .badge[hidden] { display: none; }
+
   .badge {
     display: inline-flex;
     flex: none;
