@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { stubNet } from '../fixtures/net';
 
 type Model = { id: string; name: string; url: string | null; status: string; task_id: string | null; mode: string | null; pose: unknown };
@@ -48,9 +48,14 @@ async function stubServer(page: Page, initial: Model[], figures?: Record<string,
   return { sent, requests: (method: string) => sent.filter((s) => s.method === method), refreshed: () => refreshed };
 }
 
-const openFigures = async (page: Page) => {
-  await page.goto('/?ui=next&e2e');
-  await page.getByRole('button', { name: 'Figures', exact: true }).click();
+const EMPTY_TRIP = { stops: [], style: 'satellite', speed: 1, format: '9:16' };
+
+/** opens a trip the test created, then the Figures dialog from the header overflow menu */
+const openFigures = async (page: Page, request: APIRequestContext) => {
+  const trip = await (await request.post('/api/trips', { data: { title: 'Figures trip', data: EMPTY_TRIP } })).json();
+  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.getByRole('button', { name: 'More', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Your figures' }).click();
   return page.getByRole('dialog');
 };
 
@@ -63,13 +68,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('figures library', () => {
-  test('list shows ready, generating and failed figures', async ({ page }) => {
+  test('list shows ready, generating and failed figures', async ({ page, request }) => {
     await stubServer(page, [
       ready('m1', 'Truck'),
       { ...ready('m2', 'Photo bike', null), url: null, status: 'pending: generation', task_id: 't' },
       { ...ready('m3', 'Bad photo', null), url: null, status: 'failed' },
     ]);
-    const dialog = await openFigures(page);
+    const dialog = await openFigures(page, request);
     await expect(card(dialog, 'Truck').getByText('Ready')).toBeVisible();
     await expect(card(dialog, 'Truck').getByText('Travels by: Land')).toBeVisible();
     await expect(card(dialog, 'Photo bike').getByText('Generating…')).toBeVisible();
@@ -79,9 +84,9 @@ test.describe('figures library', () => {
     await expect(card(dialog, 'Truck').locator('img')).toBeVisible();
   });
 
-  test('add a .glb gives a ready card', async ({ page }) => {
+  test('add a .glb gives a ready card', async ({ page, request }) => {
     const server = await stubServer(page, []);
-    const dialog = await openFigures(page);
+    const dialog = await openFigures(page, request);
     await expect(dialog.getByText('No figures yet')).toBeVisible();
     await dialog.getByRole('button', { name: 'Add figure' }).click();
     await dialog.getByTestId('figure-file').setInputFiles({ name: 'rover.glb', mimeType: 'model/gltf-binary', buffer: BOX });
@@ -92,9 +97,9 @@ test.describe('figures library', () => {
     expect(server.requests('POST')[0].url).toContain('/api/models/upload?name=rover');
   });
 
-  test('add a photo shows Generating, then Ready once the server finishes', async ({ page }) => {
+  test('add a photo shows Generating, then Ready once the server finishes', async ({ page, request }) => {
     const server = await stubServer(page, []);
-    const dialog = await openFigures(page);
+    const dialog = await openFigures(page, request);
     await dialog.getByRole('button', { name: 'Add figure' }).click();
     await dialog.getByTestId('figure-file').setInputFiles({ name: 'moto.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('jpg') });
     await dialog.getByRole('button', { name: 'Make 3D model' }).click();
@@ -104,9 +109,9 @@ test.describe('figures library', () => {
     expect(server.refreshed()).toBe(true);
   });
 
-  test('editing the pose saves it and changes the thumbnail', async ({ page }) => {
+  test('editing the pose saves it and changes the thumbnail', async ({ page, request }) => {
     const server = await stubServer(page, [ready('m1', 'Truck')]);
-    const dialog = await openFigures(page);
+    const dialog = await openFigures(page, request);
     await expect(card(dialog, 'Truck').locator('img')).toBeVisible();
     const before = await thumbSrc(dialog, 'Truck');
     await card(dialog, 'Truck').getByRole('button', { name: 'Edit' }).click();
@@ -120,9 +125,9 @@ test.describe('figures library', () => {
     await expect.poll(() => thumbSrc(dialog, 'Truck')).not.toBe(before);
   });
 
-  test('delete then Undo never reaches the server', async ({ page }) => {
+  test('delete then Undo never reaches the server', async ({ page, request }) => {
     const server = await stubServer(page, [ready('m1', 'Truck')]);
-    const dialog = await openFigures(page);
+    const dialog = await openFigures(page, request);
     await card(dialog, 'Truck').getByRole('button', { name: 'Delete' }).click();
     await expect(card(dialog, 'Truck')).toHaveCount(0);
     await page.getByRole('status').getByRole('button', { name: 'Undo' }).click();
@@ -132,9 +137,9 @@ test.describe('figures library', () => {
     await expect(card(dialog, 'Truck')).toBeVisible();
   });
 
-  test('delete without Undo removes it and resets defaults pointing at it', async ({ page }) => {
+  test('delete without Undo removes it and resets defaults pointing at it', async ({ page, request }) => {
     const server = await stubServer(page, [ready('m1', 'Truck'), ready('m2', 'Other')], { ground: `model:${BOX_URL}` });
-    const dialog = await openFigures(page);
+    const dialog = await openFigures(page, request);
     await card(dialog, 'Truck').getByRole('button', { name: 'Delete' }).click();
     await expect(page.getByRole('status')).toContainText('“Truck” deleted.');
     expect(server.requests('DELETE')).toHaveLength(0);
@@ -142,9 +147,10 @@ test.describe('figures library', () => {
     await expect.poll(() => (server.requests('PUT').find((r) => r.url === '/api/settings')?.body as { figures: { ground: string } } | undefined)?.figures.ground).toBe('car');
   });
 
-  test('@needs-p3-04 pose edit rebuilds the player trip', async ({ page }) => {
+  test('@needs-p3-04 pose edit rebuilds the player trip', async ({ page, request }) => {
     await stubServer(page, [ready('m1', 'Truck')]);
-    await page.goto('/trip/abc?ui=next&e2e');
+    const trip = await (await request.post('/api/trips', { data: { title: 'Figures trip', data: EMPTY_TRIP } })).json();
+    await page.goto(`/trip/${trip.id}?ui=next&e2e`);
     await page.evaluate(() => {
       const w = window as unknown as { __ta: { player: { setTrip: (...a: unknown[]) => unknown } }; __setTripCalls: number };
       const original = w.__ta.player.setTrip.bind(w.__ta.player);
@@ -153,7 +159,8 @@ test.describe('figures library', () => {
     });
     const calls = () => page.evaluate(() => (window as unknown as { __setTripCalls: number }).__setTripCalls);
     const before = await calls();
-    await page.getByRole('button', { name: 'Figures', exact: true }).click();
+    await page.getByRole('button', { name: 'More', exact: true }).click();
+    await page.getByRole('menuitem', { name: 'Your figures' }).click();
     const dialog = page.getByRole('dialog');
     await card(dialog, 'Truck').getByRole('button', { name: 'Edit' }).click();
     await dialog.getByRole('button', { name: 'Turn 90°' }).click();
