@@ -1,8 +1,8 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { DEFAULT_SETTINGS } from '../../../domain/settings';
 import type { Format, Overlay, Trip } from '../../../domain/types';
 import { api } from '../../../services/api';
 import { DEFAULT_OVERLAY } from '../../../services/video';
+import { useSettings } from '../../settings';
 import { useTripContext } from '../../trips';
 import { errorCode, isAbort, prepareExport, videoFileName, type ExportErrorCode, type FrameProbe, type PreparedExport } from './exportJob';
 
@@ -46,6 +46,7 @@ function canShareFile(file: File) {
 /** Prepare → Captions → Render → Done for the open trip; mounted only while the dialog is open */
 export function useExport(trip: Trip): ExportController {
   const { update } = useTripContext();
+  const { settings } = useSettings();
   const { format, overlay = DEFAULT_OVERLAY } = trip.data;
   const [host, setHost] = useState<HTMLDivElement | null>(null);
   const prepared = useRef<PreparedExport | null>(null);
@@ -70,7 +71,7 @@ export function useExport(trip: Trip): ExportController {
   };
 
   const prepare = useEffectEvent((el: HTMLDivElement, signal: AbortSignal) =>
-    prepareExport({ host: el, trip, format, longSide: DEFAULT_SETTINGS.exportLongSide, onProgress: setProgress, signal }));
+    prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, onProgress: setProgress, signal }));
   const onPrepareError = useEffectEvent((e: unknown) => fail(e, 'prepare'));
 
   useEffect(() => {
