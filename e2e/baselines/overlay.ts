@@ -11,7 +11,10 @@ export interface Sample { name: string; x: number; y: number; rgba: number[] }
 export async function captureOverlay(page: Page, times: { ground: number; air: number } | null) {
   return page.evaluate(async ({ stops, legs, speed, times }) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { Animator, idle, loadStyle, TILE_CACHE_ZOOM_LEVELS } = await load('/src/animator.ts');
+    const { Animator } = await load('/src/animator.ts');
+    const { idle } = await load('/src/services/map/createOffscreenMap.ts');
+    const { loadStyle } = await load('/src/services/map/styles/loadStyle.ts');
+    const { TILE_CACHE_ZOOM_LEVELS } = await load('/src/services/map/styles/hosts.ts');
     const maplibreUrl = () => performance.getEntriesByType('resource').map((e) => e.name).find((n) => /maplibre-gl\.mjs/.test(n))!;
     const { MercatorCoordinate, Map: MlMap } = await load(maplibreUrl());
     const W = 960, H = 540;
@@ -91,7 +94,7 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
       await render(T.air);
       const af = anim.frame;
       const aLeg = tl.legs[airIdx];
-      const { pointAt } = await load('/src/timeline.ts');
+      const { pointAt } = await load('/src/domain/timeline/index.ts');
       const { pos: midPt, alt: midAlt } = pointAt(aLeg, 0.5);
       out.air = {
         samples: [
