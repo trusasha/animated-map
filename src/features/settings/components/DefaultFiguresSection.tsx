@@ -27,7 +27,7 @@ export function DefaultFiguresSection({ rows, value, onChange }: Props) {
                 src={tile.src}
                 name={tile.name}
                 selected={value[row.mode] === tile.id}
-                onClick={() => onChange(row.mode, tile.id)}
+                onSelect={() => onChange(row.mode, tile.id)}
               />
             ))}
           </div>
