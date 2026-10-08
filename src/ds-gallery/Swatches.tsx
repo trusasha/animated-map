@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 const COLOR_NAME = /^--(color|text|surface|accent|focus|status)/;
 
@@ -32,15 +32,17 @@ export function Swatches({ theme }: { theme: string }) {
     for (const n of tokenNames()) by.set(group(n), [...(by.get(group(n)) ?? []), n]);
     return [...by.entries()];
   }, []);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const root = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const style = getComputedStyle(document.documentElement);
-    setValues(Object.fromEntries(groups.flatMap(([, names]) => names.map((n) => [n, style.getPropertyValue(n).trim()]))));
-  }, [groups, theme]);
+    root.current?.querySelectorAll<HTMLElement>('[data-token]').forEach((el) => {
+      el.textContent = style.getPropertyValue(el.dataset.token!).trim();
+    });
+  }, [theme]);
 
   return (
-    <section className="gallery-section" data-testid="swatches" data-theme-shown={theme} aria-labelledby="h-swatches">
+    <section ref={root} className="gallery-section" data-testid="swatches" data-theme-shown={theme} aria-labelledby="h-swatches">
       <h2 id="h-swatches">Color tokens</h2>
       {groups.map(([g, names]) => (
         <div key={g}>
@@ -50,7 +52,7 @@ export function Swatches({ theme }: { theme: string }) {
               <li key={n}>
                 <span className="swatch" style={{ background: `var(${n})` }} />
                 <code>{n}</code>
-                <small>{values[n]}</small>
+                <small data-token={n} />
               </li>
             ))}
           </ul>
