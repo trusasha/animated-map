@@ -41,12 +41,12 @@ test('trips: list is lightweight, get returns full data', async ({ request }) =>
   expect((await request.get(`/api/trips/${created.id}`)).status()).toBe(404);
 });
 
-test('models, config and log routes', async ({ request }) => {
+test('models, config and log routes', async ({ request }, info) => {
   expect(Array.isArray(await (await request.get('/api/models')).json())).toBe(true);
   expect(await (await request.get('/api/config')).json()).toHaveProperty('photo3d');
   const type = `server-spec-${Date.now()}`;
   await request.post('/api/log', { data: { type, data: { ok: 1 } } });
-  expect(readFileSync('.e2e-data/logs/actions.jsonl', 'utf8')).toContain(type);
+  expect(readFileSync(`.e2e-data-${new URL(info.project.use.baseURL!).port}/logs/actions.jsonl`, 'utf8')).toContain(type);
 });
 
 test('HEIC converts to JPEG', async () => {
