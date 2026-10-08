@@ -132,7 +132,7 @@ export function RangeRail({ count, from, to, onChange, containerRef, labels, nod
       onPointerUp={() => setDrag(null)}
       onPointerCancel={() => setDrag(null)}
     >
-      {ys.slice(0, count).map((y, i) => (
+      {ys.slice(0, count).map((_, i) => (
         <div key={i} data-rail-idx={i} className={styles.cell} title={labels.rowClick} style={{ top: tops[i], height: (tops[i + 1] ?? height) - tops[i] }} onPointerDown={(e) => onCell(i, e)} />
       ))}
       {ys.slice(0, count - 1).map((y, i) => (
