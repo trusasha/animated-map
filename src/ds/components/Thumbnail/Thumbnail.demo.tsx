@@ -39,6 +39,17 @@ export default function Demo() {
           />
         ))}
       </ThumbnailGrid>
+      <ThumbnailGrid columns={3}>
+        {figures.map((f) => (
+          <ThumbnailTile key={f.id} size={60} layout="stacked" src={f.src} name={f.name} sub={f.id === 'ship' ? 'Yours' : undefined} selected={picked === f.id} onSelect={() => setPicked(f.id)} />
+        ))}
+        <ThumbnailTile size={60} layout="stacked" add name="Your own" onSelect={() => undefined} />
+      </ThumbnailGrid>
+      <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
+        {figures.map((f) => (
+          <ThumbnailTile key={f.id} size={40} layout="stacked" src={f.src} name={f.name} selected={picked === f.id} onSelect={() => setPicked(f.id)} />
+        ))}
+      </div>
       <ThumbnailTile size={40} src={figures[0].src} name="Compact row" sub="40px well" />
     </div>
   );

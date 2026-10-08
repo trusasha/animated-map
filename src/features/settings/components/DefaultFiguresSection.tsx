@@ -24,6 +24,7 @@ export function DefaultFiguresSection({ rows, value, onChange }: Props) {
               <ThumbnailTile
                 key={tile.id}
                 size={40}
+                layout="stacked"
                 src={tile.src}
                 name={tile.name}
                 selected={value[row.mode] === tile.id}
