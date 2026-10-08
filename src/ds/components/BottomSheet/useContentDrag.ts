@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useEffectEvent, type RefObject } from 'react';
 import { TAP_SLOP } from './useSheetDrag';
 import type { Snap } from './snap';
 
@@ -10,8 +10,7 @@ interface Drag {
 
 /** Touch drag that starts inside the scrolling content: pull down at scrollTop 0, or pull up before full. */
 export function useContentDrag(content: RefObject<HTMLElement | null>, snap: Snap, drag: Drag) {
-  const latest = useRef({ snap, drag });
-  latest.current = { snap, drag };
+  const current = useEffectEvent(() => ({ snap, drag }));
 
   useEffect(() => {
     const el = content.current;
@@ -28,11 +27,11 @@ export function useContentDrag(content: RefObject<HTMLElement | null>, snap: Sna
     };
     const onMove = (e: TouchEvent) => {
       const y = e.touches[0]!.clientY;
-      const { snap: current, drag: d } = latest.current;
+      const { snap: now, drag: d } = current();
       if (tracking && !active) {
         const dy = y - startY;
         const pullDown = dy > TAP_SLOP && el.scrollTop <= 0;
-        const pullUp = dy < -TAP_SLOP && current !== 'full';
+        const pullUp = dy < -TAP_SLOP && now !== 'full';
         if (!pullDown && !pullUp) return;
         active = true;
         d.begin(startY, e.timeStamp);
@@ -43,7 +42,7 @@ export function useContentDrag(content: RefObject<HTMLElement | null>, snap: Sna
       d.move(y, e.timeStamp);
     };
     const onEnd = (e: TouchEvent) => {
-      if (active) latest.current.drag.end(lastY, e.timeStamp, e.type === 'touchcancel');
+      if (active) current().drag.end(lastY, e.timeStamp, e.type === 'touchcancel');
       tracking = false;
       active = false;
     };

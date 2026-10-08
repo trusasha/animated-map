@@ -30,7 +30,7 @@ export default function Demo() {
       <Button variant="ghost" size="sm" onClick={() => setPlacement(placement === 'bottom' ? 'top' : 'bottom')}>
         Placement: {placement}
       </Button>
-      <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel="Dismiss" placement={placement} />
+      <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel="Dismiss" placement={placement} topInset={56} />
     </div>
   );
 }

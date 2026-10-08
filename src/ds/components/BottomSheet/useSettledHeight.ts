@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useEffectEvent, type RefObject } from 'react';
 
 export interface HeightInfo {
   /** False while dragging or while the snap transition is still running. */
@@ -13,15 +13,14 @@ export function useSettledHeight(
   dragging: boolean,
   onHeightChange?: (px: number, info: HeightInfo) => void,
 ) {
-  const callback = useRef(onHeightChange);
-  callback.current = onHeightChange;
+  const report = useEffectEvent((px: number, info: HeightInfo) => onHeightChange?.(px, info));
 
   useEffect(() => {
     const el = sheet.current;
     if (!ready || !el) return;
-    callback.current?.(height, { settled: false });
+    report(height, { settled: false });
     if (dragging) return;
-    const settle = () => callback.current?.(height, { settled: true });
+    const settle = () => report(height, { settled: true });
     const onEnd = (e: TransitionEvent) => {
       if (e.target === el && e.propertyName === 'height') settle();
     };

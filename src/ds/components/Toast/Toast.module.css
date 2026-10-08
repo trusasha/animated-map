@@ -12,7 +12,7 @@
   }
 
   .toaster[data-placement='bottom'] { bottom: var(--space-20); flex-direction: column-reverse; }
-  .toaster[data-placement='top'] { top: var(--space-20); }
+  .toaster[data-placement='top'] { top: calc(var(--space-20) + var(--toaster-top-inset, 0px)); }
 
   .toast {
     pointer-events: auto;
@@ -26,6 +26,7 @@
     border: var(--border-whisper);
     box-shadow: var(--elevation-deep);
     color: var(--text-body);
+    cursor: pointer;
     font-family: var(--font-sans);
     font-size: var(--type-label-size);
     line-height: var(--type-label-lh);
