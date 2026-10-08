@@ -22,6 +22,7 @@ export const inspector = {
     defaultFor: 'Default for {mode} segments',
     useDefault: 'Use default',
     applyAll: 'Apply to all segments',
+    appliedAll: 'Color applied to all {count} segments.',
     custom: 'Custom color',
     names: {
       charcoal: 'Charcoal', blue: 'Blue', teal: 'Teal', green: 'Green',
