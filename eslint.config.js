@@ -175,7 +175,6 @@ const buildConfig = (root) => tseslint.config(
       'src/App.tsx',
       'src/legacy/**',
       'src/animator.ts',
-      'src/exporter.ts',
       'src/main.tsx',
     ],
     rules: {
@@ -191,7 +190,6 @@ const buildConfig = (root) => tseslint.config(
     files: [
       'src/App.tsx',
       'src/api.ts',
-      'src/exporter.ts',
       'src/figures-gallery.ts',
       'src/figures.ts',
       'src/geo.ts',
