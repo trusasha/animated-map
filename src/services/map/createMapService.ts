@@ -1,11 +1,23 @@
 import * as maplibregl from 'maplibre-gl';
 import type { MapOverlay3D } from '../../domain/overlay3d';
 import type { LngLat, MapStyle } from '../../domain/types';
-import { MapPlayer } from './player';
+import { createCamera } from './camera';
+import { installTripsLayer, setTrips } from './home/tripsLayer';
+import { startSpin } from './home/spin';
+import { installEditorLayers, setEditorSegments } from './layers/editorLayers';
+import { applyVisibility } from './layers/visibility';
+import { createMarkers } from './markers';
+import { installPointer } from './pick';
+import { MapPlayer, OVERLAY_LAYER } from './player';
+import { probe } from './probe';
 import { GLYPHS, TILE_CACHE_ZOOM_LEVELS } from './styles/hosts';
 import { installImageResolver } from './styles/imageResolver';
 import { loadStyle } from './styles/loadStyle';
-import type { MapService } from './types';
+import type { EditorRouteView, HomeTrip, MapMode, MapService } from './types';
+
+const NO_ROUTE: EditorRouteView = { segments: [], stops: [], selected: null };
+
+const subscribe = <T>(set: Set<T>, cb: T) => { set.add(cb); return () => { set.delete(cb); }; };
 
 /** the interactive map; owns the container and the MapLibre instance, starts on the satellite style */
 export function createMapService(container: HTMLElement, overlay: MapOverlay3D): MapService {
@@ -18,7 +30,40 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
   installImageResolver(map);
   const player = new MapPlayer(map, overlay);
+  const camera = createCamera(map);
   const loaded = new Promise<void>((r) => map.once('load', () => r()));
+
+  const on = { segment: new Set<(i: number) => void>(), empty: new Set<() => void>(), drag: new Set<(i: number, p: LngLat) => void>() };
+  const markers = createMarkers(map, (i, p) => on.drag.forEach((cb) => cb(i, p)));
+  let mode: MapMode = 'editor';
+  let editing = true;
+  let route = NO_ROUTE;
+  let trips: HomeTrip[] = [];
+  let highlighted: string | null = null;
+  let stopSpin: (() => void) | undefined;
+
+  const refresh = () => {
+    applyVisibility(map, mode, editing);
+    markers.show(mode === 'editor' && editing);
+  };
+  player.onEditing = (e) => {
+    editing = e;
+    camera.suspend(!e);
+    refresh();
+  };
+  // registered after the player's own style.load handler, so the overlay layer already exists
+  map.on('style.load', () => {
+    installTripsLayer(map, OVERLAY_LAYER);
+    installEditorLayers(map, OVERLAY_LAYER);
+    setTrips(map, trips, highlighted);
+    setEditorSegments(map, route.segments, route.selected);
+    refresh();
+  });
+  const pointer = installPointer(map, {
+    active: () => mode === 'editor' && editing,
+    segment: (i) => on.segment.forEach((cb) => cb(i)),
+    empty: () => on.empty.forEach((cb) => cb()),
+  });
 
   let current: MapStyle | undefined;
   const setStyle = async (s: MapStyle) => {
@@ -62,9 +107,54 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
       return [x, y];
     },
     destroy() {
+      stopSpin?.();
+      markers.clear();
       player.stop();
       overlay.dispose();
       map.remove();
     },
+
+    setMode(m) {
+      if (m === 'home') {
+        pointer.cancel();
+        player.clear();
+        player.select(null);
+        route = NO_ROUTE;
+        setEditorSegments(map, [], null);
+        markers.clear();
+      }
+      mode = m;
+      refresh();
+    },
+    setEditorRoute(view) {
+      if (view.selected !== route.selected) player.select(view.selected);
+      route = view;
+      setEditorSegments(map, view.segments, view.selected);
+      markers.set(view.stops);
+    },
+    onSegmentClick: (cb) => subscribe(on.segment, cb),
+    onEmptyClick: (cb) => subscribe(on.empty, cb),
+    onStopDrag: (cb) => subscribe(on.drag, cb),
+    startPick: (onPick) => pointer.start(onPick),
+    setHomeTrips(t) {
+      trips = t;
+      setTrips(map, trips, highlighted);
+    },
+    highlightTrip(id) {
+      highlighted = id;
+      setTrips(map, trips, highlighted);
+    },
+    setSpin(spin) {
+      if (spin && !stopSpin) stopSpin = startSpin(map, () => mode === 'home' && highlighted === null);
+      if (!spin) { stopSpin?.(); stopSpin = undefined; }
+    },
+
+    setPadding: (p) => camera.setPadding(p),
+    resetPadding: () => camera.resetPadding(),
+    getPadding: () => camera.getPadding(),
+    fitTo: (points, o) => camera.fitTo(points, o),
+    flyTo: (v, o) => camera.flyTo(v, o),
+    jumpTo: (v) => camera.jumpTo(v),
+    probe: () => probe(map, camera.getPadding(), markers.visible),
   };
 }
