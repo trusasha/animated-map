@@ -21,7 +21,8 @@ export interface EditorMapBindingArgs {
   poseKey: string | null;
 }
 
-const FIT = { route: { maxZoom: 9, duration: 800 }, leg: { maxZoom: 13, duration: 800 } };
+const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fitOptions = (leg: boolean) => ({ maxZoom: leg ? 13 : 9, duration: reduced() ? 0 : 800 });
 
 export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, onStopDrag, poseKey }: EditorMapBindingArgs) {
   const { t } = useT();
@@ -67,7 +68,7 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
       const key = stops.slice(s0, s1 + 1).map((s) => `${s.id}@${s.lng},${s.lat}`).join();
       if (key !== fitted.current) {
         fitted.current = key;
-        void map.fitTo(fitPoints(data, null), FIT.route);
+        void map.fitTo(fitPoints(data, null), fitOptions(false));
       }
     })().catch(reportError);
     return () => { cancelled = true; };
@@ -79,7 +80,7 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
     if (!map || !data || shown.current === selected) return;
     shown.current = selected;
     if (selected === null && stops && stops.length < 2) return;
-    void map.fitTo(fitPoints(data, selected), selected === null ? FIT.route : FIT.leg);
+    void map.fitTo(fitPoints(data, selected), fitOptions(selected !== null));
   // eslint-disable-next-line react-hooks/exhaustive-deps -- fits when the selection changes, not on every edit
   }, [map, selected]);
 }

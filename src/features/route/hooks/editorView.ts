@@ -22,15 +22,16 @@ export function editorView({ data, settings, selected, pickingId, titleOf }: Edi
     : [];
   const stops = data.stops.map((s, k) => {
     const endOfSelected = selected !== null && (k === selected || k === selected + 1);
+    const draggable = selected !== null && k === selected + 1;
     return {
       lngLat: [s.lng, s.lat] as LngLat,
       label: String(k + 1),
-      title: titleOf(s.name),
+      title: draggable ? titleOf(s.name) : s.name,
       end: k === 0 || k === last,
       approx: !!s.approx,
       active: endOfSelected || s.id === pickingId,
       inRange: k >= s0 && k <= s1,
-      draggable: selected !== null && k === selected + 1,
+      draggable,
     };
   });
   return { segments, stops, selected };
