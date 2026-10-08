@@ -32,6 +32,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(vite.middlewares);
 }
 
+// express recognises error handlers by their 4 arguments
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   logAction('server.error', { path: req.path, message: err.message });
