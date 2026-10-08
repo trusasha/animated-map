@@ -6,8 +6,10 @@ import './controls.css';
 export function installControls(map: maplibregl.Map, container: HTMLElement) {
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
   map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
-  // compact attribution opens itself on first render and then covers the panels' tap targets on phones
-  map.once('load', () => container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'));
+  // compact attribution opens itself on first render and again on every style change, covering the panels
+  const collapse = () => container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
+  map.on('load', collapse);
+  map.on('style.load', () => requestAnimationFrame(collapse));
   const corner = container.querySelector<HTMLElement>('.maplibregl-ctrl-bottom-right');
   return (inset: ControlsInset) => {
     if (!corner) return;
