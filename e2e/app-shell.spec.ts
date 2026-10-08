@@ -66,12 +66,12 @@ test.describe('app shell @map', () => {
   test('an error thrown in one slot is caught, toasted and logged; siblings stay', async ({ page, request }) => {
     const log = await collectLog(page);
     const trip = await seedTrip(request);
-    await page.goto(`/trip/${trip.id}?ui=next&e2e&crash=route-panel`);
-    await expect(page.getByRole('alert')).toContainText('route-panel crashed');
-    await expect(page.locator('[data-placeholder="route-panel"]')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Видео' })).toBeVisible();
+    await page.goto(`/trip/${trip.id}?ui=next&e2e&crash=video-panel`);
+    await expect(page.getByRole('alert')).toContainText('video-panel crashed');
+    await expect(page.getByRole('heading', { name: 'Видео' })).toHaveCount(0);
+    await expect(page.getByTestId('editor-shell')).toBeVisible();
     await expect(header(page)).toBeVisible();
-    await log.waitFor('error', (d) => String(d.message).includes('route-panel crashed'));
+    await log.waitFor('error', (d) => String(d.message).includes('video-panel crashed'));
     await removeTrip(request, trip.id);
   });
 
