@@ -1,0 +1,91 @@
+import { span } from '../../../domain/trips';
+import { legsOf } from '../../../domain/route';
+import { videoSize } from '../../../domain/video';
+import type { Format, LngLat, Mode, Overlay, Trip } from '../../../domain/types';
+import { createOffscreenMap } from '../../../services/map';
+import { createOverlay3D } from '../../../services/scene3d';
+import { attributionOf, drawOverlay, isVideoError, renderVideo } from '../../../services/video';
+
+export type ExportErrorCode = 'codec-unsupported' | 'failed';
+export interface ExportFrame { label: string; mode: Mode }
+/** mid-render sample of the map canvas: a blank map has one colour */
+export interface FrameProbe { distinct: number; progress: number }
+
+export interface PreparedExport {
+  width: number;
+  height: number;
+  /** CSS pixels of the map host; the frame preview scales it into the well */
+  hostWidth: number;
+  hostHeight: number;
+  /** the still the captions preview is drawn over */
+  frame: ExportFrame;
+  /** back to the preview frame, e.g. after a cancelled render */
+  showStill(): Promise<void>;
+  render(o: { overlay: Overlay; onProgress: (p: number) => void; signal: AbortSignal; onProbe?: (p: FrameProbe) => void }): Promise<Blob>;
+  destroy(): void;
+}
+
+// the camera fits the host's CSS size, so it stays fixed and the long side only changes the pixel ratio
+const HOST_LONG_SIDE = 960;
+const PREVIEW_AT = 0.4;
+
+export const aborted = () => new DOMException('aborted', 'AbortError');
+export const isAbort = (e: unknown) => (e instanceof DOMException && e.name === 'AbortError') || isVideoError(e, 'aborted');
+export const errorCode = (e: unknown): ExportErrorCode => (isVideoError(e, 'codec-unsupported') ? 'codec-unsupported' : 'failed');
+
+/** "Berlin → Şile" in 9:16 → Berlin-Şile-9x16.mp4 */
+export const videoFileName = (title: string, format: Format) => `${title.replace(/[^\p{L}\p{N}]+/gu, '-')}-${format.replace(':', 'x')}.mp4`;
+
+function distinctColors(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const px = ctx.getImageData(0, 0, w, h).data, seen = new Set<number>();
+  for (let i = 0; i < px.length && seen.size < 64; i += 4 * 7) seen.add(((px[i] >> 3) << 10) | ((px[i + 1] >> 3) << 5) | (px[i + 2] >> 3));
+  return seen.size;
+}
+
+/** loads the offscreen map for the trip's video stretch and stops on a preview frame */
+export async function prepareExport(o: {
+  host: HTMLElement; trip: Trip; format: Format; longSide: number; onProgress: (p: number) => void; signal: AbortSignal;
+}): Promise<PreparedExport> {
+  const d = o.trip.data, [s0, s1] = span(d);
+  const { width, height } = videoSize(o.format, o.longSide);
+  const pr = Math.max(width, height) / HOST_LONG_SIDE;
+  const hostWidth = width / pr, hostHeight = height / pr;
+  o.host.style.width = `${hostWidth}px`;
+  o.host.style.height = `${hostHeight}px`;
+
+  const map = await createOffscreenMap(o.host, { style: d.style, pixelRatio: pr }, createOverlay3D());
+  try {
+    if (o.signal.aborted) throw aborted();
+    const { player, idle, canvas } = map;
+    const stops = d.stops.slice(s0, s1 + 1);
+    const legs = legsOf(d).slice(s0, s1).map((l, i) => ({ ...l, path: l.path ?? [[stops[i].lng, stops[i].lat], [stops[i + 1].lng, stops[i + 1].lat]] as LngLat[] }));
+    await player.setTrip(stops, legs, d.speed);
+    await player.preload(o.onProgress, o.signal);
+    if (o.signal.aborted) throw aborted();
+    const duration = player.duration;
+    const still = async () => { player.setFrame(duration * PREVIEW_AT); await idle(); };
+    await still();
+    const f = player.currentFrame()!;
+    const attribution = attributionOf(d.style);
+    return {
+      width, height, hostWidth, hostHeight, frame: { label: f.label, mode: f.mode }, destroy: map.destroy, showStill: still,
+      async render({ overlay, onProgress, signal, onProbe }) {
+        let probed = !onProbe;
+        return renderVideo({
+          width, height, duration, signal, onProgress,
+          renderFrame: async (ctx, t, progress) => {
+            player.setFrame(t);
+            await idle();
+            const fr = player.currentFrame()!;
+            ctx.drawImage(canvas(), 0, 0, width, height);
+            if (!probed && progress >= 0.5) { probed = true; onProbe!({ distinct: distinctColors(ctx, width, height), progress }); }
+            drawOverlay(ctx, width, height, overlay, o.trip.title, fr.label, fr.mode, progress, attribution);
+          },
+        });
+      },
+    };
+  } catch (e) {
+    map.destroy();
+    throw e;
+  }
+}
