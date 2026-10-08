@@ -4,5 +4,5 @@ export { createMapService } from './createMapService';
 export { createOffscreenMap } from './createOffscreenMap';
 export { BUFFER_AHEAD } from './preload';
 export type {
-  CameraView, EditorRouteView, EditorSegment, EditorStop, FitOptions, HomeTrip, MapMode, MapProbe, MapService, OffscreenMap, Padding, TripPlayer,
+  CameraView, ControlsInset, EditorRouteView, EditorSegment, EditorStop, FitOptions, HomeTrip, MapMode, MapProbe, MapService, OffscreenMap, Padding, TripPlayer,
 } from './types';

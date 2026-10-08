@@ -4,7 +4,7 @@
     background: var(--surface-card);
     color: var(--text-body);
     font-family: var(--font-sans);
-    border-radius: var(--radius-large);
+    border-radius: var(--radius-comfortable);
     border: var(--border-whisper);
   }
 

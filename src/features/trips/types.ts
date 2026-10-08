@@ -7,6 +7,8 @@ export interface HomeGlobe {
   highlightTrip: (id: string | null) => void;
   setSpin: (on: boolean) => void;
   setPadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
+  setGlobeRadius: (px: number) => void;
+  setControlsInset: (inset: { bottom: number; right: number }) => void;
 }
 
 export interface HomeScreenProps { onOpenTrip: (id: string) => void; globe?: HomeGlobe }
@@ -20,6 +22,14 @@ export interface AppHeaderProps {
   onExport: () => void;
   onOpenSettings: () => void;
   onOpenFigures: () => void;
+}
+
+export interface VideoActionsProps {
+  onPreview: () => void;
+  onExport: () => void;
+  /** "Export" instead of "Export video" */
+  short?: boolean;
+  className?: string;
 }
 
 /** loads and autosaves the trip for `tripId`, exposes it to the features below; null = Home */

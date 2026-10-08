@@ -18,4 +18,4 @@
 .sample { display: block; width: 26px; border-top: 2px solid; }
 .sample[data-mode='water'] { border-top-style: dashed; }
 .sample[data-mode='air'] { border-top-style: dotted; }
-.banner { position: fixed; top: var(--space-16); left: 50%; transform: translateX(-50%); z-index: var(--z-overlay); max-width: calc(100% - 24px); }
+.banner { position: fixed; top: calc(var(--overlay-top, 0px) + var(--space-16)); left: var(--overlay-x, 50%); transform: translateX(-50%); z-index: var(--z-overlay); max-width: calc(100% - 24px); }

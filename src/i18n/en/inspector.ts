@@ -1,7 +1,7 @@
 export const inspector = {
   caption: 'Segment {index} of {total} · drag the finish marker to move it',
   captionShort: 'Segment {index} of {total}',
-  allStops: '← All stops',
+  allStops: 'All stops',
   deselect: 'Deselect segment',
   title: '{from} → {to}',
   travelBy: 'Travel by',

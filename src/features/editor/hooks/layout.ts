@@ -1,0 +1,40 @@
+import type { ViewportMode } from '../../../ds';
+import type { ControlsInset, Padding } from '../../../services/map';
+
+/** floating cards: margin to the map edge, route column and desktop inspector widths (A§2.3) */
+export const EDGE = 16;
+export const COLUMN = 356;
+export const INSPECTOR = 336;
+
+export interface ChromeState {
+  mode: ViewportMode;
+  inspector: boolean;
+  previewing: boolean;
+  /** phone sheet height, px */
+  sheet: number;
+  /** preview transport height, px */
+  transport: number;
+}
+
+const ZERO: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
+const column = EDGE + COLUMN;
+const rightCard = (s: ChromeState) => (s.mode === 'desktop' && s.inspector ? EDGE + INSPECTOR : 0);
+
+/** camera padding that keeps the route clear of the visible panels and the bottom-right controls */
+export function paddingFor(s: ChromeState): Padding {
+  if (s.previewing) return ZERO;
+  if (s.mode === 'desktop') return { top: 60, bottom: 60, left: column + 18, right: s.inspector ? rightCard(s) + 48 : 60 };
+  if (s.mode === 'tablet') return { top: 50, bottom: 50, left: column + 8, right: 60 };
+  return { top: 40, bottom: s.sheet + EDGE, left: 32, right: 56 };
+}
+
+export function controlsFor(s: ChromeState): ControlsInset {
+  if (s.previewing) return { bottom: s.mode === 'phone' ? s.transport + EDGE : 0, right: 0 };
+  return { bottom: s.mode === 'phone' ? s.sheet : 0, right: rightCard(s) };
+}
+
+/** horizontal centre of the free map area, for the pick banner */
+export function overlayCenter(s: ChromeState): string {
+  if (s.mode === 'phone' || s.previewing) return '50%';
+  return `calc(50% + ${(column - rightCard(s)) / 2}px)`;
+}
