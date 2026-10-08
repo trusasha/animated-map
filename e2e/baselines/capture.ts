@@ -12,13 +12,29 @@ export const MIGRATE_INPUTS = ['trip-legs-v1', 'trip-chained', 'trip-broken'].ma
 export async function boot(page: Page, path = '/') {
   await stubNet(page);
   await emptyTrips(page);
+  // counts the app's own completed setTrip calls without changing what they do
+  await page.addInitScript(() => {
+    let anim: any;
+    (window as any).__setTripDone = 0;
+    Object.defineProperty(window, '__anim', {
+      configurable: true,
+      get: () => anim,
+      set: (a) => {
+        const setTrip = a.setTrip.bind(a);
+        a.setTrip = async (...args: unknown[]) => {
+          try { return await setTrip(...args); } finally { (window as any).__setTripDone++; }
+        };
+        anim = a;
+      },
+    });
+  });
   await page.goto(path);
   await page.waitForFunction(() => {
     const a = (window as any).__anim;
     return a && a.map.loaded() && a.map.getSource('stops');
   });
   // the app's own setTrip for its empty trip must land before ours
-  await page.waitForTimeout(500);
+  await page.waitForFunction(() => (window as any).__setTripDone > 0);
 }
 
 export async function captureFrames(page: Page) {

@@ -31,6 +31,7 @@ test.describe('pre-refactor baselines @baseline', () => {
     const expected = json('frames.json');
     const actual = await captureFrames(page);
     expectClose(actual.duration, expected.duration, 1e-9, 'duration');
+    expect(actual.frames.length, 'frames length').toBe(expected.frames.length);
     actual.frames.forEach((f, i) => {
       expect(f.name).toBe(expected.frames[i].name);
       expectClose(f.frame, expected.frames[i].frame, 1e-9, `${f.name}.frame`);
@@ -47,6 +48,7 @@ test.describe('pre-refactor baselines @baseline', () => {
     await boot(page);
     const expected = json('mercator.json');
     const actual = await captureMercator(page);
+    expect(actual.length, 'points length').toBe(expected.length);
     actual.forEach((p, i) => {
       expectClose({ x: p.x, y: p.y, z: p.z }, { x: expected[i].x, y: expected[i].y, z: expected[i].z }, 1e-12, `point ${i}`);
       expect(Math.abs(p.meterUnit - expected[i].meterUnit), `point ${i} meterUnit`).toBeLessThanOrEqual(1e-9 * expected[i].meterUnit);
@@ -80,6 +82,7 @@ test.describe('pre-refactor baselines @baseline', () => {
     assertFigureVisible(actual.ground.samples, 'ground');
     assertFigureVisible(actual.air.samples, 'air');
     for (const key of ['ground', 'air'] as const) {
+      expect(actual[key].samples.length, `${key} samples length`).toBe(expected[key].length);
       actual[key].samples.forEach((s: Sample, i: number) => {
         const e: Sample = expected[key][i];
         expect([s.name, s.x, s.y]).toEqual([e.name, e.x, e.y]);
