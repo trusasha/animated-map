@@ -74,6 +74,7 @@ export function App() {
         if (!a.playing) setPlaying(false);
       };
       anim.current = a;
+      if (import.meta.env.DEV || new URLSearchParams(location.search).has('e2e')) (window as any).__anim = a;
       a.onBuffering = setBuffering;
       map.once('load', () => setMapReady(true));
     }).catch(report);

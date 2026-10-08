@@ -1,6 +1,6 @@
 [
-  { "path": "src/App.tsx", "max": 733, "reason": "legacy, split in P2/P3" },
-  { "path": "src/animator.ts", "max": 559, "reason": "legacy, split in P2/P3" },
+  { "path": "src/App.tsx", "max": 734, "reason": "legacy, split in P2/P3; P0-04 debug hook" },
+  { "path": "src/animator.ts", "max": 563, "reason": "legacy, split in P2/P3; P0-04 DEM clamp export" },
   { "path": "src/figures.ts", "max": 589, "reason": "legacy, split in P2/P3" },
   { "path": "src/timeline.ts", "max": 236, "reason": "legacy, split in P2/P3" }
 ]
