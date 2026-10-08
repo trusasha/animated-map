@@ -11,6 +11,7 @@ export default function Demo() {
   const [snap, setSnap] = useState<Snap>('collapsed');
   const [height, setHeight] = useState(0);
   const [settled, setSettled] = useState(true);
+  const [detail, setDetail] = useState(false);
   return (
     <div data-testid="demo-BottomSheet" style={{ display: 'grid', gap: 'var(--space-12)' }}>
       <div style={{ display: 'flex', gap: 'var(--space-8)', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -19,6 +20,7 @@ export default function Demo() {
             {s}
           </Button>
         ))}
+        <Button size="sm" variant="ghost" onClick={() => setDetail((d) => !d)}>{detail ? 'Show list' : 'Show detail'}</Button>
         <span data-testid="sheet-height">snap {snap} · {Math.round(height)}px · {settled ? 'settled' : 'moving'}</span>
       </div>
       <div
@@ -45,11 +47,12 @@ export default function Demo() {
           collapseLabel="Collapse panel"
           header={<strong>Route · 4 stops</strong>}
           footer={<Button size="sm">Export</Button>}
+          contentKey={detail ? 'detail' : 'list'}
         >
-          <Button size="sm" variant="ghost">Add stop</Button>
+          <Button size="sm" variant="ghost">{detail ? 'All stops' : 'Add stop'}</Button>
           {Array.from({ length: 12 }, (_, i) => (
             <p key={i} style={{ margin: 'var(--space-8) 0 0', color: 'var(--text-secondary)' }}>
-              Stop {i + 1}
+              {detail ? `Setting ${i + 1}` : `Stop ${i + 1}`}
             </p>
           ))}
         </BottomSheet>
