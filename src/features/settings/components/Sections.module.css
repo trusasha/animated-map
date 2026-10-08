@@ -6,4 +6,4 @@
 .row { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-12); }
 .label { font-size: var(--type-label-size); font-weight: var(--weight-medium); color: var(--text-secondary); }
 .tiles { display: flex; gap: var(--space-6); flex-wrap: wrap; }
-.narrow { max-width: 320px; }
+.narrow { max-width: 360px; }
