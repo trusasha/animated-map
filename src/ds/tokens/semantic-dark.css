@@ -50,6 +50,12 @@
 
   --elevation-card: rgba(0, 0, 0, 0.3) 0 4px 18px, rgba(0, 0, 0, 0.25) 0 0.8px 2.925px, 0 0 0 1px rgba(255, 255, 255, 0.08);
   --elevation-deep: rgba(0, 0, 0, 0.35) 0 7px 15px, rgba(0, 0, 0, 0.45) 0 23px 52px, 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  --danger-fill: #e38f54;
+  --danger-fill-hover: #eda06a;
+  --text-on-danger: #101418;
+  --ui-handle: var(--text-muted);
+  --ui-handle-hover: var(--text-secondary);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -105,5 +111,11 @@
 
     --elevation-card: rgba(0, 0, 0, 0.3) 0 4px 18px, rgba(0, 0, 0, 0.25) 0 0.8px 2.925px, 0 0 0 1px rgba(255, 255, 255, 0.08);
     --elevation-deep: rgba(0, 0, 0, 0.35) 0 7px 15px, rgba(0, 0, 0, 0.45) 0 23px 52px, 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    --danger-fill: #e38f54;
+    --danger-fill-hover: #eda06a;
+    --text-on-danger: #101418;
+    --ui-handle: var(--text-muted);
+    --ui-handle-hover: var(--text-secondary);
   }
 }

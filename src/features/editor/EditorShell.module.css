@@ -1,0 +1,55 @@
+.shell {
+  position: absolute;
+  inset: 0;
+}
+
+.column,
+.right,
+.sheet,
+.transport {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-height: 0;
+  pointer-events: none;
+}
+
+.column > *,
+.right > *,
+.sheet > *,
+.transport > * {
+  pointer-events: auto;
+}
+
+.column {
+  top: var(--space-16);
+  left: var(--space-16);
+  width: 356px;
+  max-height: calc(100% - var(--space-16));
+}
+
+.right {
+  top: var(--space-16);
+  right: var(--space-16);
+  width: 336px;
+}
+
+.sheet {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 46dvh;
+  padding: var(--space-12) var(--space-16);
+  background: var(--surface-card);
+  border-top: var(--border-whisper);
+  border-radius: var(--radius-large) var(--radius-large) 0 0;
+  box-shadow: var(--elevation-deep);
+  pointer-events: auto;
+}
+
+.transport {
+  left: var(--space-16);
+  right: var(--space-16);
+  bottom: var(--space-16);
+}

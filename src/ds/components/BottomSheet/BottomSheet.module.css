@@ -50,12 +50,12 @@
     width: 36px;
     height: 4px;
     border-radius: var(--radius-pill);
-    background: var(--text-decorative);
+    background: var(--ui-handle);
     transition: background-color var(--duration-fast) var(--ease-standard);
   }
 
   .grabber:hover .bar {
-    background: var(--text-muted);
+    background: var(--ui-handle-hover);
   }
 
   .grabber:focus-visible {
@@ -63,11 +63,17 @@
     outline-offset: -2px;
   }
 
+  .header {
+    flex: none;
+    padding: 0 var(--space-16) var(--space-8);
+  }
+
   .content {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
+    touch-action: pan-y;
     padding: 0 var(--space-16) var(--space-16);
   }
 

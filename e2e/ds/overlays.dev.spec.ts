@@ -124,14 +124,14 @@ test.describe('BottomSheet', () => {
     const readout = section.getByTestId('sheet-height');
     await expect(readout).toContainText('snap collapsed');
     const before = await readout.textContent();
-    await section.getByRole('button', { name: 'Resize panel' }).click();
+    await section.getByRole('button', { name: 'Collapse panel' }).click();
     await expect(readout).not.toHaveText(before!);
   });
 
-  test('the grabber reports expanded state', async ({ page }) => {
+  test('the grabber name follows the state', async ({ page }) => {
     const section = demoSection(page, 'BottomSheet');
     await section.getByRole('button', { name: 'peek' }).click();
-    await expect(section.getByRole('button', { name: 'Resize panel' })).toHaveAttribute('aria-expanded', 'false');
+    await expect(section.getByRole('button', { name: 'Expand panel' })).toBeVisible();
   });
 });
 

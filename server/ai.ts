@@ -1,5 +1,6 @@
-import { FIGURES, type Mode, type ParsedTrip, type Place } from '../src/types.ts';
-import { distance } from '../src/geo.ts';
+import { FIGURES } from '../src/domain/figures.ts';
+import type { Mode, ParsedTrip, Place } from '../src/domain/types.ts';
+import { distance } from '../src/domain/geo.ts';
 
 const OPENAI = 'https://api.openai.com/v1';
 const FAL_3D = 'https://queue.fal.run/fal-ai/hunyuan3d-v3/image-to-3d';

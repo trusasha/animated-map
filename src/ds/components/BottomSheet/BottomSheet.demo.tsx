@@ -10,6 +10,7 @@ const snaps: Snap[] = ['peek', 'collapsed', 'full'];
 export default function Demo() {
   const [snap, setSnap] = useState<Snap>('collapsed');
   const [height, setHeight] = useState(0);
+  const [settled, setSettled] = useState(true);
   return (
     <div data-testid="demo-BottomSheet" style={{ display: 'grid', gap: 'var(--space-12)' }}>
       <div style={{ display: 'flex', gap: 'var(--space-8)', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -18,7 +19,7 @@ export default function Demo() {
             {s}
           </Button>
         ))}
-        <span data-testid="sheet-height">snap {snap} · {Math.round(height)}px</span>
+        <span data-testid="sheet-height">snap {snap} · {Math.round(height)}px · {settled ? 'settled' : 'moving'}</span>
       </div>
       <div
         style={{
@@ -34,11 +35,18 @@ export default function Demo() {
         <BottomSheet
           snap={snap}
           onSnapChange={setSnap}
-          onHeightChange={setHeight}
+          onHeightChange={(px, info) => {
+            setHeight(px);
+            setSettled(info.settled);
+          }}
           label="Route"
+          contentLabel="Route stops"
+          expandLabel="Expand panel"
+          collapseLabel="Collapse panel"
+          header={<strong>Route · 4 stops</strong>}
           footer={<Button size="sm">Export</Button>}
         >
-          <strong>Route · 4 stops</strong>
+          <Button size="sm" variant="ghost">Add stop</Button>
           {Array.from({ length: 12 }, (_, i) => (
             <p key={i} style={{ margin: 'var(--space-8) 0 0', color: 'var(--text-secondary)' }}>
               Stop {i + 1}

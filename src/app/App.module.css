@@ -1,0 +1,44 @@
+.app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+}
+
+.header {
+  grid-row: 1;
+  position: relative;
+  z-index: 2;
+  background: var(--surface-page);
+  border-bottom: var(--border-whisper);
+}
+
+.map {
+  grid-row: 2;
+  grid-column: 1;
+  min-height: 0;
+}
+
+.layer {
+  grid-row: 2;
+  grid-column: 1;
+  position: relative;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.layer > * {
+  pointer-events: auto;
+}
+
+.dialogs {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.dialogs > * {
+  pointer-events: auto;
+}

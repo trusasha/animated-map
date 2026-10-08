@@ -172,11 +172,8 @@ const buildConfig = (root) => tseslint.config(
   {
     // Temporary legacy exceptions (added 2026-10-08): remove an entry when its file is deleted or split
     files: [
-      'src/App.tsx',
       'src/legacy/**',
-      'src/animator.ts',
-      'src/exporter.ts',
-      'src/main.tsx',
+      'src/app/main.tsx',
     ],
     rules: {
       'no-restricted-imports': 'off',
@@ -189,19 +186,16 @@ const buildConfig = (root) => tseslint.config(
   {
     // Temporary legacy quality debt (files as of 2026-10-08; new top-level files get full errors): demoted to warnings until each file is rewritten under the new layers
     files: [
-      'src/App.tsx',
-      'src/api.ts',
-      'src/exporter.ts',
+      'src/legacy/LegacyApp.tsx',
+      'src/legacy/api.ts',
       'src/figures-gallery.ts',
-      'src/figures.ts',
-      'src/geo.ts',
-      'src/main.tsx',
-      'src/route.check.ts',
-      'src/route.ts',
-      'src/thumbs.ts',
-      'src/timeline.check.ts',
-      'src/timeline.ts',
-      'src/types.ts',
+      'src/legacy/figures.ts',
+      'src/legacy/geo.ts',
+      'src/app/main.tsx',
+      'src/legacy/route.ts',
+      'src/legacy/thumbs.ts',
+      'src/legacy/timeline.ts',
+      'src/legacy/types.ts',
       'server/ai.ts',
     ],
     rules: {

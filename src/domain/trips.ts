@@ -1,6 +1,7 @@
-import { chain } from './route';
+import { chain, migrate } from './route';
 import { DEFAULT_SETTINGS } from './settings';
-import type { LngLat, Mode, Stop, TripData, TripSummary, UserSettings } from './types';
+import { ASPECTS } from './video';
+import type { Format, LngLat, MapStyle, Mode, Stop, Trip, TripData, TripSummary, UserSettings } from './types';
 
 /** stop indices [first, last] the video covers: the chosen stretch, or the whole route */
 export function span(d: TripData): [number, number] {
@@ -63,3 +64,18 @@ export function moveStopTo(d: TripData, i: number, [lng, lat]: LngLat): TripData
 
 /** true when an edit dropped the video range (for the "range reset" toast) */
 export const rangeWasReset = (before: TripData, after: TripData) => !!before.range && !after.range;
+
+const STYLES: MapStyle[] = ['satellite', 'streets', 'dark', 'ukiyoe'];
+
+/** a stored trip of any age becomes one the UI can open: missing style, speed, format and overlay get defaults */
+export function normalizeTrip(t: Trip, settings: UserSettings = DEFAULT_SETTINGS): Trip {
+  const m = migrate(t, settings), d = m.data;
+  const data: TripData = {
+    ...d,
+    style: STYLES.includes(d.style) ? d.style : 'satellite',
+    speed: typeof d.speed === 'number' && d.speed > 0 ? d.speed : 1,
+    format: Object.hasOwn(ASPECTS, d.format) ? d.format : ('9:16' satisfies Format),
+    overlay: { title: d.overlay?.title ?? true, label: d.overlay?.label ?? true, progress: d.overlay?.progress ?? true },
+  };
+  return { ...m, data };
+}
