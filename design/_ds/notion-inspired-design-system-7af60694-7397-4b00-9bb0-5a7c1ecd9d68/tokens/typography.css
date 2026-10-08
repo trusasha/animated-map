@@ -1,0 +1,17 @@
+:root{
+--font-sans:Inter,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,"Segoe UI Emoji","Segoe UI Symbol";
+--font-features-display:"lnum","locl";
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;--weight-bold:700;
+
+--type-display-hero-size:64px;--type-display-hero-lh:1.00;--type-display-hero-ls:-2.125px;
+--type-display-2-size:54px;--type-display-2-lh:1.04;--type-display-2-ls:-1.875px;
+--type-section-size:48px;--type-section-lh:1.00;--type-section-ls:-1.5px;
+--type-subheading-lg-size:40px;--type-subheading-lg-lh:1.50;--type-subheading-lg-ls:normal;
+--type-subheading-size:26px;--type-subheading-lh:1.23;--type-subheading-ls:-0.625px;
+--type-card-title-size:22px;--type-card-title-lh:1.27;--type-card-title-ls:-0.25px;
+--type-body-lg-size:20px;--type-body-lg-lh:1.40;--type-body-lg-ls:-0.125px;
+--type-body-size:16px;--type-body-lh:1.50;
+--type-nav-size:15px;--type-nav-lh:1.33;
+--type-caption-size:14px;--type-caption-lh:1.43;
+--type-badge-size:12px;--type-badge-lh:1.33;--type-badge-ls:0.125px;
+}

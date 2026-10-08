@@ -1,0 +1,8 @@
+:root{
+--space-unit:8px;
+--space-2:2px;--space-3:3px;--space-4:4px;--space-5:5px;--space-6:6px;--space-7:7px;--space-8:8px;--space-11:11px;--space-12:12px;--space-14:14px;--space-16:16px;--space-24:24px;--space-32:32px;
+--section-pad-y:80px;--section-pad-y-lg:120px;--section-pad-y-mobile:48px;
+--container-max:1200px;
+--radius-micro:4px;--radius-subtle:5px;--radius-standard:8px;--radius-comfortable:12px;--radius-large:16px;--radius-pill:9999px;--radius-circle:100%;
+--bp-mobile-sm:400px;--bp-mobile:600px;--bp-tablet-sm:768px;--bp-tablet:1080px;--bp-desktop-sm:1200px;--bp-desktop:1440px;
+}

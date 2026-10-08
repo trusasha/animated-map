@@ -1,0 +1,52 @@
+:root{
+/* Primary */
+--color-black:rgba(0,0,0,0.95);
+--color-white:#ffffff;
+--color-blue:#0075de;
+/* Brand secondary */
+--color-navy:#213183;
+--color-blue-active:#005bab;
+/* Warm neutrals */
+--color-warm-white:#f6f5f4;
+--color-warm-dark:#31302e;
+--color-warm-gray-500:#615d59;
+--color-warm-gray-300:#a39e98;
+--color-input-border:#dddddd;
+--color-translucent:rgba(0,0,0,0.05);
+/* Semantic accents */
+--color-teal:#2a9d99;
+--color-green:#1aae39;
+--color-orange:#dd5b00;
+--color-pink:#ff64c8;
+--color-purple:#391c57;
+--color-brown:#523410;
+/* Interactive */
+--color-link:#0075de;
+--color-link-light:#62aef0;
+--color-focus:#097fe8;
+--color-badge-bg:#f2f9ff;
+--color-badge-text:#097fe8;
+
+/* Semantic aliases */
+--text-primary:var(--color-black);
+--text-body:var(--color-black);
+--text-secondary:var(--color-warm-gray-500);
+--text-muted:var(--color-warm-gray-300);
+--text-on-accent:var(--color-white);
+--text-on-dark:var(--color-white);
+--text-link:var(--color-link);
+--text-link-on-dark:var(--color-link-light);
+--text-input:rgba(0,0,0,0.9);
+--surface-page:var(--color-white);
+--surface-card:var(--color-white);
+--surface-alt:var(--color-warm-white);
+--surface-dark:var(--color-warm-dark);
+--surface-brand-dark:var(--color-navy);
+--surface-secondary-button:var(--color-translucent);
+--accent:var(--color-blue);
+--accent-active:var(--color-blue-active);
+--status-success:var(--color-teal);
+--status-complete:var(--color-green);
+--status-warning:var(--color-orange);
+--border-whisper-color:rgba(0,0,0,0.1);
+}

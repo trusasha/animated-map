@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/tokens/effects.css">
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/tokens/base.css">
+  <link rel="stylesheet" href="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
+  <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+  <script src="_ds/notion-inspired-design-system-7af60694-7397-4b00-9bb0-5a7c1ecd9d68/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; }
+    a { color: #0075de; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    input[type=range] { accent-color: #0075de; width: 100%; margin: 0; }
+    .maplibregl-map { font-family: var(--font-sans); }
+    .maplibregl-ctrl-bottom-right { z-index: 960 !important; }
+    .maplibregl-ctrl-attrib { max-width: 380px; }
+    html[data-ta-mode=phone] .maplibregl-ctrl-bottom-right { bottom: auto; top: 0; display: flex; flex-direction: column-reverse; align-items: flex-end; }
+    html[data-ta-mode=phone] .maplibregl-ctrl-bottom-right .maplibregl-ctrl { margin: 10px 10px 0 0; }
+    html[data-ta-mode=phone] .maplibregl-ctrl-attrib { max-width: calc(100vw - 20px); }
+    html[data-ta-theme=dark] .maplibregl-ctrl-group, html[data-ta-theme=dark] .maplibregl-ctrl-attrib { filter: invert(0.9) hue-rotate(180deg); }
+  </style>
+</helmet>
+
+<div style="{{ rootStyle }}">
+
+  <header style="{{ headerStyle }}">
+    <button onClick="{{ onLogo }}" style="border:none;background:transparent;padding:4px 6px;margin-left:-6px;min-width:40px;min-height:40px;flex:none;border-radius:5px;font-family:inherit;font-weight:700;font-size:18px;letter-spacing:-0.25px;white-space:nowrap;color:rgba(0,0,0,0.95);cursor:pointer" style-hover="background:rgba(0,0,0,0.05)">{{ logoLabel }}</button>
+    <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ notPhone }}"><div style="width:1px;height:20px;background:rgba(0,0,0,0.1);flex:none"></div></sc-if>
+    <input value="{{ tripName }}" onChange="{{ onName }}" aria-label="Trip name" style="border:1px solid transparent;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:15px;font-weight:600;flex:0 1 260px;width:260px;min-width:0;background:transparent;color:rgba(0,0,0,0.95);outline:none" style-hover="border-color:rgba(0,0,0,0.1)" style-focus="border-color:#dddddd;outline:2px solid #097fe8">
+    <sc-if value="{{ notPhone }}"><span style="font-size:12px;color:#a39e98;white-space:nowrap">{{ savedLabel }}</span></sc-if>
+    <div style="flex:1"></div>
+    <sc-if value="{{ isDesktop }}"><x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" size="sm" onClick="{{ onNewTrip }}" hint-size="auto,32px">New trip</x-import></sc-if>
+    <sc-if value="{{ notPhone }}">
+    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="secondary" disabled="{{ actionsDisabled }}" onClick="{{ onPreview }}" hint-size="auto,36px">Preview</x-import>
+    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="primary" disabled="{{ actionsDisabled }}" onClick="{{ onExport }}" hint-size="auto,36px">{{ exportLabel }}</x-import>
+    </sc-if>
+    </sc-if>
+    <sc-if value="{{ isHome }}"><div style="flex:1"></div></sc-if>
+    <button onClick="{{ openSettings }}" title="Settings" aria-label="Settings" style="border:none;background:transparent;width:36px;height:36px;padding:0;border-radius:4px;color:#615d59;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(0,0,0,0.05)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+  </header>
+
+  <div style="{{ gridStyle }}">
+
+    <aside style="{{ routeStyle }}">
+      <sc-if value="{{ isPhone }}">
+        <button onClick="{{ toggleSheet }}" aria-label="{{ sheetLabel }}" style="flex:none;border:none;background:#fff;padding:12px 0 10px;cursor:pointer;display:flex;justify-content:center;position:sticky;top:0;z-index:5;width:100%"><span style="width:36px;height:4px;border-radius:9999px;background:#dddddd"></span></button>
+      </sc-if>
+      <div style="{{ routeHeadStyle }}">
+        <div style="font-weight:700;font-size:15px">Route</div>
+        <span style="font-size:12px;color:#a39e98;white-space:nowrap">{{ stopsLabel }}</span>
+        <div style="flex:1"></div>
+        <sc-if value="{{ hasPoints }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ toggleAI }}" style="border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:#0075de;cursor:pointer;padding:4px 6px;border-radius:4px;white-space:nowrap" style-hover="background:rgba(0,0,0,0.05)">{{ aiToggleLabel }}</button>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ rangeOk }}">
+        <div style="padding:0 16px 8px;display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#615d59">
+          <span style="width:8px;height:8px;border-radius:50%;background:#0075de;flex:none;margin-top:4px"></span>
+          <span style="flex:1">{{ rangeNote }}</span>
+          <sc-if value="{{ hasRange }}">
+            <button onClick="{{ resetRange }}" style="border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:500;color:#0075de;cursor:pointer;padding:0;white-space:nowrap" style-hover="text-decoration:underline">Use whole route</button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:16px 16px 8px">
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1.2">Where does your trip start?</div>
+          <div style="margin-top:6px;color:#615d59">Search for a place, or describe the whole trip and the route is built for you.</div>
+        </div>
+      </sc-if>
+
+      <div style="padding:0 8px" onTouchMove="{{ onListTouchMove }}" onTouchEnd="{{ onListTouchEnd }}">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="0">
+          <sc-if value="{{ r.isPoint }}">
+            <div data-idx="{{ r.idx }}" style="display:flex;align-items:stretch" onMouseEnter="{{ r.onEnter }}" onMouseLeave="{{ r.onLeave }}">
+            <sc-if value="{{ r.rail }}">
+              <div onMouseDown="{{ r.onRailDown }}" onTouchStart="{{ r.onRailTouch }}" title="{{ r.railTitle }}" style="{{ r.railBox }}">
+                <div style="{{ r.railTop }}"></div>
+                <div style="{{ r.railBot }}"></div>
+                <sc-if value="{{ r.isHandle }}"><div style="{{ r.handleStyle }}"></div></sc-if>
+              </div>
+            </sc-if>
+            <div style="{{ r.rowStyle }}">
+              <div style="{{ r.numStyle }}">{{ r.num }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;gap:6px;align-items:baseline">
+                  <span style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</span>
+                  <span style="font-size:12px;color:#a39e98">{{ r.label }}</span>
+                </div>
+                <div style="font-size:12px;color:#615d59;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.sub }}</div>
+                <sc-if value="{{ r.approx }}">
+                  <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;align-items:flex-start">
+                    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Badge" tone="warning" hint-size="auto,20px">Approximate</x-import>
+                    <span style="font-size:12px;color:#615d59">Placed by a guess. Check it and move it on the map.</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ r.picking }}">
+                  <div style="margin-top:4px;font-size:12px;color:#097fe8">{{ pickRowHint }}</div>
+                </sc-if>
+              </div>
+              <div style="{{ r.actStyle }}">
+                <button title="Move up" onClick="{{ r.onUp }}" disabled="{{ r.upDisabled }}" style="{{ r.upStyle }}">↑</button>
+                <button title="Move down" onClick="{{ r.onDown }}" disabled="{{ r.downDisabled }}" style="{{ r.downStyle }}">↓</button>
+                <button title="Place on map" onClick="{{ r.onMove }}" style="{{ r.moveStyle }}">Move</button>
+                <button title="Delete stop" onClick="{{ r.onDel }}" style="border:none;background:transparent;font-family:inherit;font-size:13px;color:#615d59;cursor:pointer;height:26px;min-width:24px;border-radius:4px" style-hover="background:rgba(0,0,0,0.05)">✕</button>
+              </div>
+            </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ r.isSeg }}">
+            <div style="display:flex;align-items:stretch" onMouseEnter="{{ r.onEnter }}">
+              <sc-if value="{{ r.rail }}"><div style="{{ r.railLineBox }}"><div style="{{ r.railLine }}"></div></div></sc-if>
+              <button onClick="{{ r.onSelect }}" style="{{ r.rowStyle }}">
+                <span style="width:24px;flex:none;display:flex;justify-content:center"><span style="{{ r.lineStyle }}"></span></span>
+                <span style="flex:1;font-size:13px">{{ r.label }}</span>
+                <span style="font-size:12px;color:#a39e98">{{ r.meta }}</span>
+              </button>
+            </div>
+          </sc-if>
+        </sc-for>
+      </div>
+
+      <div style="padding:8px 16px 12px;position:relative">
+        <input value="{{ q }}" placeholder="{{ searchPlaceholder }}" onChange="{{ onQ }}" onKeyDown="{{ onQKey }}" onFocus="{{ onQFocus }}" onBlur="{{ onQBlur }}" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:15px;padding:8px 10px;border-radius:4px;border:1px solid #dddddd;outline:none;color:rgba(0,0,0,0.9);background:#fff" style-focus="outline:2px solid #097fe8">
+        <sc-if value="{{ showSugg }}">
+          <div style="position:absolute;left:16px;right:16px;top:calc(100% - 8px);background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:8px;box-shadow:var(--shadow-deep);z-index:30;padding:4px;display:flex;flex-direction:column">
+            <sc-for list="{{ sugg }}" as="sg">
+              <button onMouseDown="{{ sg.onPick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:0;border:none;background:transparent;text-align:left;padding:6px 8px;border-radius:5px;cursor:pointer;font-family:inherit" style-hover="background:rgba(0,0,0,0.05)">
+                <span style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.95)">{{ sg.name }}</span>
+                <span style="font-size:12px;color:#615d59">{{ sg.sub }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noResults }}">
+              <div style="padding:8px;font-size:13px;color:#615d59">No places match “{{ q }}”.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showComposer }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ isEmpty }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:4px 16px 8px;color:#a39e98;font-size:12px">
+            <div style="flex:1;height:1px;background:rgba(0,0,0,0.1)"></div>or<div style="flex:1;height:1px;background:rgba(0,0,0,0.1)"></div>
+          </div>
+        </sc-if>
+        <div style="margin:4px 16px 16px;border:1px solid rgba(0,0,0,0.1);border-radius:12px;padding:14px;background:#f6f5f4;display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div style="font-weight:600">Describe your trip</div>
+            <div style="font-size:12px;color:#615d59">{{ aiHint }}</div>
+          </div>
+          <sc-if value="{{ aiOff }}">
+            <div style="font-size:12px;color:#615d59;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:8px 10px">This turns on with an OpenAI key. Search works without it.</div>
+          </sc-if>
+          <textarea rows="4" value="{{ aiText }}" onChange="{{ onAIText }}" disabled="{{ aiInputDisabled }}" placeholder="Flew from Berlin to Istanbul, took the ferry to Kadıköy, then a motorbike to Şile" style="width:100%;box-sizing:border-box;resize:vertical;font-family:inherit;font-size:14px;line-height:1.5;padding:8px 10px;border-radius:4px;border:1px solid #dddddd;outline:none;background:#fff;color:rgba(0,0,0,0.9)" style-focus="outline:2px solid #097fe8"></textarea>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onClick="{{ onMic }}" disabled="{{ micDisabled }}" style="{{ micStyle }}">{{ micLabel }}</button>
+            <span style="font-size:12px;color:#615d59;flex:1">{{ aiStatusLabel }}</span>
+            <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" size="sm" disabled="{{ aiSubmitDisabled }}" onClick="{{ onAISubmit }}" hint-size="auto,30px">Build route</x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ phoneVideo }}">
+        <div style="margin:0 16px 16px;padding-top:16px;border-top:1px solid rgba(0,0,0,0.1);display:flex;flex-direction:column;gap:12px">
+          <div style="font-weight:700;font-size:15px">Video</div>
+          <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:center">
+            <span style="font-size:12px;font-weight:600;color:#615d59">Map style</span>
+            <select value="{{ styleVal }}" onChange="{{ onStyle }}" style="font-family:inherit;font-size:16px;padding:8px;border-radius:4px;border:1px solid #dddddd;background:#fff;min-width:0;color:rgba(0,0,0,0.9)">
+              <option value="satellite">Satellite</option>
+              <option value="streets">Streets</option>
+              <option value="dark">Dark</option>
+              <option value="ukiyo">Japanese print</option>
+            </select>
+            <span style="font-size:12px;font-weight:600;color:#615d59">Speed</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="range" min="0.5" max="2.5" step="0.25" value="{{ speed }}" onChange="{{ onSpeed }}" style="flex:1;min-width:0;width:auto;height:28px">
+              <span style="font-size:12px;width:34px;flex:none;text-align:right;font-variant-numeric:tabular-nums">{{ speedLabel }}</span>
+            </div>
+          </div>
+        </div>
+        <div style="position:sticky;bottom:0;margin-top:auto;background:#fff;border-top:1px solid rgba(0,0,0,0.1);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:flex-end;align-items:center;z-index:5">
+          <span style="font-size:12px;color:#a39e98;flex:1">{{ savedLabel }}</span>
+          <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="secondary" disabled="{{ actionsDisabled }}" onClick="{{ onPreview }}" hint-size="auto,40px">Preview</x-import>
+          <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="primary" disabled="{{ actionsDisabled }}" onClick="{{ onExport }}" hint-size="auto,40px">Export</x-import>
+        </div>
+      </sc-if>
+    </aside>
+
+    <main style="{{ mapStyle }}">
+      <div ref="{{ mapRef }}" style="{{ mapBgStyle }}"></div>
+      <div style="{{ overlayLayer }}">
+      <div style="{{ homeStyle }}">
+        <div style="width:100%;max-width:440px;display:flex;flex-direction:column;gap:clamp(20px,4vh,32px)">
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+            <h1 style="margin:0;font-size:clamp(34px,6.2vh,48px);line-height:1.05;letter-spacing:-1.5px;font-weight:700;font-feature-settings:'lnum','locl';text-wrap:balance">Turn your trip into a video.</h1>
+            <p style="margin:0;font-size:20px;line-height:1.4;font-weight:600;color:#615d59;text-wrap:pretty">Add your stops, choose how you travel between them, and get a clip for Reels, TikTok or YouTube.</p>
+            <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" size="lg" onClick="{{ onStartNew }}" hint-size="auto,48px">New trip</x-import>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;font-weight:600;color:#615d59">Your trips</div>
+            <sc-if value="{{ hasTrips }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:2px;max-height:260px;overflow:auto;margin:0 -10px">
+                <sc-for list="{{ tripCards }}" as="tc" hint-placeholder-count="3">
+                  <button onClick="{{ tc.onOpen }}" onMouseEnter="{{ tc.onEnter }}" onMouseLeave="{{ tc.onLeave }}" style="display:flex;align-items:center;gap:12px;border:none;background:transparent;border-radius:8px;padding:10px;text-align:left;cursor:pointer;font-family:inherit;color:rgba(0,0,0,0.95);transition:background-color 120ms" style-hover="background:rgba(0,0,0,0.05)">
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                      <span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ tc.name }}</span>
+                      <span style="font-size:12px;color:#615d59">{{ tc.meta }}</span>
+                    </div>
+                    <span style="font-size:12px;color:#a39e98;white-space:nowrap">{{ tc.edited }}</span>
+                    <span style="color:#a39e98">→</span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noTrips }}">
+              <div style="font-size:14px;color:#a39e98">No trips yet. Your trips are saved here automatically.</div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ pickActive }}">
+        <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:900;pointer-events:auto;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:8px;box-shadow:var(--shadow-deep);padding:8px 8px 8px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap">
+          <span>{{ pickVerb }} the map to place <b style="font-weight:600">{{ pickName }}</b></span>
+          <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="secondary" size="sm" onClick="{{ cancelPick }}" hint-size="auto,28px">Cancel</x-import>
+        </div>
+      </sc-if>
+      <div style="{{ toastWrapStyle }}">
+        <sc-if value="{{ building }}">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:9999px;box-shadow:var(--shadow-card);padding:6px 14px;font-size:13px;font-weight:500;color:#615d59">Building route…</div>
+        </sc-if>
+        <sc-for list="{{ toasts }}" as="tt">
+          <button onClick="{{ tt.onClose }}" style="{{ tt.style }}"><span style="flex:1">{{ tt.text }}</span><span style="color:#a39e98">✕</span></button>
+        </sc-for>
+      </div>
+      </div>
+    </main>
+
+    <aside style="{{ inspStyle }}">
+      <sc-if value="{{ isPhone }}">
+        <button onClick="{{ toggleSheet }}" aria-label="{{ sheetLabel }}" style="flex:none;border:none;background:#fff;padding:12px 0 10px;cursor:pointer;display:flex;justify-content:center;position:sticky;top:0;z-index:5;width:100%"><span style="width:36px;height:4px;border-radius:9999px;background:#dddddd"></span></button>
+      </sc-if>
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:16px;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;color:#a39e98">{{ selIndexLabel }}</div>
+              <div style="font-size:18px;font-weight:700;letter-spacing:-0.25px;line-height:1.3">{{ selTitle }}</div>
+            </div>
+            <button onClick="{{ deselect }}" title="Close" style="{{ closeBtnStyle }}" style-hover="background:rgba(0,0,0,0.05)">{{ closeLabel }}</button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;font-weight:600;color:#615d59">Travel by</div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;background:#f6f5f4;border-radius:6px;padding:3px">
+              <sc-for list="{{ typeOpts }}" as="o">
+                <button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button>
+              </sc-for>
+            </div>
+            <div style="font-size:12px;color:#615d59">{{ selTypeNote }}</div>
+            <sc-if value="{{ selNoRoad }}">
+              <div style="font-size:12px;color:#615d59;background:#f6f5f4;border-radius:8px;padding:8px 10px">No road found here, so this segment runs in a straight line.</div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;font-weight:600;color:#615d59">Figure</div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ figOpts }}" as="f">
+                <button onClick="{{ f.onPick }}" disabled="{{ f.disabled }}" style="{{ f.style }}">
+                  <div style="height:60px;background:#f6f5f4;border-radius:6px;overflow:hidden;display:flex">{{ f.box }}</div>
+                  <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</div>
+                  <div style="font-size:11px;color:#a39e98;margin-top:-4px">{{ f.sub }}</div>
+                </button>
+              </sc-for>
+              <button onClick="{{ openLibAdd }}" style="border:1px dashed rgba(0,0,0,0.1);background:#fff;border-radius:8px;padding:6px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;color:#615d59;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px" style-hover="background:rgba(0,0,0,0.05)">
+                <span style="font-size:18px;line-height:1">+</span>Your own
+              </button>
+            </div>
+            <button onClick="{{ openLib }}" style="align-self:flex-start;border:none;background:transparent;font-family:inherit;font-size:12px;color:#0075de;cursor:pointer;padding:0" style-hover="text-decoration:underline">Manage your figures →</button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+              <span style="font-weight:600;color:#615d59">Line color</span>
+              <sc-if value="{{ segColorCustom }}"><button onClick="{{ resetSegColor }}" style="border:none;background:transparent;font-family:inherit;font-size:12px;color:#0075de;cursor:pointer;padding:0" style-hover="text-decoration:underline">Use default</button></sc-if>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+                <sc-for list="{{ segSwatches }}" as="sw"><button title="{{ sw.title }}" onClick="{{ sw.onPick }}" style="{{ sw.style }}"></button></sc-for>
+                <label title="Custom color" style="{{ segCustomStyle }}">+<input type="color" value="{{ segColorVal }}" onChange="{{ onSegCustom }}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;margin:0"></label>
+              </div>
+            <div style="display:flex;gap:8px;align-items:baseline;justify-content:space-between">
+              <span style="font-size:12px;color:#a39e98">{{ colorNote }}</span>
+              <button onClick="{{ applyColorAll }}" style="border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:500;color:#0075de;cursor:pointer;padding:0;white-space:nowrap" style-hover="text-decoration:underline">Apply to all segments</button>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="font-weight:600;color:#615d59">Pace</span><span style="font-variant-numeric:tabular-nums">{{ paceLabel }}</span></div>
+            <input type="range" min="0.25" max="3" step="0.25" value="{{ pace }}" onChange="{{ onPace }}">
+            <div style="font-size:12px;color:#a39e98">On top of the video speed.</div>
+          </div>
+
+          <sc-if value="{{ canSmooth }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span style="font-weight:600;color:#615d59">Smoothing</span><span style="font-variant-numeric:tabular-nums">{{ smoothLabel }}</span></div>
+              <input type="range" min="0" max="4" step="0.5" value="{{ smooth }}" onChange="{{ onSmooth }}">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#a39e98"><span>Exact road</span><span>Smooth turns</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noSmooth }}">
+            <div style="font-size:12px;color:#a39e98">Air segments fly a smooth arc, so there is no smoothing.</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+    </aside>
+    <aside style="{{ videoStyle }}">
+      <sc-if value="{{ showVideo }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-weight:700;font-size:15px">Video</div>
+          <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:center">
+            <span style="font-size:12px;font-weight:600;color:#615d59">Map style</span>
+            <select ref="{{ styleSel }}" defaultValue="{{ styleVal }}" onChange="{{ onStyle }}" style="font-family:inherit;font-size:13px;padding:6px;border-radius:4px;border:1px solid #dddddd;background:#fff;min-width:0;color:rgba(0,0,0,0.9)">
+              <option value="satellite">Satellite</option>
+              <option value="streets">Streets</option>
+              <option value="dark">Dark</option>
+              <option value="ukiyo">Japanese print</option>
+            </select>
+            <span style="font-size:12px;font-weight:600;color:#615d59">Speed</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="range" min="0.5" max="2.5" step="0.25" value="{{ speed }}" onChange="{{ onSpeed }}" style="flex:1;min-width:0;width:auto">
+              <span style="font-size:12px;width:34px;flex:none;text-align:right;font-variant-numeric:tabular-nums">{{ speedLabel }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </aside>
+  </div>
+
+  <sc-if value="{{ showLayoutPill }}">
+  <div style="position:fixed;left:50%;transform:translateX(-50%);top:66px;z-index:1500;display:flex;align-items:center;gap:4px;background:#31302e;color:#fff;border-radius:9999px;padding:4px 4px 4px 12px;font-size:12px;box-shadow:var(--shadow-deep)">
+    <span style="opacity:0.7;margin-right:4px">Layout</span>
+    <sc-for list="{{ layoutOpts }}" as="o">
+      <button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ libOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLib }}" style="{{ scrimStyle }}">
+      <div onClick="{{ stop }}" style="width:720px;max-width:100%;max-height:calc(100dvh - 24px);overflow:auto;background:#fff;border-radius:16px;border:1px solid rgba(0,0,0,0.1);box-shadow:var(--shadow-deep);padding:clamp(16px,4vw,24px);display:flex;flex-direction:column;gap:20px;box-sizing:border-box">
+
+        <sc-if value="{{ libList }}">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="flex:1">
+              <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px">Your figures</div>
+              <div style="color:#615d59">Shared across all your trips.</div>
+            </div>
+            <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" onClick="{{ openLibAdd }}" hint-size="auto,36px">Add figure</x-import>
+            <button onClick="{{ closeLib }}" title="Close" style="border:none;background:transparent;font-size:14px;color:#615d59;cursor:pointer;width:36px;height:36px;border-radius:4px" style-hover="background:rgba(0,0,0,0.05)">✕</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+            <sc-for list="{{ libItems }}" as="it">
+              <div style="border:1px solid rgba(0,0,0,0.1);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+                <div style="height:120px;background:#f6f5f4;display:flex">{{ it.box }}</div>
+                <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span style="font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ it.name }}</span>
+                    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Badge" tone="{{ it.tone }}" hint-size="auto,20px">{{ it.statusLabel }}</x-import>
+                  </div>
+                  <div style="font-size:12px;color:#615d59">{{ it.meta }}</div>
+                  <div style="display:flex;gap:6px">
+                    <sc-if value="{{ it.isReady }}">
+                      <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="secondary" size="sm" onClick="{{ it.onEdit }}" hint-size="auto,28px">Edit</x-import>
+                    </sc-if>
+                    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" size="sm" onClick="{{ it.onDel }}" hint-size="auto,28px">Delete</x-import>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ libEmpty }}">
+            <div style="color:#615d59;padding:24px 0;text-align:center">No figures yet. Upload a .glb model or a photo.</div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ libAdd }}">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button onClick="{{ openLib }}" style="border:none;background:transparent;font-family:inherit;font-size:14px;color:#615d59;cursor:pointer;padding:4px 6px;border-radius:4px" style-hover="background:rgba(0,0,0,0.05)">← Back</button>
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;flex:1">Add a figure</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:24px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="height:200px;background:#f6f5f4;border-radius:12px;border:1px solid rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;overflow:hidden;color:#a39e98;font-size:13px;text-align:center;padding:0">
+                <sc-if value="{{ draftHasImg }}"><div style="{{ draftImgStyle }}"></div></sc-if>
+                <sc-if value="{{ draftNoImg }}"><span style="padding:16px">{{ draftPreviewText }}</span></sc-if>
+              </div>
+              <label style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:4px;background:rgba(0,0,0,0.05);font-weight:600;cursor:pointer">
+                <input type="file" accept=".glb,image/*,.heic,.heif" onChange="{{ onFile }}" style="display:none">{{ fileBtnLabel }}
+              </label>
+              <div style="font-size:12px;color:#a39e98">A ready 3D model (.glb) or a photo. iPhone HEIC photos work.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-if value="{{ draftIsPhoto }}">
+                <div style="font-size:13px;color:#615d59;background:#f6f5f4;border-radius:8px;padding:10px 12px">For the best model, the photo should show one whole object, from the side or at 3/4. The background is removed for you.</div>
+              </sc-if>
+              <sc-if value="{{ photoBlocked }}">
+                <div style="font-size:13px;color:#b34a00;background:rgba(221,91,0,0.1);border-radius:8px;padding:10px 12px">Making a model from a photo needs a fal.ai key. You can still upload a ready .glb model.</div>
+              </sc-if>
+              <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Input" label="Name" value="{{ draftName }}" onChange="{{ onDraftName }}" placeholder="Name your figure" hint-size="100%,64px"></x-import>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:14px;font-weight:500;color:#615d59">Travels by</div>
+                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;background:#f6f5f4;border-radius:6px;padding:3px">
+                  <sc-for list="{{ draftTypeOpts }}" as="o"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+                </div>
+                <div style="font-size:12px;color:#a39e98">Shows up only on segments of this type. “Any” shows up everywhere.</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" disabled="{{ saveDisabled }}" onClick="{{ onSaveDraft }}" hint-size="auto,36px">{{ saveLabel }}</x-import>
+                <span style="font-size:12px;color:#a39e98">{{ saveNote }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ libEdit }}">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button onClick="{{ openLib }}" style="border:none;background:transparent;font-family:inherit;font-size:14px;color:#615d59;cursor:pointer;padding:4px 6px;border-radius:4px" style-hover="background:rgba(0,0,0,0.05)">← Back</button>
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;flex:1">Edit figure</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:24px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="height:260px;background:#f6f5f4;border-radius:12px;border:1px solid rgba(0,0,0,0.1);display:flex;position:relative">
+                {{ editBox }}
+                <div style="position:absolute;left:12px;bottom:10px;right:12px;display:flex;justify-content:space-between;font-size:12px;color:#615d59"><span>Light face = nose</span><span>Direction of travel →</span></div>
+              </div>
+              <div style="font-size:12px;color:#a39e98">Turn it until the nose points along the arrow and the wheels or hull face down, like the built-in figures.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Input" label="Name" value="{{ editName }}" onChange="{{ onEditName }}" hint-size="100%,64px"></x-import>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:14px;font-weight:500;color:#615d59">Travels by</div>
+                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;background:#f6f5f4;border-radius:6px;padding:3px">
+                  <sc-for list="{{ editTypeOpts }}" as="o"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:14px;font-weight:500;color:#615d59">Pose</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ poseBtns }}" as="b">
+                    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="secondary" size="sm" onClick="{{ b.on }}" hint-size="auto,28px">{{ b.label }}</x-import>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:14px"><span style="font-weight:500;color:#615d59">Size</span><span style="font-variant-numeric:tabular-nums">{{ editScaleLabel }}</span></div>
+                <input type="range" min="0.5" max="2" step="0.1" value="{{ editScale }}" onChange="{{ onEditScale }}">
+              </div>
+              <div style="font-size:12px;color:#615d59">Pose and size apply everywhere this figure is used: thumbnails, the map and the video.</div>
+              <div style="display:flex;gap:8px">
+                <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" onClick="{{ onEditSave }}" hint-size="auto,36px">Save</x-import>
+                <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" onClick="{{ onEditDel }}" hint-size="auto,36px">Delete figure</x-import>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ setOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeSettings }}" style="{{ scrimStyle }}">
+      <div onClick="{{ stop }}" style="width:640px;max-width:100%;max-height:calc(100dvh - 24px);overflow:auto;background:#fff;border-radius:16px;border:1px solid rgba(0,0,0,0.1);box-shadow:var(--shadow-deep);padding:clamp(16px,4vw,24px);display:flex;flex-direction:column;gap:24px;box-sizing:border-box">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px">Settings</div>
+            <div style="color:#615d59">Apply to all your trips.</div>
+          </div>
+          <button onClick="{{ closeSettings }}" title="Close" style="border:none;background:transparent;font-size:14px;color:#615d59;cursor:pointer;width:36px;height:36px;border-radius:4px" style-hover="background:rgba(0,0,0,0.05)">✕</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-weight:600">Appearance</div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;background:#f6f5f4;border-radius:6px;padding:3px;max-width:320px">
+            <sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:20px">
+          <div>
+            <div style="font-weight:600">Default figures</div>
+            <div style="font-size:12px;color:#615d59">Used for new segments of each type.</div>
+          </div>
+          <sc-for list="{{ setFigRows }}" as="row">
+            <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#615d59">{{ row.label }}</span>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <sc-for list="{{ row.figs }}" as="f">
+                  <button onClick="{{ f.onPick }}" title="{{ f.name }}" style="{{ f.style }}">
+                    <div style="height:40px;background:#f6f5f4;border-radius:5px;overflow:hidden;display:flex">{{ f.box }}</div>
+                    <span style="font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:20px">
+          <div>
+            <div style="font-weight:600">Line colors</div>
+            <div style="font-size:12px;color:#615d59">Segments with their own color keep it.</div>
+          </div>
+          <sc-for list="{{ setColorRows }}" as="row">
+            <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#615d59">{{ row.label }}</span>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+                <sc-for list="{{ row.swatches }}" as="sw"><button title="{{ sw.title }}" onClick="{{ sw.onPick }}" style="{{ sw.style }}"></button></sc-for>
+                <label title="Custom color" style="{{ row.customStyle }}">+<input type="color" value="{{ row.val }}" onChange="{{ row.onCustom }}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;margin:0"></label>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:20px">
+          <div style="font-weight:600">New segments</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#615d59">Fly when the next stop is farther than</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ flyKmLabel }}</span></div>
+            <input type="range" min="100" max="2000" step="50" value="{{ flyKm }}" onChange="{{ onFlyKm }}">
+            <div style="font-size:12px;color:#a39e98">Closer stops start as land segments.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:20px">
+          <div>
+            <div style="font-weight:600">Export quality</div>
+            <div style="font-size:12px;color:#615d59">Size of the long side of the video.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;background:#f6f5f4;border-radius:6px;padding:3px;max-width:320px">
+            <sc-for list="{{ resOpts }}" as="o"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;border-top:1px solid rgba(0,0,0,0.1);padding-top:20px">
+          <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" onClick="{{ closeSettings }}" hint-size="auto,36px">Done</x-import>
+          <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" onClick="{{ resetSettings }}" hint-size="auto,36px">Reset to defaults</x-import>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ expOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ scrimStyle }}">
+      <div style="width:900px;max-width:100%;max-height:calc(100dvh - 24px);overflow:auto;background:#fff;border-radius:16px;border:1px solid rgba(0,0,0,0.1);box-shadow:var(--shadow-deep);padding:clamp(16px,4vw,24px);display:flex;flex-direction:column;gap:20px;box-sizing:border-box">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;flex:1">Export video</div>
+          <div style="display:flex;gap:4px;font-size:12px">
+            <sc-for list="{{ steps }}" as="st"><span style="{{ st.style }}">{{ st.label }}</span></sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ expPrep }}">
+          <div style="padding:64px 0;display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div style="font-weight:600">Loading the map for your video</div>
+            <div style="width:320px;height:6px;border-radius:9999px;background:#f6f5f4;overflow:hidden"><div style="{{ expBarStyle }}"></div></div>
+            <div style="font-size:12px;color:#615d59;font-variant-numeric:tabular-nums">{{ expPctLabel }}</div>
+            <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" size="sm" onClick="{{ onCancelExp }}" hint-size="auto,28px">Cancel</x-import>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ expMain }}">
+          <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+            <div style="flex:none;width:min(400px,100%);height:min(440px,72vw);display:flex;align-items:center;justify-content:center;background:#f6f5f4;border-radius:12px">
+              <div style="{{ frameStyle }}">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#615d59">{{ frameCenter }}</div>
+                <sc-if value="{{ capTitle }}"><div style="position:absolute;top:14px;left:14px;right:14px;font-size:17px;font-weight:700;letter-spacing:-0.25px;line-height:1.2">{{ tripName }}</div></sc-if>
+                <sc-if value="{{ capSeg }}"><div style="position:absolute;left:14px;bottom:30px;background:#fff;border-radius:9999px;padding:4px 10px;font-size:11px;font-weight:600;box-shadow:var(--shadow-card);white-space:nowrap">{{ frameSeg }}</div></sc-if>
+                <sc-if value="{{ capProgress }}"><div style="position:absolute;left:14px;right:14px;bottom:18px;height:3px;border-radius:9999px;background:rgba(0,0,0,0.1)"><div style="width:38%;height:100%;border-radius:9999px;background:rgba(0,0,0,0.95)"></div></div></sc-if>
+                <div style="position:absolute;right:6px;bottom:4px;font-size:8px;color:#615d59">© OpenStreetMap contributors</div>
+              </div>
+            </div>
+
+            <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:20px">
+              <sc-if value="{{ expCaptions }}">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="font-weight:600">Captions</div>
+                  <sc-for list="{{ capToggles }}" as="c">
+                    <button onClick="{{ c.onToggle }}" style="display:flex;align-items:center;gap:10px;border:none;background:transparent;padding:0;cursor:pointer;font-family:inherit;font-size:14px;color:rgba(0,0,0,0.95);text-align:left">
+                      <span style="{{ c.track }}"><span style="{{ c.knob }}"></span></span>
+                      <span style="flex:1">{{ c.label }}</span>
+                    </button>
+                  </sc-for>
+                  <div style="display:flex;align-items:center;gap:10px;color:#a39e98">
+                    <span style="width:30px;height:18px;border-radius:9999px;background:#a39e98;position:relative;flex:none"><span style="position:absolute;top:2px;left:14px;width:14px;height:14px;border-radius:50%;background:#fff"></span></span>
+                    <span>Map attribution · always on, required by the map license</span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(0,0,0,0.1);padding-top:16px">
+                  <div style="font-weight:600">Format</div>
+                  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+                    <sc-for list="{{ expFormatOpts }}" as="o">
+                      <button onClick="{{ o.onPick }}" style="{{ o.style }}"><span style="font-weight:600">{{ o.label }}</span><span style="font-size:11px;color:#615d59">{{ o.sub }}</span></button>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:12px;color:#615d59">The frame reloads in a few seconds after you switch.</div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" disabled="{{ reloading }}" onClick="{{ onRender }}" hint-size="auto,36px">Render video</x-import>
+                  <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" onClick="{{ onCancelExp }}" hint-size="auto,36px">Cancel</x-import>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ expRender }}">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="font-weight:600">Rendering frame by frame</div>
+                  <div style="height:6px;border-radius:9999px;background:#f6f5f4;overflow:hidden"><div style="{{ expBarStyle }}"></div></div>
+                  <div style="font-size:12px;color:#615d59;font-variant-numeric:tabular-nums">{{ expPctLabel }}</div>
+                  <div style="font-size:14px;color:#b34a00;background:rgba(221,91,0,0.1);border-radius:8px;padding:12px 14px"><b style="font-weight:600">Keep this tab open and visible.</b> Rendering stops if you switch tabs or minimize the window.</div>
+                  <div><x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" onClick="{{ onCancelExp }}" hint-size="auto,36px">Cancel render</x-import></div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ expDone }}">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:18px;font-weight:700;letter-spacing:-0.25px">Your video is ready</div>
+                  <div style="font-size:13px;color:#615d59">{{ fileName }}</div>
+                  <div style="display:flex;gap:8px">
+                    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" onClick="{{ onDownload }}" hint-size="auto,36px">Download MP4</x-import>
+                    <x-import component-from-global-scope="NotionInspiredDesignSystem_7af606.Button" variant="ghost" onClick="{{ onCancelExp }}" hint-size="auto,36px">Done</x-import>
+                  </div>
+                  <div style="font-size:12px;color:#a39e98">On a phone, Share sends it straight to Instagram or TikTok.</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;three&quot;,&quot;map&quot;,&quot;single&quot;],&quot;default&quot;:&quot;map&quot;,&quot;tsType&quot;:&quot;'three'|'map'|'single'&quot;},&quot;startWith&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sample&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;sample&quot;,&quot;tsType&quot;:&quot;'sample'|'empty'&quot;},&quot;openaiKey&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;falKey&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  static PLACES = [
+    ['Berlin','Germany',52.52,13.405],['Istanbul','Türkiye',41.0082,28.9784],['Kadıköy','Istanbul, Türkiye',40.9917,29.027],['Şile','Istanbul, Türkiye',41.1758,29.6125,true],
+    ['Bodrum','Muğla, Türkiye',37.0344,27.4305],['Göreme','Nevşehir, Türkiye',38.6431,34.8289,true],['Paris','Île-de-France, France',48.8566,2.3522],['London','England, United Kingdom',51.5074,-0.1278],
+    ['Lisbon','Portugal',38.7223,-9.1393],['Porto','Portugal',41.1579,-8.6291],['Madrid','Spain',40.4168,-3.7038],['Barcelona','Catalonia, Spain',41.3874,2.1686],
+    ['Rome','Lazio, Italy',41.9028,12.4964],['Florence','Tuscany, Italy',43.7696,11.2558],['Venice','Veneto, Italy',45.4408,12.3155],['Naples','Campania, Italy',40.8518,14.2681],
+    ['Athens','Attica, Greece',37.9838,23.7275],['Santorini','South Aegean, Greece',36.3932,25.4615],['Dubrovnik','Croatia',42.6507,18.0944],['Split','Croatia',43.5081,16.4402],
+    ['Vienna','Austria',48.2082,16.3738],['Prague','Czechia',50.0755,14.4378],['Budapest','Hungary',47.4979,19.0402],['Amsterdam','Netherlands',52.3676,4.9041],
+    ['Copenhagen','Denmark',55.6761,12.5683],['Oslo','Norway',59.9139,10.7522],['Stockholm','Sweden',59.3293,18.0686],['Helsinki','Finland',60.1699,24.9384],
+    ['Tallinn','Estonia',59.437,24.7536],['Reykjavík','Iceland',64.1466,-21.9426],['Tbilisi','Georgia',41.7151,44.8271],['Batumi','Adjara, Georgia',41.6168,41.6367],
+    ['Yerevan','Armenia',40.1792,44.4991],['Dubai','United Arab Emirates',25.2048,55.2708],['Cairo','Egypt',30.0444,31.2357],['Marrakesh','Morocco',31.6295,-7.9811],
+    ['New York','New York, USA',40.7128,-74.006],['Boston','Massachusetts, USA',42.3601,-71.0589],['San Francisco','California, USA',37.7749,-122.4194],['Los Angeles','California, USA',34.0522,-118.2437],
+    ['Tokyo','Japan',35.6762,139.6503],['Kyoto','Japan',35.0116,135.7681],['Osaka','Japan',34.6937,135.5023],['Bangkok','Thailand',13.7563,100.5018],
+    ['Phuket','Thailand',7.8804,98.3923],['Singapore','Singapore',1.3521,103.8198],['Sydney','New South Wales, Australia',-33.8688,151.2093]
+  ];
+  static FIGS = [
+    {id:'plane',name:'Plane',type:'air',d:[130,26,40]},{id:'heli',name:'Helicopter',type:'air',d:[90,44,40]},
+    {id:'car',name:'Car',type:'land',d:[100,36,50]},{id:'enduro',name:'Enduro',type:'land',d:[86,44,20]},{id:'sport',name:'Sport bike',type:'land',d:[92,32,20]},
+    {id:'bus',name:'Bus',type:'land',d:[130,54,50]},{id:'train',name:'Train',type:'land',d:[150,44,42]},{id:'bicycle',name:'Bicycle',type:'land',d:[80,42,12]},
+    {id:'liner',name:'Liner',type:'water',d:[150,46,48]},{id:'sail',name:'Sailboat',type:'water',d:[110,28,40]}
+  ];
+  static TYPES = {air:'Air',land:'Land',water:'Water',any:'Any'};
+  static STYLES = [
+    {id:'satellite',label:'Satellite',f:'saturate(1.4) contrast(1.05) hue-rotate(-10deg)'},{id:'streets',label:'Streets',f:'none'},
+    {id:'dark',label:'Dark',f:'invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)'},{id:'ukiyo',label:'Japanese print',f:'sepia(0.55) saturate(0.8) contrast(0.92) brightness(1.03)'}
+  ];
+  static FORMATS = [{id:'9:16',sub:'Reels · TikTok'},{id:'4:5',sub:'Instagram post'},{id:'1:1',sub:'Square'},{id:'16:9',sub:'YouTube'}];
+  static PALETTE = [['#31302e','Charcoal'],['#0075de','Blue'],['#2a9d99','Teal'],['#1aae39','Green'],['#dd5b00','Orange'],['#ff64c8','Pink'],['#391c57','Purple'],['#523410','Brown']];
+  static DEF_SETTINGS = {figs:{air:'plane', land:'car', water:'liner'}, colors:{air:'#0075de', land:'#dd5b00', water:'#2a9d99'}, flyKm:600, res:1920, theme:'auto'};
+  static INV = 'invert(0.9) hue-rotate(180deg)';
+  static UNINV = 'hue-rotate(180deg) invert(1) contrast(1.25)';
+  static SAMPLE = 'Flew from Berlin to Istanbul, took the ferry to Kadıköy, then a motorbike to Şile';
+  static KW = [['flew','air','plane'],['fly','air','plane'],['flight','air','plane'],['plane','air','plane'],['helicopter','air','heli'],['ferry','water','liner'],['boat','water','liner'],['cruise','water','liner'],['sail','water','sail'],['motorbike','land','sport'],['motorcycle','land','sport'],['scooter','land','sport'],['enduro','land','enduro'],['bus','land','bus'],['train','land','train'],['bike','land','bicycle'],['cycled','land','bicycle'],['car','land','car'],['drove','land','car'],['drive','land','car']];
+
+  mapRef = React.createRef();
+  fromSel = React.createRef();
+  toSel = React.createRef();
+  styleSel = React.createRef();
+  n = 100;
+  uid() { return 'id' + (this.n++); }
+  state = this.initState();
+
+  initState() {
+    const sample = (this.props.startWith ?? 'sample') === 'sample';
+    const lib = [
+      {id:'c1',name:'My Vespa',type:'land',status:'ready',img:null,pose:{yaw:0,roll:0,pitch:0},scale:1,d:[90,40,26]},
+      {id:'c2',name:"Grandpa's boat",type:'water',status:'generating',img:null,pose:{yaw:0,roll:0,pitch:0},scale:1,d:[110,34,40]},
+      {id:'c3',name:'Hot air balloon',type:'air',status:'error',img:null,pose:{yaw:0,roll:0,pitch:0},scale:1,d:[60,70,60]}
+    ];
+    const now = Date.now(), trips = sample ? [{...this.sampleTrip(), id:'t1', edited:now - 2 * 36e5}, this.japanTrip(now - 2 * 864e5), this.iberiaTrip(now - 19 * 864e5)] : [];
+    const cur = trips[0] ? JSON.parse(JSON.stringify(trips[0])) : {...this.emptyTrip(), id:'t0', edited:now};
+    return {vw:window.innerWidth, vh:window.innerHeight, sheetFull:false, trip:cur, trips, screen:'home', homePhase:'home', chromeIn:false, hoverTrip:null, selSeg:null, pickId:null, building:false, pending:[], q:'', qFocus:false,
+      aiOpen:false, aiText:'', aiStatus:null, toasts:[], saved:'saved', layout:null,
+      lib, libView:null, draft:null, edit:null, exp:null, setOpen:false, settings:JSON.parse(JSON.stringify(Component.DEF_SETTINGS))};
+  }
+  P(name, approx) { const p = Component.PLACES.find(x => x[0] === name); return {id:this.uid(), name:p[0], sub:p[1], lat:p[2], lng:p[3], approx:!!approx}; }
+  baseTrip() { return {style:'streets', format:'9:16', speed:1, range:null, captions:{title:true, seg:true, progress:true}}; }
+  sampleTrip() {
+    return {...this.baseTrip(), name:'Berlin to Şile', points:[this.P('Berlin'),this.P('Istanbul'),this.P('Kadıköy'),this.P('Şile',true)],
+      segs:[{type:'air',fig:'plane',pace:1,smooth:1},{type:'water',fig:'liner',pace:1,smooth:1},{type:'land',fig:'sport',pace:1,smooth:1}]};
+  }
+  japanTrip(ed) { return {...this.baseTrip(), id:'t2', edited:ed, name:'Japan by rail', points:[this.P('Tokyo'), this.P('Kyoto'), this.P('Osaka')],
+    segs:[{type:'land', fig:'train', pace:1, smooth:1}, {type:'land', fig:'train', pace:1, smooth:1}]}; }
+  iberiaTrip(ed) { return {...this.baseTrip(), id:'t3', edited:ed, name:'Iberian road trip', points:[this.P('Lisbon'), this.P('Porto'), this.P('Madrid'), this.P('Barcelona')],
+    segs:[{type:'land', fig:'car', pace:1, smooth:1}, {type:'land', fig:'car', pace:1, smooth:1}, {type:'land', fig:'train', pace:1, smooth:1}]}; }
+  emptyTrip() { const t = this.state && this.state.trip; return {...this.baseTrip(), style:t?t.style:'streets', format:t?t.format:'9:16', name:'New trip', points:[], segs:[]}; }
+
+  componentDidMount() {
+    this.onVw = () => { if (window.innerWidth !== this.state.vw || window.innerHeight !== this.state.vh) this.setState({vw:window.innerWidth, vh:window.innerHeight}); };
+    window.addEventListener('resize', this.onVw);
+    if (window.matchMedia) { this.mq = window.matchMedia('(prefers-color-scheme: dark)'); this.onMq = () => this.forceUpdate(); this.mq.addEventListener && this.mq.addEventListener('change', this.onMq); }
+    this.tryInit();
+    this.onKey = e => { if (e.key === 'Escape' && this.state.pickId) this.setState({pickId:null}); };
+    window.addEventListener('keydown', this.onKey);
+    this.onUp = () => { if (this.state.dragEnd) this.setState({dragEnd:null}); };
+    window.addEventListener('mouseup', this.onUp);
+    this.genTimer = setTimeout(() => this.setState(s => ({lib: s.lib.map(f => f.id === 'c2' ? {...f, status:'ready'} : f)})), 20000);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); clearTimeout(this.genTimer); clearInterval(this.expT); if (this.ro) this.ro.disconnect(); cancelAnimationFrame(this.raf); clearInterval(this.sizeT); window.removeEventListener('resize', this.onWinResize); if (this.map) this.map.remove(); }
+  componentDidUpdate(pp, ps) {
+    if (!this.map) return;
+    const lay = this.state.layout || this.props.layout, play = ps.layout || pp.layout;
+    if (lay !== play) { setTimeout(() => { this.map.resize(); this.fitKey = null; this.draw(); }, 60); }
+    if (pp.startWith !== this.props.startWith) { this.setState({trip: (this.props.startWith ?? 'sample') === 'sample' ? this.sampleTrip() : this.emptyTrip(), selSeg:null}); }
+    this.draw();
+  }
+  static STYLE_URL = {streets:'https://tiles.openfreemap.org/styles/liberty', satellite:'https://tiles.openfreemap.org/styles/liberty', dark:'https://tiles.openfreemap.org/styles/positron', ukiyo:'https://tiles.openfreemap.org/styles/positron'};
+  mode() { const w = window.innerWidth; return w < 700 ? 'phone' : w < 1100 ? 'tablet' : 'desktop'; }
+  lay() { const m = this.mode(); return m === 'desktop' ? (this.lay()) : m; }
+  homePadFor(w) { return w < 700 ? 0 : Math.round(Math.min(600, Math.max(w < 1100 ? 360 : 440, w * 0.42))); }
+  homeCam() {
+    const el = this.mapRef.current, w = (el && el.clientWidth) || window.innerWidth, hh = (el && el.clientHeight) || window.innerHeight - 57;
+    if (w < 700) { const b = Math.round(hh * 0.56), r = 0.42 * Math.min(w, hh - b); return {zoom:Math.log2(r * 2 * Math.PI / 512), padding:{left:0, top:0, right:0, bottom:b}, pad:0}; }
+    const pad = this.homePadFor(w), r = 0.4 * Math.min(hh, w - pad);
+    return {zoom:Math.log2(r * 2 * Math.PI / 512), padding:{left:pad, top:0, right:0, bottom:0}, pad};
+  }
+  tryInit() {
+    const ML = window.maplibregl;
+    if (!ML || !this.mapRef.current) { this.initT = setTimeout(() => this.tryInit(), 100); return; }
+    this.ML = ML;
+    this.mapEl = document.createElement('div'); this.mapEl.style.cssText = 'position:absolute;inset:0;';
+    this.mapRef.current.appendChild(this.mapEl);
+    this.styleUrl = Component.STYLE_URL[this.state.trip.style] || Component.STYLE_URL.streets;
+    const hp = this.homeCam();
+    this.map = new ML.Map({container:this.mapEl, style:this.styleUrl, center:[18, 34], zoom:hp.zoom, attributionControl:false, maxPitch:70});
+    this.map.addControl(new ML.AttributionControl({compact:true, customAttribution:'Terrain: Mapzen, AWS'}), 'bottom-right');
+    this.map.addControl(new ML.NavigationControl({visualizePitch:true}), 'bottom-right');
+    this.map.on('style.load', () => this.setupStyle());
+    this.map.setPadding(hp.padding);
+    this.map.on('load', () => this.syncSize());
+    this.map.once('load', () => { if (this.state.screen === 'home') { const p = this.homeCam(); this.map.jumpTo({padding:p.padding, zoom:p.zoom}); } });
+    this.map.on('click', e => this.onMapClick(e));
+    this.map.on('mousemove', e => { if (!this.styleReady || this.state.screen !== 'editor' || this.state.pickId) return;
+      const f = this.map.queryRenderedFeatures(e.point, {layers:['seg-hit']}); this.map.getCanvas().style.cursor = f.length ? 'pointer' : ''; });
+    this.map.on('dragstart', () => { this.userMoving = true; }); this.map.on('dragend', () => { this.userMoving = false; });
+    this.map.on('error', e => console.warn('map', e && e.error && e.error.message));
+    if (window.ResizeObserver) { this.ro = new ResizeObserver(() => this.syncSize()); this.ro.observe(this.mapRef.current); this.ro.observe(this.mapEl); }
+    window.addEventListener('resize', this.onWinResize = () => this.syncSize());
+    this.sizeT = setInterval(() => this.syncSize(), 1000);
+    const spin = () => { this.raf = requestAnimationFrame(spin); const s = this.state;
+      if (this.styleReady && s.screen === 'home' && !this.flying && !s.hoverTrip && !this.userMoving && !this.map.isMoving()) { const c = this.map.getCenter(); this.map.setCenter([c.lng + 0.035, c.lat]); } };
+    spin();
+  }
+  syncSize() {
+    const m = this.map; if (!m || !this.mapEl) return;
+    if (this.mapRef.current && this.mapEl.parentNode !== this.mapRef.current) this.mapRef.current.appendChild(this.mapEl);
+    const c = m.getCanvas(), w = this.mapEl.clientWidth, hh = this.mapEl.clientHeight;
+    if (w && hh && (Math.abs(c.clientWidth - w) > 1 || Math.abs(c.clientHeight - hh) > 1)) m.resize();
+  }
+  setupStyle() {
+    const m = this.map; this.styleReady = false; this.syncSize();
+    try { m.setProjection({type:'globe'}); } catch (e) {}
+    const dem = {type:'raster-dem', tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding:'terrarium', tileSize:256, maxzoom:14};
+    try {
+      if (!m.getSource('terrain')) m.addSource('terrain', dem);
+      if (!m.getSource('hills')) m.addSource('hills', dem);
+      const firstSym = (m.getStyle().layers.find(l => l.type === 'symbol') || {}).id;
+      if (!m.getLayer('hills')) m.addLayer({id:'hills', type:'hillshade', source:'hills', paint:{'hillshade-exaggeration':0.35, 'hillshade-shadow-color':'#4a3f35', 'hillshade-highlight-color':'#ffffff'}}, firstSym);
+      m.setTerrain({source:'terrain', exaggeration:1.4});
+    } catch (e) { console.warn('terrain', String(e)); }
+    try { m.setSky({'atmosphere-blend':['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 7, 0]}); } catch (e) {}
+    const empty = {type:'FeatureCollection', features:[]};
+    ['route', 'trips', 'trip-pts'].forEach(id => { if (!m.getSource(id)) m.addSource(id, {type:'geojson', data:empty}); });
+    const base = {'line-color':['get', 'color'], 'line-width':['case', ['get', 'sel'], 5.5, 3.5], 'line-opacity':['get', 'op']};
+    if (!m.getLayer('seg-casing')) m.addLayer({id:'seg-casing', type:'line', source:'route', filter:['==', ['get', 'sel'], true], layout:{'line-cap':'round', 'line-join':'round'}, paint:{'line-color':'#ffffff', 'line-width':12, 'line-opacity':0.95, 'line-blur':0.5}});
+    const lay = (id, filter, dash) => { if (!m.getLayer(id)) m.addLayer({id, type:'line', source:'route', filter, layout:{'line-cap':'round', 'line-join':'round'}, paint: dash ? {...base, 'line-dasharray':dash} : base}); };
+    lay('seg-land', ['all', ['==', ['get', 'type'], 'land'], ['==', ['get', 'pend'], false]]);
+    lay('seg-water', ['all', ['==', ['get', 'type'], 'water'], ['==', ['get', 'pend'], false]], [2, 1.6]);
+    lay('seg-air', ['all', ['==', ['get', 'type'], 'air'], ['==', ['get', 'pend'], false]], [0.1, 2]);
+    lay('seg-pend', ['==', ['get', 'pend'], true], [0.1, 2.5]);
+    if (!m.getLayer('seg-hit')) m.addLayer({id:'seg-hit', type:'line', source:'route', paint:{'line-width':22, 'line-opacity':0.01}});
+    if (!m.getLayer('trips')) m.addLayer({id:'trips', type:'line', source:'trips', layout:{'line-cap':'round', 'line-join':'round'}, paint:{'line-color':['case', ['get', 'hl'], '#0075de', '#31302e'], 'line-width':['case', ['get', 'hl'], 3.5, 2], 'line-opacity':0.9}});
+    if (!m.getLayer('trip-pts')) m.addLayer({id:'trip-pts', type:'circle', source:'trip-pts', paint:{'circle-radius':['case', ['get', 'hl'], 4.5, 3], 'circle-color':'#ffffff', 'circle-stroke-width':2, 'circle-stroke-color':['case', ['get', 'hl'], '#0075de', '#31302e']}});
+    this.styleReady = true; this.dataSig = null; this.draw();
+  }
+  zeroPad() { return {top:0, left:0, right:0, bottom:0}; }
+  editPad(lay) {
+    if (lay === 'phone') return {top:40, left:32, right:32, bottom:Math.round(window.innerHeight * (this.state.sheetFull ? 0.8 : 0.46)) + 16};
+    if (lay === 'tablet') return {top:50, left:380, right:50, bottom:50};
+    return lay === 'map' ? {top:60, left:390, right:60 + (this.state.selSeg != null ? 340 : 0), bottom:60} : {top:70, left:70, right:70, bottom:70};
+  }
+  bounds(pts) { let a = 180, b = 90, c = -180, d = -90; pts.forEach(p => { a = Math.min(a, p.lng); b = Math.min(b, p.lat); c = Math.max(c, p.lng); d = Math.max(d, p.lat); }); return [[a, b], [c, d]]; }
+  camFor(pts, pad, maxZoom) {
+    const el = this.mapRef.current, W = el.clientWidth, H = el.clientHeight;
+    const mx = l => (l + 180) / 360, my = la => { const s = Math.sin(la * Math.PI / 180); return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI); };
+    const iy = y => Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180 / Math.PI;
+    const [[x0, y0], [x1, y1]] = this.bounds(pts), X0 = mx(x0), X1 = mx(x1), Y0 = my(y1), Y1 = my(y0);
+    const aw = W - pad.left - pad.right, ah = H - pad.top - pad.bottom;
+    const z = Math.min(maxZoom, Math.log2(Math.min(aw / (Math.max(X1 - X0, 1e-6) * 512), ah / (Math.max(Y1 - Y0, 1e-6) * 512))));
+    const k = 512 * Math.pow(2, z), cx = (X0 + X1) / 2 - (pad.left - pad.right) / 2 / k, cy = (Y0 + Y1) / 2 - (pad.top - pad.bottom) / 2 / k;
+    return {center:[cx * 360 - 180, iy(cy)], zoom:z};
+  }
+  fly(opts, dur) {
+    this.flying = true; let done = false;
+    const finish = () => {
+      if (done) return; done = true; clearTimeout(this.flyT);
+      if (this.map.isMoving()) this.map.stop();
+      this.map.jumpTo(opts);
+      this.flying = false; this.syncSize();
+      if (this.state.screen === 'editor') { const s = this.state; this.fitKey = `${s.selSeg}|${s.trip.points.length}|${s.fitNonce || 0}|${this.lay()}|${this.lay() === 'phone' ? s.sheetFull : ''}`; this.setState({chromeIn:true}); }
+      this.draw();
+    };
+    if (document.hidden) { finish(); return; }
+    this.map.once('moveend', finish);
+    this.flyT = setTimeout(finish, dur + 600);
+    this.map.flyTo({...opts, duration:dur, essential:true, curve:1.6});
+  }
+  centroid(tr) { const P = tr.points; if (!P.length) return null; return [P.reduce((a, p) => a + p.lng, 0) / P.length, P.reduce((a, p) => a + p.lat, 0) / P.length]; }
+  sortTrips(list) { return [...list].sort((a, b) => b.edited - a.edited); }
+  upsert(list, tr) { return this.sortTrips([tr, ...list.filter(x => x.id !== tr.id)]); }
+  openTrip(id) {
+    if (this.flying || !this.map) return;
+    const tr = this.state.trips.find(x => x.id === id); if (!tr) return;
+    this.flying = true;
+    this.setState({trip:JSON.parse(JSON.stringify(tr)), screen:'editor', homePhase:'out', chromeIn:false, selSeg:null, pickId:null, hoverTrip:null, aiOpen:false}, () => {
+      const lay = this.lay();
+      const cam = tr.points.length >= 2 ? this.camFor(tr.points, this.editPad(lay), 10) : tr.points.length ? {center:[tr.points[0].lng, tr.points[0].lat], zoom:6} : {center:this.map.getCenter(), zoom:4.5};
+      this.fly({...cam, bearing:0, pitch:0, padding:this.zeroPad()}, 2600);
+    });
+  }
+  startNew() {
+    if (this.flying || !this.map) return;
+    const c = this.map.getCenter(), nt = {...this.emptyTrip(), id:this.uid(), edited:Date.now()};
+    this.flying = true;
+    this.setState(st => ({trips:this.upsert(st.trips, nt), trip:nt, screen:'editor', homePhase:'out', chromeIn:false, selSeg:null, pickId:null, hoverTrip:null, aiOpen:false}), () => {
+      this.fly({center:[c.lng, Math.max(-50, Math.min(60, c.lat))], zoom:4.5, bearing:0, pitch:0, padding:this.zeroPad()}, 2200);
+    });
+  }
+  goHome() {
+    if (this.flying || !this.map) return;
+    const ctr = this.centroid(this.state.trip) || [this.map.getCenter().lng, this.map.getCenter().lat];
+    this.flying = true;
+    this.setState(st => ({trips:this.upsert(st.trips, st.trip), screen:'home', homePhase:'home', chromeIn:false, selSeg:null, pickId:null, exp:null}), () => {
+      const hp = this.homeCam(); this.fly({center:[ctr[0], Math.max(-40, Math.min(55, ctr[1]))], zoom:hp.zoom, bearing:0, pitch:0, padding:hp.padding}, 2400);
+    });
+  }
+  hoverTrip(id) {
+    this.setState({hoverTrip:id});
+    if (!id || this.flying || !this.map) return;
+    const tr = this.state.trips.find(x => x.id === id), c = tr && this.centroid(tr);
+    if (c) this.map.easeTo({center:[c[0], Math.max(-40, Math.min(55, c[1]))], padding:this.homeCam().padding, duration:1100});
+  }
+
+  dist(a, b) { const R = 6371, r = Math.PI / 180, dLa = (b.lat - a.lat) * r, dLo = (b.lng - a.lng) * r;
+    const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+  noRoad(a, b, g) { return g.type === 'land' && this.dist(a, b) > 2500; }
+  path(a, b, g) {
+    const dx = b.lng - a.lng, dy = b.lat - a.lat, len = Math.hypot(dx, dy) || 1, px = -dy / len, py = dx / len, out = [];
+    if (g.type === 'air') {
+      const cx = a.lng + dx / 2 + px * len * 0.22, cy = a.lat + dy / 2 + py * len * 0.22;
+      for (let k = 0; k <= 40; k++) { const t = k / 40, u = 1 - t; out.push([u*u*a.lat + 2*u*t*cy + t*t*b.lat, u*u*a.lng + 2*u*t*cx + t*t*b.lng]); }
+    } else if (g.type === 'land' && !this.noRoad(a, b, g)) {
+      const amp = len * 0.035 / (1 + g.smooth * 0.4);
+      for (let k = 0; k <= 30; k++) { const t = k / 30, w = Math.sin(t * Math.PI * 4) * Math.sin(t * Math.PI) * amp; out.push([a.lat + dy * t + py * w, a.lng + dx * t + px * w]); }
+    } else { out.push([a.lat, a.lng], [b.lat, b.lng]); }
+    return out;
+  }
+  rangeIdx() {
+    const t = this.state.trip, N = t.points.length;
+    if (!t.range) return [0, Math.max(0, N - 1)];
+    const f = t.points.findIndex(p => p.id === t.range.from), to = t.points.findIndex(p => p.id === t.range.to);
+    return (f < 0 || to < 0 || f >= to) ? [0, N - 1] : [f, to];
+  }
+  draw() {
+    this.syncSize();
+    const syncSel = () => { const [a, b] = this.rangeIdx(); if (this.fromSel.current) this.fromSel.current.value = String(a); if (this.toSel.current) this.toSel.current.value = String(b); if (this.styleSel.current) this.styleSel.current.value = this.state.trip.style; };
+    syncSel(); requestAnimationFrame(syncSel); setTimeout(syncSel, 150);
+    if (!this.map || !this.styleReady) return;
+    try { this.drawInner(); } catch (err) { console.warn('map draw', String(err && err.stack || err)); }
+  }
+  drawInner() {
+    const ML = this.ML, m = this.map, s = this.state, t = s.trip, P = t.points, N = P.length, [rf, rt] = this.rangeIdx(), C = Component;
+    const url = C.STYLE_URL[t.style] || C.STYLE_URL.streets;
+    if (url !== this.styleUrl) { this.styleUrl = url; this.styleReady = false; m.setStyle(url); return; }
+    const st = C.STYLES.find(x => x.id === t.style); m.getCanvas().style.filter = st ? st.f : 'none';
+    const ed = s.screen === 'editor';
+    const feats = ed ? t.segs.map((g, i) => { const a = P[i], b = P[i + 1]; if (!a || !b) return null; const inR = i >= rf && i < rt, pend = s.pending.includes(i);
+      return {type:'Feature', properties:{i, type:g.type, color:this.segColor(g), sel:s.selSeg === i, pend, op: inR ? (pend ? 0.5 : 0.92) : 0.25}, geometry:{type:'LineString', coordinates:this.path(a, b, g).map(q => [q[1], q[0]])}}; }).filter(Boolean) : [];
+    const trips = ed ? [] : s.trips.filter(x => x.points.length >= 2);
+    const sig = JSON.stringify([feats, trips.map(x => [x.id, x.points.map(p => [p.lat, p.lng])]), s.hoverTrip]);
+    if (sig !== this.dataSig) { this.dataSig = sig;
+      m.getSource('route').setData({type:'FeatureCollection', features:feats});
+      m.getSource('trips').setData({type:'FeatureCollection', features:trips.map(x => ({type:'Feature', properties:{hl:x.id === s.hoverTrip}, geometry:{type:'LineString', coordinates:x.points.map(p => [p.lng, p.lat])}}))});
+      m.getSource('trip-pts').setData({type:'FeatureCollection', features:trips.flatMap(x => x.points.map(p => ({type:'Feature', properties:{hl:x.id === s.hoverTrip}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}})))});
+    }
+    const mk = ed ? P.map((p, i) => {
+      const inR = i >= rf && i <= rt, ends = i === 0 || i === N - 1, selEnd = s.selSeg != null && (i === s.selSeg || i === s.selSeg + 1);
+      const drag = s.selSeg != null && i === s.selSeg + 1 && !s.pickId, pick = s.pickId === p.id;
+      const bc = p.approx ? '#dd5b00' : (selEnd || pick) ? '#0075de' : 'rgba(0,0,0,0.25)';
+      const html = `<div style="width:24px;height:24px;border-radius:50%;box-sizing:border-box;background:${ends ? '#31302e' : '#fff'};color:${ends ? '#fff' : 'rgba(0,0,0,0.95)'};border:2px ${p.approx ? 'dashed' : 'solid'} ${bc};display:flex;align-items:center;justify-content:center;font:600 11px Inter,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,0.2);opacity:${inR ? 1 : 0.45};${drag ? 'cursor:grab;' : 'cursor:default;'}">${i + 1}</div>`;
+      return {id:p.id, lng:p.lng, lat:p.lat, html, drag, title:p.name + (drag ? ' · drag to move' : '')};
+    }) : [];
+    const msig = JSON.stringify(mk);
+    if (msig !== this.markSig) { this.markSig = msig; (this.markers || []).forEach(x => x.remove());
+      this.markers = mk.map(x => { const el = document.createElement('div'); el.innerHTML = x.html; el.title = x.title;
+        const mm = new ML.Marker({element:el, draggable:x.drag}).setLngLat([x.lng, x.lat]).addTo(m);
+        if (x.drag) mm.on('dragend', () => this.movePoint(x.id, mm.getLngLat())); return mm; }); }
+    m.getCanvas().style.cursor = s.pickId ? 'crosshair' : '';
+    if (!ed || this.flying) return;
+    const lay = this.lay(), key = `${s.selSeg}|${N}|${s.fitNonce || 0}|${lay}|${lay === 'phone' ? s.sheetFull : ''}`;
+    if (key !== this.fitKey) { this.fitKey = key; const pad = this.editPad(lay);
+      const fit = (pts, maxZoom) => m.fitBounds(this.bounds(pts), {padding:pad, maxZoom, duration:900});
+      if (s.selSeg != null && P[s.selSeg + 1]) fit(this.path(P[s.selSeg], P[s.selSeg + 1], t.segs[s.selSeg]).map(q => ({lat:q[0], lng:q[1]})), 11);
+      else if (N >= 2) fit(P, 10);
+      else if (N === 1) m.easeTo({center:[P[0].lng, P[0].lat], zoom:6, duration:900});
+    }
+  }
+
+  touch() { this.setState(s => ({saved:'saving', trip:{...s.trip, edited:Date.now()}})); clearTimeout(this.saveT); this.saveT = setTimeout(() => this.setState({saved:'saved'}), 700); }
+  setTrip(patch) { this.setState(s => ({trip: {...s.trip, ...(typeof patch === 'function' ? patch(s.trip) : patch)}})); this.touch(); }
+  toast(text, kind = 'info') {
+    const id = this.uid(); this.setState(s => ({toasts: [...s.toasts, {id, text, kind}].slice(-3)}));
+    if (kind === 'info') setTimeout(() => this.dismiss(id), 5500);
+  }
+  dismiss(id) { this.setState(s => ({toasts: s.toasts.filter(x => x.id !== id)})); }
+  build(idx) {
+    this.setState({building:true, pending:idx}); clearTimeout(this.buildT);
+    this.buildT = setTimeout(() => this.setState({building:false, pending:[]}), 1500);
+  }
+  defFig(type) { const id = this.state.settings.figs[type]; return this.validFigs(type).some(f => f.id === id) ? id : Component.FIGS.find(f => f.type === type).id; }
+  defSeg(a, b) { const air = this.dist(a, b) > this.state.settings.flyKm; return {type: air ? 'air' : 'land', fig:this.defFig(air ? 'air' : 'land'), pace:1, smooth:1}; }
+  segColor(g) { return g.color || this.state.settings.colors[g.type]; }
+  swatches(cur, pick, k) { k = k || (this.mode() === 'desktop' ? 22 : 32);
+    const inPal = Component.PALETTE.some(p => p[0] === cur);
+    return {list: Component.PALETTE.map(([c, n]) => ({key:c, title:n, onPick:() => pick(c),
+      style:{width:k, height:k, borderRadius:'50%', background:c, cursor:'pointer', padding:0, boxSizing:'border-box', border: cur === c ? '2px solid #fff' : '1px solid rgba(0,0,0,0.1)', boxShadow: cur === c ? '0 0 0 2px #097fe8' : 'none', transition:'box-shadow 120ms', filter: this.isDark() ? Component.UNINV : 'none'}})),
+      custom:{width:k, height:k, borderRadius:'50%', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', boxSizing:'border-box', cursor:'pointer', fontSize:14, lineHeight:1, overflow:'hidden',
+        background: inPal ? '#fff' : cur, color: inPal ? '#615d59' : '#fff', border: inPal ? '1px dashed rgba(0,0,0,0.25)' : '2px solid #fff', boxShadow: inPal ? 'none' : '0 0 0 2px #097fe8', filter: (this.isDark() && !inPal) ? Component.UNINV : 'none'}};
+  }
+  isDark() { const t = this.state.settings.theme; return t === 'dark' || (t === 'auto' && !!window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
+  setSettings(fn) { this.setState(s => ({settings: fn(JSON.parse(JSON.stringify(s.settings)))})); }
+  validFigs(type) { return [...Component.FIGS.filter(f => f.type === type), ...this.state.lib.filter(f => f.status === 'ready' && (f.type === type || f.type === 'any'))]; }
+  fig(id) { return Component.FIGS.find(f => f.id === id) || this.state.lib.find(f => f.id === id) || Component.FIGS[0]; }
+  norm(x) { return x.toLowerCase().replace(/ı/g, 'i').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  rangeCheck(t, points) {
+    if (!t.range) return {range:null, reset:false};
+    const f = points.findIndex(p => p.id === t.range.from), to = points.findIndex(p => p.id === t.range.to);
+    if (f < 0 || to < 0 || f >= to || points.length < 3) return {range:null, reset:true};
+    return {range:t.range, reset:false};
+  }
+
+  addPlace(pl) {
+    const t = this.state.trip, pt = {id:this.uid(), name:pl[0], sub:pl[1], lat:pl[2], lng:pl[3], approx:false};
+    const points = [...t.points, pt], segs = [...t.segs];
+    if (points.length > 1) segs.push(this.defSeg(points[points.length - 2], pt));
+    this.setState({trip:{...t, points, segs}, q:'', pickId:null});
+    this.touch(); if (points.length > 1) this.build([segs.length - 1]);
+  }
+  delPoint(i) {
+    const t = this.state.trip, N = t.points.length, points = t.points.filter((_, k) => k !== i); let segs = [...t.segs], pend = [];
+    if (N <= 2) segs = []; else if (i === 0) segs.splice(0, 1); else if (i === N - 1) segs.pop(); else { segs.splice(i - 1, 1); pend = [i - 1]; }
+    const {range, reset} = this.rangeCheck(t, points);
+    this.setState({trip:{...t, points, segs, range}, selSeg:null, pickId:null}); this.touch();
+    if (reset) this.toast('Video range reset to the whole route.');
+    if (pend.length) this.build(pend);
+  }
+  reorder(i, dir) {
+    const t = this.state.trip, j = i + dir; if (j < 0 || j >= t.points.length) return;
+    const points = [...t.points]; [points[i], points[j]] = [points[j], points[i]];
+    const m = Math.min(i, j), pend = [m - 1, m, m + 1].filter(k => k >= 0 && k < t.segs.length);
+    const {range, reset} = this.rangeCheck(t, points);
+    this.setState({trip:{...t, points, range}, selSeg:null, pickId:null}); this.touch();
+    if (reset) this.toast('Video range reset to the whole route.');
+    this.build(pend);
+  }
+  movePoint(id, ll) {
+    const t = this.state.trip, i = t.points.findIndex(p => p.id === id); if (i < 0) return;
+    const here = {lat:ll.lat, lng:ll.lng}; let best = null, bd = 1e9;
+    Component.PLACES.forEach(pl => { const d = this.dist(here, {lat:pl[2], lng:pl[3]}); if (d < bd) { bd = d; best = pl; } });
+    const old = t.points[i], named = bd < 40;
+    const np = {...old, lat:ll.lat, lng:ll.lng, approx:false, name: named ? best[0] : old.name, sub: named ? best[1] : old.sub};
+    const points = t.points.map(p => p.id === id ? np : p);
+    this.setState({trip:{...t, points}, pickId:null}); this.touch();
+    if (!named) this.toast(`Couldn't name this spot, so it keeps the name “${old.name}”.`);
+    this.build([i - 1, i].filter(k => k >= 0 && k < t.segs.length));
+  }
+  onMapClick(e) {
+    const s = this.state; if (s.screen !== 'editor' || this.flying) return;
+    if (s.pickId) { this.movePoint(s.pickId, e.lngLat); return; }
+    const f = this.styleReady ? this.map.queryRenderedFeatures(e.point, {layers:['seg-hit']}) : [];
+    if (f.length) this.selectSeg(f[0].properties.i); else if (s.selSeg != null) this.setState({selSeg:null});
+  }
+  startPick(id) { this.setState(s => ({pickId: s.pickId === id ? null : id, sheetFull: this.mode() === 'phone' ? false : s.sheetFull})); }
+  selectSeg(i) { this.setState({selSeg:i}); }
+  setSeg(i, patch) {
+    const t = this.state.trip, g = {...t.segs[i], ...patch};
+    if (patch.type && !this.validFigs(patch.type).some(f => f.id === g.fig)) g.fig = this.defFig(patch.type);
+    this.setTrip({segs: t.segs.map((x, k) => k === i ? g : x)});
+    if (patch.type || patch.smooth != null) this.build([i]);
+  }
+  dragTo(end, j) {
+    const [rf, rt] = this.rangeIdx();
+    if (end === 'from') { const f = Math.min(j, rt - 1); if (f !== rf) this.setRange(f, rt); }
+    else { const to = Math.max(j, rf + 1); if (to !== rt) this.setRange(rf, to); }
+  }
+  setRange(f, to) {
+    const P = this.state.trip.points;
+    if (to <= f) to = Math.min(P.length - 1, f + 1);
+    this.setTrip({range: (f === 0 && to === P.length - 1) ? null : {from:P[f].id, to:P[to].id}});
+  }
+
+  parseStory(text) {
+    const nt = this.norm(text), hits = [];
+    Component.PLACES.forEach(pl => { const n = this.norm(pl[0]); let k = nt.indexOf(n);
+      while (k >= 0) { const pre = nt[k - 1], post = nt[k + n.length]; if (!(pre && /[a-z]/.test(pre)) && !(post && /[a-z]/.test(post))) hits.push({pos:k, end:k + n.length, pl}); k = nt.indexOf(n, k + 1); } });
+    hits.sort((a, b) => a.pos - b.pos);
+    const seq = hits.filter((h, i) => i === 0 || h.pl !== hits[i - 1].pl);
+    const segs = [];
+    for (let i = 1; i < seq.length; i++) {
+      const win = nt.slice(i >= 2 ? seq[i - 2].end : 0, seq[i].pos); let best = null;
+      Component.KW.forEach(([w, type, fig]) => { const k = win.lastIndexOf(w); if (k >= 0) { const e = k + w.length; if (!best || e > best.e || (e === best.e && w.length > best.l)) best = {e, l:w.length, type, fig}; } });
+      const a = {lat:seq[i - 1].pl[2], lng:seq[i - 1].pl[3]}, b = {lat:seq[i].pl[2], lng:seq[i].pl[3]};
+      segs.push(best ? {type:best.type, fig:best.fig, pace:1, smooth:1} : this.defSeg(a, b));
+    }
+    return {points: seq.map(h => ({id:this.uid(), name:h.pl[0], sub:h.pl[1], lat:h.pl[2], lng:h.pl[3], approx:!!h.pl[4]})), segs};
+  }
+  runAI(text) {
+    this.setState({aiStatus:'parsing'});
+    setTimeout(() => {
+      const r = this.parseStory(text);
+      if (r.points.length < 2) { this.setState({aiStatus:null}); this.toast("Couldn't find a route in that. Name the places in the order you visited them.", 'error'); return; }
+      const t = this.state.trip, name = `${r.points[0].name} to ${r.points[r.points.length - 1].name}`;
+      this.setState(s => ({trip:{...t, points:r.points, segs:r.segs, range:null, name}, aiStatus:null, aiOpen:false, aiText:'', selSeg:null, pickId:null, fitNonce:(s.fitNonce || 0) + 1}));
+      this.touch(); this.build(r.segs.map((_, k) => k));
+      this.toast(`Route replaced with ${r.points.length} stops. Suggested name: “${name}”.` + (t.range ? ' Video range reset to the whole route.' : ''));
+    }, 1700);
+  }
+  onMic() {
+    const st = this.state.aiStatus;
+    if (st === 'recording') { this.setState({aiStatus:'recognizing'}); setTimeout(() => { this.setState({aiText:Component.SAMPLE}); this.runAI(Component.SAMPLE); }, 1300); }
+    else if (!st) this.setState({aiStatus:'recording'});
+  }
+
+  openExport() {
+    this.setState({exp:{step:'prep', pct:0, reload:false}}); clearInterval(this.expT);
+    this.expT = setInterval(() => this.setState(s => {
+      if (!s.exp) return null; const pct = s.exp.pct + 7;
+      if (pct >= 100) { clearInterval(this.expT); return {exp:{...s.exp, step:'captions', pct:0}}; }
+      return {exp:{...s.exp, pct}};
+    }), 100);
+  }
+  reloadFrame() {
+    this.setState(s => ({exp:{...s.exp, reload:true}})); clearTimeout(this.relT);
+    this.relT = setTimeout(() => this.setState(s => s.exp ? {exp:{...s.exp, reload:false}} : null), 1400);
+  }
+  renderVideo() {
+    this.setState(s => ({exp:{...s.exp, step:'render', pct:0}})); clearInterval(this.expT);
+    this.expT = setInterval(() => this.setState(s => {
+      if (!s.exp) return null; const pct = s.exp.pct + 2;
+      if (pct >= 100) { clearInterval(this.expT); return {exp:{...s.exp, step:'done', pct:100}}; }
+      return {exp:{...s.exp, pct}};
+    }), 100);
+  }
+  cancelExp() { clearInterval(this.expT); this.setState({exp:null}); }
+
+  box(f, k) {
+    const h = React.createElement, [W, H, D] = f.d || [100, 40, 40], p = f.pose || {yaw:0, roll:0, pitch:0}, sc = (f.scale || 1) * k;
+    const side = f.img ? {backgroundImage:`url(${f.img})`, backgroundSize:'cover', backgroundPosition:'center'} : {};
+    const face = (w, ht, tf, bg, ex) => h('div', {style:{position:'absolute', left:(W - w) / 2, top:(H - ht) / 2, width:w, height:ht, background:bg, transform:tf, boxSizing:'border-box', border:'1px solid rgba(0,0,0,0.12)', ...ex}});
+    return h('div', {style:{flex:1, minWidth:0, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', perspective:700, filter: this.isDark() ? Component.UNINV : 'none', opacity: f.status && f.status !== 'ready' ? 0.4 : 1}},
+      h('div', {style:{width:W, height:H, flexShrink:0, position:'relative', transformStyle:'preserve-3d', transition:'transform 200ms cubic-bezier(0.2,0,0,1)',
+        transform:`scale(${sc}) rotateX(-22deg) rotateY(-30deg) rotateY(${p.yaw}deg) rotateZ(${p.roll}deg) rotateX(${p.pitch}deg)`}},
+        face(W, H, `translateZ(${D / 2}px)`, '#615d59', side), face(W, H, `rotateY(180deg) translateZ(${D / 2}px)`, '#615d59', side),
+        face(W, D, `rotateX(90deg) translateZ(${H / 2}px)`, '#a39e98'), face(W, D, `rotateX(-90deg) translateZ(${H / 2}px)`, '#523410'),
+        face(D, H, `rotateY(90deg) translateZ(${W / 2}px)`, '#f6f5f4'), face(D, H, `rotateY(-90deg) translateZ(${W / 2}px)`, '#31302e')));
+  }
+  seg(on) {
+    return {border: on ? '1px solid rgba(0,0,0,0.1)' : '1px solid transparent', background: on ? '#fff' : 'transparent', boxShadow: on ? 'var(--shadow-card)' : 'none',
+      borderRadius:4, padding:'6px 4px', fontFamily:'inherit', fontSize:13, fontWeight: on ? 600 : 500, color: on ? 'rgba(0,0,0,0.95)' : '#615d59', cursor:'pointer', transition:'background-color 120ms'};
+  }
+  chip(on) {
+    return {border: on ? '1.5px solid #0075de' : '1px solid rgba(0,0,0,0.1)', background:'#fff', borderRadius:8, padding:'8px 10px', fontFamily:'inherit', fontSize:13, fontWeight:500,
+      color:'rgba(0,0,0,0.95)', cursor:'pointer', textAlign:'left', display:'flex', flexDirection:'column', gap:0};
+  }
+  iconBtn(dis, on) {
+    return {border:'none', background: on ? '#f2f9ff' : 'transparent', fontFamily:'inherit', fontSize:13, fontWeight:500, color: on ? '#097fe8' : dis ? '#dddddd' : '#615d59',
+      cursor: dis ? 'default' : 'pointer', height: this.mode() === 'desktop' ? 26 : 40, minWidth: this.mode() === 'desktop' ? 24 : 36, padding:'0 5px', borderRadius:4};
+  }
+
+  renderVals() {
+    const s = this.state, t = s.trip, P = t.points, N = P.length, C = Component, T = C.TYPES;
+    const layout = this.lay(), mode = this.mode(), phone = mode === 'phone', touch = mode !== 'desktop', rw = touch ? 24 : 16, rl = rw / 2 - 1;
+    const aiOn = this.props.openaiKey ?? true, falOn = this.props.falKey ?? true;
+    const [rf, rt] = this.rangeIdx(), W = '1px solid rgba(0,0,0,0.1)';
+    const panel = {background:'#fff', overflow:'auto', minHeight:0, display:'flex', flexDirection:'column'};
+    const fl = {...panel, zIndex:1000, margin:16, borderRadius:12, border:W, boxShadow:'var(--shadow-deep)', alignSelf:'start', maxHeight:'calc(100% - 32px)', boxSizing:'border-box'};
+    const LY = {
+      three:{g:{gridTemplateColumns:'minmax(260px,24vw) minmax(0,1fr) minmax(270px,25vw)', gridTemplateRows:'minmax(0,1fr)'}, r:{...panel, gridArea:'1/1', borderRight:W}, m:{gridArea:'1/2'}, i:{...panel, gridArea:'1/3', borderLeft:W}, v:{...panel, gridArea:'1/3', borderLeft:W}},
+      map:{g:{gridTemplateColumns:'356px minmax(0,1fr) 336px', gridTemplateRows:'minmax(0,max-content) auto minmax(0,1fr)'}, r:{...fl, gridArea:'1/1', margin:'16px 0 0 16px', maxHeight:'calc(100% - 16px)'}, m:{gridArea:'1/1/4/4'}, i:{...fl, gridArea:'1/3/4/4'}, v:{...fl, gridArea:'2/1', margin:'12px 0 16px 16px', maxHeight:'none', overflow:'visible'}},
+      tablet:{g:{gridTemplateColumns:'356px minmax(0,1fr)', gridTemplateRows:'minmax(0,max-content) auto minmax(0,1fr)'}, r:{...fl, gridArea:'1/1', margin:'16px 0 0 16px', maxHeight:'calc(100% - 16px)'}, m:{gridArea:'1/1/4/3'}, i:{...fl, gridArea:'1/1/4/2', margin:'16px 0 16px 16px'}, v:{...fl, gridArea:'2/1', margin:'12px 0 16px 16px', maxHeight:'none', overflow:'visible'}},
+      phone:{g:{gridTemplateColumns:'minmax(0,1fr)', gridTemplateRows:'minmax(0,1fr) auto'}, r:{...panel, gridArea:'2/1', zIndex:1000, borderRadius:'16px 16px 0 0', borderTop:W, boxShadow:'var(--shadow-deep)', maxHeight: s.sheetFull ? 'calc(100dvh - 72px)' : '46dvh', transition:'max-height 200ms cubic-bezier(0.2,0,0,1)'}, m:{gridArea:'1/1/3/2'}, i:{...panel, gridArea:'2/1', zIndex:1000, borderRadius:'16px 16px 0 0', borderTop:W, boxShadow:'var(--shadow-deep)', maxHeight: s.sheetFull ? 'calc(100dvh - 72px)' : '46dvh', transition:'max-height 200ms cubic-bezier(0.2,0,0,1)'}, v:{display:'none'}},
+      single:{g:{gridTemplateColumns:'380px minmax(0,1fr)', gridTemplateRows:'minmax(0,1fr) auto'}, r:{...panel, gridArea:'1/1', borderRight:W}, m:{gridArea:'1/2/3/3'}, i:{...panel, gridArea:'2/1', borderRight:W, borderTop:W, maxHeight:'50vh'}, v:{...panel, gridArea:'2/1', borderRight:W, borderTop:W, maxHeight:'50vh'}}
+    }[layout] || {};
+
+    const rows = [];
+    P.forEach((p, i) => {
+      const inR = i >= rf && i <= rt, ends = i === 0 || (i === N - 1 && N > 1), picking = s.pickId === p.id;
+      const selEnd = s.selSeg != null && (i === s.selSeg || i === s.selSeg + 1);
+      rows.push({isPoint:true, key:p.id, idx:i, num:i + 1, name:p.name, sub:p.sub, approx:p.approx, picking, label: i === 0 ? 'Start' : (i === N - 1 ? 'Finish' : ''),
+        upDisabled:i === 0, downDisabled:i === N - 1, onEnter:() => { if (this.state.dragEnd) this.dragTo(this.state.dragEnd, i); this.setState({hoverId:p.id}); }, onLeave:() => this.setState(st => st.hoverId === p.id ? {hoverId:null} : null),
+        actStyle:{display: (s.hoverId === p.id || picking) ? 'flex' : 'none', gap:0, flex:'none'}, upStyle:this.iconBtn(i === 0), downStyle:this.iconBtn(i === N - 1), moveStyle:this.iconBtn(false, picking),
+        onUp:() => this.reorder(i, -1), onDown:() => this.reorder(i, 1), onDel:() => this.delPoint(i), onMove:() => this.startPick(p.id),
+        rail:N >= 3, isHandle: N >= 3 && (i === rf || i === rt), railTitle: i === rf ? 'Drag to change where the video starts' : i === rt ? 'Drag to change where the video ends' : 'Click to move the nearest handle here',
+        onRailTouch:() => { const end = i === rf ? 'from' : i === rt ? 'to' : i < rf ? 'from' : i > rt ? 'to' : (i - rf <= rt - i ? 'from' : 'to'); this.setState({dragEnd:end}); this.dragTo(end, i); },
+        onRailDown:ev => { ev.preventDefault(); const end = i === rf ? 'from' : i === rt ? 'to' : i < rf ? 'from' : i > rt ? 'to' : (i - rf <= rt - i ? 'from' : 'to'); this.setState({dragEnd:end}); this.dragTo(end, i); },
+        railBox:{width:rw, flex:'none', position:'relative', touchAction:'none', cursor: (i === rf || i === rt) ? 'ns-resize' : 'pointer'},
+        railTop:{position:'absolute', left:rl, width:2, top:0, height:20, background: i === 0 ? 'transparent' : (i > rf && i <= rt) ? '#0075de' : 'rgba(0,0,0,0.1)'},
+        railBot:{position:'absolute', left:rl, width:2, top:20, bottom:0, background: i === N - 1 ? 'transparent' : (i >= rf && i < rt) ? '#0075de' : 'rgba(0,0,0,0.1)'},
+        handleStyle:{position:'absolute', left:(rw - (touch ? 20 : 16)) / 2, top: touch ? 10 : 12, width: touch ? 20 : 16, height: touch ? 20 : 16, boxSizing:'border-box', borderRadius:'50%', background:'#fff', border:'2px solid #0075de', boxShadow:'var(--shadow-card)', pointerEvents:'none', transform: s.dragEnd && ((s.dragEnd === 'from' && i === rf) || (s.dragEnd === 'to' && i === rt)) ? 'scale(1.2)' : 'none', transition:'transform 120ms'},
+        rowStyle:{flex:1, minWidth:0, display:'flex', gap:10, alignItems:'flex-start', padding:'8px', borderRadius:8, background: picking ? '#f2f9ff' : 'transparent', opacity: inR ? 1 : 0.45},
+        numStyle:{width:24, height:24, flex:'none', boxSizing:'border-box', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:600,
+          background: ends ? '#31302e' : '#fff', color: ends ? '#fff' : 'rgba(0,0,0,0.95)', border: p.approx ? '2px dashed #dd5b00' : selEnd ? '2px solid #0075de' : W}});
+      if (i < N - 1 && t.segs[i]) {
+        const g = t.segs[i], sel = s.selSeg === i, pend = s.pending.includes(i);
+        rows.push({isSeg:true, key:'s' + p.id, label:`${T[g.type]} · ${this.fig(g.fig).name}`,
+          meta: pend ? 'Building…' : this.noRoad(p, P[i + 1], g) ? 'Straight line' : (g.pace !== 1 ? `×${g.pace}` : ''),
+          onSelect:() => this.setState({selSeg: sel ? null : i}), rail:N >= 3, onEnter:() => {},
+          railLineBox:{width:rw, flex:'none', position:'relative'},
+          railLine:{position:'absolute', left:rl, width:2, top:0, bottom:0, background: (i >= rf && i < rt) ? '#0075de' : 'rgba(0,0,0,0.1)'},
+          rowStyle:{display:'flex', alignItems:'center', gap:10, flex:1, minWidth:0, padding: touch ? '9px 8px' : '2px 8px', border:'none', background: sel ? '#f2f9ff' : 'transparent', borderRadius:8, cursor:'pointer',
+            textAlign:'left', fontFamily:'inherit', color: sel ? '#097fe8' : '#615d59', fontWeight: sel ? 600 : 400, opacity: (i >= rf && i < rt) ? 1 : 0.45},
+          lineStyle:{width:0, height:26, borderLeft:`2px ${g.type === 'air' ? 'dotted' : g.type === 'water' ? 'dashed' : 'solid'} ${this.segColor(g)}`}});
+      }
+    });
+
+    const qn = this.norm(s.q.trim());
+    const sugg = qn ? C.PLACES.filter(pl => this.norm(pl[0]).includes(qn) || this.norm(pl[1]).includes(qn))
+      .sort((a, b) => this.norm(a[0]).indexOf(qn) - this.norm(b[0]).indexOf(qn)).slice(0, 6) : [];
+
+    const sel = s.selSeg != null && t.segs[s.selSeg] ? s.selSeg : null, g = sel != null ? t.segs[sel] : null;
+    const figOpts = g ? [...C.FIGS.filter(f => f.type === g.type), ...s.lib.filter(f => f.status !== 'error' && (f.type === g.type || f.type === 'any'))].map(f => {
+      const on = g.fig === f.id, dis = f.status === 'generating';
+      return {key:f.id, name:f.name, sub: dis ? 'Generating…' : (f.status ? 'Yours' : ''), disabled:dis, box:this.box(f, 0.42), onPick:() => this.setSeg(sel, {fig:f.id}),
+        style:{border: on ? '1.5px solid #0075de' : W, background:'#fff', borderRadius:8, padding:6, cursor: dis ? 'default' : 'pointer', fontFamily:'inherit', color:'rgba(0,0,0,0.95)',
+          display:'flex', flexDirection:'column', gap:6, textAlign:'left', minWidth:0, minHeight:96}};
+    }) : [];
+
+    const tc = (on) => ({width:30, height:18, borderRadius:9999, background: on ? '#0075de' : '#dddddd', position:'relative', flex:'none', transition:'background-color 120ms'});
+    const kc = (on) => ({position:'absolute', top:2, left: on ? 14 : 2, width:14, height:14, borderRadius:'50%', background:'#fff', transition:'left 120ms'});
+    const capT = (k, label) => ({label, track:tc(t.captions[k]), knob:kc(t.captions[k]), onToggle:() => this.setTrip(tr => ({captions:{...tr.captions, [k]:!tr.captions[k]}}))});
+
+    const e = s.exp, stepIdx = e ? ['prep', 'captions', 'render', 'done'].indexOf(e.step) : 0;
+    const [aw, ah] = t.format.split(':').map(Number), fh = aw / ah > 1 ? 400 * ah / aw : 400, frameH = Math.min(400, fh), frameW = frameH * aw / ah;
+    const fw = Math.min(frameW, 360, window.innerWidth - 72), fhh = fw * ah / aw;
+    const sg0 = t.segs[rf], ra = P[rf], rb = P[rf + 1];
+
+    const libTypeOpts = (cur, set) => ['air', 'land', 'water', 'any'].map(k => ({label:T[k], style:this.seg(cur === k), onPick:() => set(k)}));
+    const d = s.draft, ed = s.edit;
+    const updEdit = (fn) => this.setState(st => ({edit: {...st.edit, ...fn(st.edit)}}));
+    const statusMap = {ready:['Ready', 'success'], generating:['Generating…', 'warning'], error:['Failed', 'neutral']};
+
+    const isEditor = s.screen === 'editor', cOn = isEditor && s.chromeIn;
+    const chrome = {opacity: cOn ? 1 : 0, transform: cOn ? 'none' : 'translateY(10px)', pointerEvents: cOn ? 'auto' : 'none', transition:'opacity 320ms cubic-bezier(0.2,0,0,1), transform 320ms cubic-bezier(0.2,0,0,1)'};
+    const ago = ts => { const d = Date.now() - ts; if (d < 6e4) return 'Just now'; if (d < 36e5) return `${Math.round(d / 6e4)} min ago`; if (d < 864e5) return `${Math.round(d / 36e5)} h ago`; if (d < 2 * 864e5) return 'Yesterday'; return new Date(ts).toLocaleDateString('en-US', {month:'short', day:'numeric'}); };
+    const homePad = this.homePadFor(this.mapRef.current ? this.mapRef.current.clientWidth : window.innerWidth);
+    const dark = this.isDark(), inv = dark ? C.INV : 'none';
+    if (document.documentElement.dataset.taMode !== mode) document.documentElement.dataset.taMode = mode;
+    if (document.documentElement.dataset.taTheme !== (dark ? 'dark' : 'light')) document.documentElement.dataset.taTheme = dark ? 'dark' : 'light';
+    return {
+      rootStyle:{height:'100dvh', display:'flex', flexDirection:'column', fontFamily:'var(--font-sans)', color:'rgba(0,0,0,0.95)', background: dark ? '#1a1a1a' : '#fff', fontSize:14, lineHeight:1.43, colorScheme: dark ? 'dark' : 'light'},
+      headerStyle:{display:'flex', alignItems:'center', gap: phone ? 6 : 12, padding: phone ? '8px 10px' : '10px 16px', borderBottom:'1px solid rgba(0,0,0,0.1)', flex:'none', background:'#fff', filter:inv, position:'relative', zIndex:5},
+      mapBgStyle:{position:'absolute', inset:0, background: dark ? '#1a1a1a' : '#fff', transition:'background-color 200ms'},
+      overlayLayer:{position:'absolute', inset:0, pointerEvents:'none', zIndex:950, filter:inv},
+      scrimStyle:{position:'fixed', inset:0, zIndex:2000, background: dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.2)', display:'flex', alignItems:'center', justifyContent:'center', padding:24, filter:inv},
+      themeOpts: [['light', 'Light'], ['dark', 'Dark'], ['auto', 'System']].map(([k, l]) => ({key:k, label:l, style:this.seg(s.settings.theme === k), onPick:() => this.setSettings(st => { st.theme = k; return st; })})),
+      isHome: !isEditor, isPhone:phone, notPhone:!phone, isDesktop: mode === 'desktop', showLayoutPill: isEditor && mode === 'desktop',
+      logoLabel: phone && isEditor ? '←' : 'Trip Animator', exportLabel: mode === 'tablet' ? 'Export' : 'Export video',
+      sheetLabel: s.sheetFull ? 'Collapse panel' : 'Expand panel', toggleSheet:() => this.setState(st => ({sheetFull:!st.sheetFull})),
+      routeHeadStyle:{padding: phone ? '8px 16px 8px' : '16px 16px 8px', display:'flex', alignItems:'center', gap:8},
+      phoneVideo: phone && isEditor,
+      pickVerb: touch ? 'Tap' : 'Click', pickRowHint: touch ? 'Tap the map to place this stop' : 'Click the map to place this stop · Esc to cancel',
+      closeLabel: touch ? '← All stops' : '✕',
+      closeBtnStyle: touch
+        ? {order:-1, flexBasis:'100%', display:'flex', alignItems:'center', gap:6, border:'none', background:'transparent', padding:0, margin:'-4px 0 0', height:32, fontFamily:'inherit', fontSize:14, fontWeight:500, color:'#0075de', cursor:'pointer', textAlign:'left'}
+        : {border:'none', background:'transparent', fontSize:14, fontFamily:'inherit', color:'#615d59', cursor:'pointer', width:28, height:28, padding:0, borderRadius:4},
+      toastWrapStyle:{position:'absolute', left:'50%', transform:'translateX(-50%)', zIndex:900, pointerEvents:'auto', display:'flex', flexDirection:'column', alignItems:'center', gap:8, maxWidth: phone ? 'calc(100% - 24px)' : 440, width:'max-content', ...(phone ? {top:12} : {bottom:20})},
+      onListTouchMove:ev => { const d = this.state.dragEnd; if (!d) return; const tt = ev.touches[0], el = tt && document.elementFromPoint(tt.clientX, tt.clientY), row = el && el.closest('[data-idx]'); if (row) this.dragTo(d, +row.dataset.idx); },
+      onListTouchEnd:() => { if (this.state.dragEnd) this.setState({dragEnd:null}); },
+      frameBoxH: phone ? '360px' : '440px',
+      setOpen:s.setOpen, openSettings:() => this.setState({setOpen:true}), closeSettings:() => this.setState({setOpen:false}),
+      resetSettings:() => this.setState({settings:JSON.parse(JSON.stringify(C.DEF_SETTINGS))}),
+      setFigRows: ['air', 'land', 'water'].map(ty => ({key:ty, label:T[ty], figs:this.validFigs(ty).map(f => { const on = this.defFig(ty) === f.id;
+        return {key:f.id, name:f.name, box:this.box(f, 0.28), onPick:() => this.setSettings(st => { st.figs[ty] = f.id; return st; }),
+          style:{width:76, border: on ? '1.5px solid #0075de' : W, background:'#fff', borderRadius:8, padding:4, cursor:'pointer', fontFamily:'inherit', color:'rgba(0,0,0,0.95)', display:'flex', flexDirection:'column', gap:4, textAlign:'left'}}; })})),
+      setColorRows: ['air', 'land', 'water'].map(ty => { const cur = s.settings.colors[ty], sw = this.swatches(cur, c => this.setSettings(st => { st.colors[ty] = c; return st; }));
+        return {key:ty, label:T[ty], swatches:sw.list, customStyle:sw.custom, val:cur, onCustom:ev => { const v = ev.target.value; this.setSettings(st => { st.colors[ty] = v; return st; }); }}; }),
+      flyKm:s.settings.flyKm, flyKmLabel:`${s.settings.flyKm} km`, onFlyKm:ev => { const v = +ev.target.value; this.setSettings(st => { st.flyKm = v; return st; }); },
+      resOpts: [[1080, '1080 px'], [1920, '1920 px']].map(([v, l]) => ({key:String(v), label:l, style:this.seg(s.settings.res === v), onPick:() => this.setSettings(st => { st.res = v; return st; })})),
+      isEditor, onLogo:() => { if (isEditor) this.goHome(); },
+      homeStyle:{position:'absolute', zIndex:950, background:'#fff', display:'flex', overflowY:'auto', scrollbarWidth:'none', boxSizing:'border-box',
+        ...(phone ? {left:0, right:0, bottom:0, maxHeight:'58%', alignItems:'flex-start', padding:'24px 20px calc(20px + env(safe-area-inset-bottom))', borderRadius:'16px 16px 0 0', borderTop:W, boxShadow:'var(--shadow-deep)'}
+          : {top:0, left:0, bottom:0, width:homePad, alignItems:'safe center', padding: mode === 'tablet' ? '32px 32px 32px 32px' : '32px 48px 32px 56px'}),
+        opacity: s.homePhase === 'home' ? 1 : 0, pointerEvents: s.homePhase === 'home' ? 'auto' : 'none', transform: s.homePhase === 'home' ? 'none' : 'translateX(-16px)', transition:'opacity 420ms cubic-bezier(0.2,0,0,1), transform 420ms cubic-bezier(0.2,0,0,1)'},
+      onStartNew:() => this.startNew(), hasTrips: s.trips.length > 0, noTrips: s.trips.length === 0,
+      tripCards: this.sortTrips(s.trips).map(x => ({key:x.id, name:x.name,
+        meta: x.points.length ? `${x.points.length} stops · ${[...new Set(x.segs.map(g => T[g.type]))].join(', ')}` : 'No stops yet',
+        edited:ago(x.edited), onOpen:() => this.openTrip(x.id), onEnter:() => this.hoverTrip(x.id), onLeave:() => this.hoverTrip(null)})),
+      gridStyle:{flex:1, minHeight:0, display:'grid', position:'relative', ...LY.g},
+      routeStyle:{...LY.r, ...chrome, filter:inv, ...((touch && sel != null) ? {display:'none'} : {})}, mapStyle:{position:'relative', minHeight:0, minWidth:0, isolation:'isolate', ...LY.m}, inspStyle:{...LY.i, display: sel != null ? 'flex' : 'none', ...chrome, filter:inv}, videoStyle:{...LY.v, display: phone ? 'none' : (mode === 'tablet' ? (sel == null ? 'flex' : 'none') : ((layout === 'map' || sel == null) ? 'flex' : 'none')), ...chrome, filter:inv}, showVideo:true,
+      mapRef:this.mapRef,
+      tripName:t.name, onName:ev => this.setTrip({name:ev.target.value}), savedLabel: s.saved === 'saving' ? 'Saving…' : 'Saved',
+      onNewTrip:() => { const nt = {...this.emptyTrip(), id:this.uid(), edited:Date.now()}; this.setState(st => ({trips:this.upsert(this.upsert(st.trips, st.trip), nt), trip:nt, selSeg:null, pickId:null, aiOpen:false, fitNonce:(st.fitNonce || 0) + 1})); this.touch(); },
+      actionsDisabled: N < 2 || s.building,
+      onPreview:() => this.toast('Preview plays the video on this map. It is outside this prototype.'),
+      onExport:() => this.openExport(),
+
+      stopsLabel: N ? `${N} stop${N === 1 ? '' : 's'}` : '', hasPoints:N > 0, isEmpty:N === 0,
+      aiToggleLabel: s.aiOpen ? 'Close' : 'Describe with AI', toggleAI:() => this.setState(st => ({aiOpen:!st.aiOpen})),
+      rows,
+      q:s.q, searchPlaceholder: N === 0 ? 'Where are you starting from?' : 'Add the next stop',
+      onQ:ev => this.setState({q:ev.target.value}), onQFocus:() => this.setState({qFocus:true}), onQBlur:() => setTimeout(() => this.setState({qFocus:false}), 120),
+      onQKey:ev => { if (ev.key === 'Enter' && sugg[0]) this.addPlace(sugg[0]); if (ev.key === 'Escape') this.setState({q:''}); },
+      showSugg: s.qFocus && !!qn, noResults: !!qn && sugg.length === 0,
+      sugg: sugg.map(pl => ({key:pl[0], name:pl[0], sub:pl[1], onPick:ev => { ev.preventDefault(); this.addPlace(pl); }})),
+
+      showComposer: N === 0 || s.aiOpen, aiOff:!aiOn,
+      aiHint: N === 0 ? 'Type it or say it. Stops, transport and figures are filled in for you.' : 'This replaces the current route.',
+      aiText:s.aiText, onAIText:ev => this.setState({aiText:ev.target.value}), aiInputDisabled: !aiOn || !!s.aiStatus,
+      micDisabled: !aiOn || s.aiStatus === 'recognizing' || s.aiStatus === 'parsing',
+      micLabel: s.aiStatus === 'recording' ? '■ Stop' : '● Speak', onMic:() => this.onMic(),
+      micStyle:{border:'none', borderRadius:4, padding:'5px 10px', fontFamily:'inherit', fontSize:13, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap',
+        background: s.aiStatus === 'recording' ? 'rgba(221,91,0,0.1)' : 'rgba(0,0,0,0.05)', color: !aiOn ? '#a39e98' : s.aiStatus === 'recording' ? '#b34a00' : '#000'},
+      aiStatusLabel: {recording:'Recording… press Stop when done', recognizing:'Recognizing your voice…', parsing:'Reading your route…'}[s.aiStatus] || '',
+      aiSubmitDisabled: !aiOn || !!s.aiStatus || !s.aiText.trim(), onAISubmit:() => this.runAI(s.aiText),
+
+      pickActive:!!s.pickId, pickName:(P.find(p => p.id === s.pickId) || {}).name, cancelPick:() => this.setState({pickId:null}),
+      building:s.building,
+      toasts: s.toasts.map(x => ({key:x.id, text:x.text, onClose:() => this.dismiss(x.id),
+        style:{display:'flex', gap:12, alignItems:'flex-start', textAlign:'left', fontFamily:'inherit', fontSize:13, lineHeight:1.43, cursor:'pointer', borderRadius:8, padding:'10px 12px',
+          border: x.kind === 'error' ? '1px solid rgba(221,91,0,0.3)' : W, background: x.kind === 'error' ? '#fff7f2' : '#fff', color: x.kind === 'error' ? '#b34a00' : 'rgba(0,0,0,0.95)', boxShadow:'var(--shadow-deep)', maxWidth:440}})),
+
+      hasSel: sel != null, noSel: sel == null, deselect:() => this.setState({selSeg:null}),
+      selTitle: g ? `${P[sel].name} → ${P[sel + 1].name}` : '', selIndexLabel: g ? `Segment ${sel + 1} of ${N - 1}${touch ? '' : ' · drag the finish marker to move it'}` : '',
+      typeOpts: ['air', 'land', 'water'].map(k => ({label:T[k], style:this.seg(g && g.type === k), onPick:() => this.setSeg(sel, {type:k})})),
+      selTypeNote: g ? {air:'Climbs and flies an arc.', land:'Follows real roads.', water:'Goes in a straight line.'}[g.type] : '',
+      selNoRoad: g ? this.noRoad(P[sel], P[sel + 1], g) : false,
+      ...(() => { if (!g) return {segSwatches:[], segCustomStyle:{}, segColorVal:'#000000', segColorCustom:false, colorNote:''};
+        const cur = this.segColor(g), sw = this.swatches(cur, c => this.setSeg(sel, {color:c}));
+        return {segSwatches:sw.list, segCustomStyle:sw.custom, segColorVal:cur, segColorCustom:!!g.color,
+          colorNote: g.color ? 'Only this segment' : `Default for ${T[g.type].toLowerCase()} segments`,
+          onSegCustom:ev => this.setSeg(sel, {color:ev.target.value}), resetSegColor:() => this.setSeg(sel, {color:null}),
+          applyColorAll:() => { this.setTrip(tr => ({segs:tr.segs.map(x => ({...x, color:cur}))})); this.toast(`Color applied to all ${t.segs.length} segments.`); }}; })(),
+      figOpts, openLibAdd:() => this.setState({libView:'add', draft:{name:'', type:g ? g.type : 'any', kind:null, url:null, heic:false}}),
+      openLib:() => this.setState({libView:'list'}),
+      pace: g ? g.pace : 1, paceLabel: g ? `×${g.pace}` : '', onPace:ev => this.setSeg(sel, {pace:+ev.target.value}),
+      canSmooth: !!g && g.type !== 'air', noSmooth: !!g && g.type === 'air',
+      smooth: g ? g.smooth : 1, smoothLabel: g ? (g.smooth === 0 ? 'Exact' : `×${g.smooth}`) : '', onSmooth:ev => this.setSeg(sel, {smooth:+ev.target.value}),
+
+      videoHint: N >= 2 ? 'Select a segment in the list or on the map to change how you travel it.' : 'These settings apply to the whole video.',
+      styleOpts: C.STYLES.map(x => ({key:x.id, label:x.label, style:this.chip(t.style === x.id), onPick:() => this.setTrip({style:x.id})})),
+      formatOpts: C.FORMATS.map(x => ({key:x.id, label:x.id, sub:x.sub, style:this.chip(t.format === x.id), onPick:() => this.setTrip({format:x.id})})),
+      styleSel:this.styleSel, styleVal:t.style, onStyle:ev => this.setTrip({style:ev.target.value}), speed:t.speed, speedLabel:`×${t.speed}`, onSpeed:ev => this.setTrip({speed:+ev.target.value}),
+      rangeOk: N >= 3, rangeNo: N < 3, hasRange: !!t.range && N >= 3, resetRange:() => this.setTrip({range:null}),
+      fromVal:String(rf), toVal:String(rt),
+      fromOpts: P.slice(0, N - 1).map((p, i) => ({key:p.id, v:String(i), label:`${i + 1}. ${p.name}`})),
+      toOpts: P.map((p, i) => ({key:p.id, v:String(i), label:`${i + 1}. ${p.name}`, i})).filter(o => o.i > rf),
+      onFrom:ev => this.setRange(+ev.target.value, rt), onTo:ev => this.setRange(rf, +ev.target.value),
+      rangeNote: t.range ? `Video covers stops ${rf + 1}–${rt + 1}. The rest stays editable but is left out.` : 'Video covers the whole route. Drag the blue handles to film only part of it.',
+
+      layoutOpts: [['three', '1a  Three panes'], ['map', '1b  Map first'], ['single', '1c  One sidebar']].map(([k, l]) => ({key:k, label:l,
+        onPick:() => this.setState({layout:k}),
+        style:{border:'none', borderRadius:9999, padding:'4px 10px', fontFamily:'inherit', fontSize:12, fontWeight:600, cursor:'pointer', whiteSpace:'pre',
+          background: layout === k ? '#fff' : 'transparent', color: layout === k ? 'rgba(0,0,0,0.95)' : '#fff'}})),
+
+      libOpen:!!s.libView, libList:s.libView === 'list', libAdd:s.libView === 'add', libEdit:s.libView === 'edit',
+      closeLib:() => this.setState({libView:null}), stop:ev => ev.stopPropagation(),
+      libEmpty: s.lib.length === 0,
+      libItems: s.lib.map(f => ({key:f.id, name:f.name, box:this.box(f, 0.9), statusLabel:statusMap[f.status][0], tone:statusMap[f.status][1], isReady:f.status === 'ready',
+        meta: f.status === 'generating' ? 'About 2 minutes. You can keep working.' : f.status === 'error' ? "Couldn't make a model from this photo. Try another one." : `Travels by: ${T[f.type]}`,
+        onEdit:() => this.setState({libView:'edit', edit:{...f, pose:{...f.pose}}}),
+        onDel:() => this.deleteFig(f.id)})),
+
+      draftHasImg: !!(d && d.url), draftNoImg: !(d && d.url), draftImgStyle:{width:'100%', height:'100%', filter: this.isDark() ? C.UNINV : 'none', backgroundImage: d && d.url ? `url(${d.url})` : 'none', backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center'}, fromSel:this.fromSel, toSel:this.toSel,
+      draftPreviewText: !d || !d.kind ? 'No file yet' : d.kind === 'glb' ? 'model.glb · ready to use right away' : d.heic ? 'HEIC photo · preview after upload' : '',
+      fileBtnLabel: d && d.kind ? 'Choose another file' : 'Choose file',
+      onFile:ev => { const f = ev.target.files && ev.target.files[0]; if (!f) return; const ext = f.name.split('.').pop().toLowerCase(), kind = ext === 'glb' ? 'glb' : 'photo', heic = ext === 'heic' || ext === 'heif';
+        this.setState(st => ({draft:{...st.draft, kind, heic, url: kind === 'photo' && !heic ? URL.createObjectURL(f) : null, name: st.draft.name || f.name.replace(/\.[^.]+$/, '')}})); },
+      draftIsPhoto: !!d && d.kind === 'photo' && falOn, photoBlocked: !!d && d.kind === 'photo' && !falOn,
+      draftName: d ? d.name : '', onDraftName:ev => { const v = ev.target.value; this.setState(st => ({draft:{...st.draft, name:v}})); },
+      draftTypeOpts: libTypeOpts(d && d.type, k => this.setState(st => ({draft:{...st.draft, type:k}}))),
+      saveDisabled: !d || !d.kind || !d.name.trim() || (d.kind === 'photo' && !falOn),
+      saveLabel: d && d.kind === 'photo' ? 'Make 3D model' : 'Save figure',
+      saveNote: d && d.kind === 'photo' ? 'Takes about 2 minutes. You can keep working.' : '',
+      onSaveDraft:() => this.saveDraft(),
+
+      editBox: ed ? this.box(ed, 1.5) : null, editName: ed ? ed.name : '', onEditName:ev => { const v = ev.target.value; updEdit(() => ({name:v})); },
+      editTypeOpts: libTypeOpts(ed && ed.type, k => updEdit(() => ({type:k}))),
+      poseBtns: [['Flip 180°', p => ({...p, yaw:p.yaw + 180})], ['Turn 90°', p => ({...p, yaw:p.yaw + 90})], ['Roll 90°', p => ({...p, roll:p.roll + 90})], ['Pitch 90°', p => ({...p, pitch:p.pitch + 90})], ['Reset', () => ({yaw:0, roll:0, pitch:0})]]
+        .map(([label, fn]) => ({key:label, label, on:() => updEdit(x => ({pose:fn(x.pose)}))})),
+      editScale: ed ? ed.scale : 1, editScaleLabel: ed ? `×${ed.scale.toFixed(1)}` : '', onEditScale:ev => { const v = +ev.target.value; updEdit(() => ({scale:v})); },
+      onEditSave:() => { this.setState(st => ({lib: st.lib.map(f => f.id === st.edit.id ? {...st.edit} : f), libView:'list'})); this.toast('Figure updated everywhere it is used.'); },
+      onEditDel:() => ed && this.deleteFig(ed.id),
+
+      expOpen:!!e, expPrep: !!e && e.step === 'prep', expMain: !!e && e.step !== 'prep',
+      expCaptions: !!e && e.step === 'captions', expRender: !!e && e.step === 'render', expDone: !!e && e.step === 'done',
+      expBarStyle:{height:'100%', width:`${e ? e.pct : 0}%`, background:'#0075de', borderRadius:9999, transition:'width 100ms linear'},
+      expPctLabel:`${e ? Math.min(100, Math.round(e.pct)) : 0}%`,
+      steps: ['Prepare', 'Captions', 'Render', 'Done'].map((l, i) => ({key:l, label:`${i + 1}. ${l}`,
+        style:{padding:'4px 10px', borderRadius:9999, fontWeight:600, whiteSpace:'nowrap', background: i === stepIdx ? '#f2f9ff' : 'transparent', color: i === stepIdx ? '#097fe8' : i < stepIdx ? '#615d59' : '#a39e98'}})),
+      frameStyle:{position:'relative', width:fw, height:fhh, background:'#e7e3de', borderRadius:4, overflow:'hidden', boxShadow:'var(--shadow-card)', transition:'width 200ms, height 200ms'},
+      frameCenter: e && e.reload ? 'Reloading map…' : `${t.format} · ${(C.STYLES.find(x => x.id === t.style) || {}).label} · map frame`,
+      reloading: !!(e && e.reload),
+      capTitle:t.captions.title, capSeg:t.captions.seg && !!sg0, capProgress:t.captions.progress,
+      frameSeg: sg0 ? `${T[sg0.type]} · ${ra.name} → ${rb.name}` : '',
+      capToggles:[capT('title', 'Trip name'), capT('seg', 'Segment label · from → to'), capT('progress', 'Progress bar')],
+      expFormatOpts: C.FORMATS.map(x => ({key:x.id, label:x.id, sub:x.sub, style:this.chip(t.format === x.id), onPick:() => { if (t.format !== x.id) { this.setTrip({format:x.id}); this.reloadFrame(); } }})),
+      expStyleOpts: C.STYLES.map(x => ({key:x.id, label:x.id === 'ukiyo' ? 'Print' : x.label, style:this.seg(t.style === x.id), onPick:() => { if (t.style !== x.id) { this.setTrip({style:x.id}); this.reloadFrame(); } }})),
+      fileName:`${t.name} · ${t.format.replace(':', 'x')}.mp4`,
+      onRender:() => this.renderVideo(), onCancelExp:() => this.cancelExp(),
+      onDownload:() => this.toast(`Downloaded “${t.name} · ${t.format.replace(':', 'x')}.mp4”.`)
+    };
+  }
+
+  saveDraft() {
+    const d = this.state.draft, id = this.uid(), photo = d.kind === 'photo';
+    const f = {id, name:d.name.trim(), type:d.type, status: photo ? 'generating' : 'ready', img:d.url, pose:{yaw:0, roll:0, pitch:0}, scale:1, d:[100, 44, 40]};
+    this.setState(s => ({lib:[f, ...s.lib], libView:'list', draft:null}));
+    if (photo) { this.toast(`“${f.name}” is generating. It updates by itself in about 2 minutes.`);
+      setTimeout(() => this.setState(s => ({lib: s.lib.map(x => x.id === id ? {...x, status:'ready'} : x)})), 9000); }
+  }
+  deleteFig(id) {
+    const t = this.state.trip;
+    const segs = t.segs.map(g => g.fig === id ? {...g, fig:Component.FIGS.find(f => f.type === g.type).id} : g);
+    this.setSettings(st => { Object.keys(st.figs).forEach(k => { if (st.figs[k] === id) st.figs[k] = Component.DEF_SETTINGS.figs[k]; }); return st; });
+    this.setState(s => ({lib: s.lib.filter(f => f.id !== id), libView:'list', edit:null, trip:{...s.trip, segs}}));
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# DS stack decision (research 2026-10-08)
+
+Sources opened: Base UI releases/quick-start/styling, React Aria getting-started, Radix releases, Lucide React guide, shadcn theming, Primer Primitives, Vite CSS modules, React 19 blog, Ladle docs.
+
+- **Tokens**: three tiers of CSS custom properties — primitive (`--gray-100`, `--space-8`) → semantic (`--bg-surface`, `--fg-muted`, `--border-subtle`, `--accent`; components use only these) → component tokens only where a component truly varies. Theme via `[data-theme]` on `<html>`, `prefers-color-scheme` when unset. `@layer ds.tokens, ds.base, ds.components, app`.
+- **Styling**: CSS Modules (`*.module.css`, native in Vite) + `data-variant` / `data-size` / `data-tone` attribute selectors. Props: `variant`, `size`, `tone`. React 19 `ref` as a prop (no forwardRef). Always accept `className`/`style`, merge with a tiny `cx()`. No `asChild`; `Button` may render `a` via `href`.
+- **Behaviour**: native for Switch, Checkbox, Segmented, Tabs, Badge, Card, Progress, Spinner, ListRow, simple Toast. **Base UI** (`@base-ui/react` 1.8.0, peer react ^17–19, verified) for Dialog, Drawer (mobile sheet), Popover, Menu, Tooltip, Select, Slider. Needs `isolation: isolate` on app root. Import only inside `src/ds/` (ESLint `no-restricted-imports`). React Aria = fallback.
+- **Icons**: `lucide-react` 1.53 (peer react ^19 ok) behind `src/ds/Icon.tsx` with a named registry; sizes 16/20/24, strokeWidth 1.75, `currentColor`, `aria-hidden` unless labelled. Only `src/ds/` imports it.
+- **Docs/QA**: `/ds.html` gallery (second Vite entry, like `figures.html`): every primitive × variant × size, light/dark toggle, token swatches. Playwright screenshots (light/dark, desktop/mobile) + `@axe-core/playwright` on it; keyboard smoke for Dialog/Menu. Folder: `src/ds/tokens/*.css`, `src/ds/components/Button/{Button.tsx,Button.module.css,index.ts}`, `src/ds/index.ts` is the only public entry.
