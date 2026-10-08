@@ -1,0 +1,16 @@
+{
+  "id": "chained",
+  "title": "Already chained",
+  "data": {
+    "stops": [
+      { "id": "a", "name": "A", "lng": 2.35, "lat": 48.85 },
+      { "id": "b", "name": "B", "lng": 13.4, "lat": 52.52, "leg": { "mode": "air", "figure": "airplane", "pathKey": "a>b:air" } },
+      { "id": "c", "name": "C", "lng": 13.9, "lat": 52.9, "leg": { "mode": "ground", "figure": "bus", "speed": 2 } },
+      { "id": "d", "name": "D", "lng": 14.2, "lat": 53.1, "leg": { "mode": "water", "figure": "ship" } }
+    ],
+    "style": "dark",
+    "speed": 1.25,
+    "format": "16:9",
+    "range": { "from": "b", "to": "d" }
+  }
+}

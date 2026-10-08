@@ -1,0 +1,17 @@
+{
+  "id": "broken",
+  "title": "Broken legs",
+  "data": {
+    "stops": [
+      { "id": "a", "name": "A", "lng": 2.35, "lat": 48.85, "leg": { "mode": "air", "figure": "airplane" } },
+      { "id": "b", "name": "B", "lng": 13.4, "lat": 52.52 },
+      { "id": "c", "name": "C", "lng": 13.5, "lat": 52.6, "leg": null },
+      { "id": "d", "name": "D", "lng": 100.5, "lat": 13.75, "leg": { "mode": "rocket", "figure": "x" } },
+      { "id": "e", "name": "E", "lng": 101, "lat": 14, "leg": { "mode": "air" } }
+    ],
+    "style": "streets",
+    "speed": 1,
+    "format": "1:1",
+    "range": { "from": "e", "to": "a" }
+  }
+}

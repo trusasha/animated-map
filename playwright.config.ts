@@ -26,7 +26,7 @@ const projects: Project[] = Object.entries(sizes).flatMap(([size, device]) =>
     };
   }),
 );
-projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
+projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: process.env.RECORD ? undefined : /@record/, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
 
 export default defineConfig({
   testDir: 'e2e',

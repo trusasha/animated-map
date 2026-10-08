@@ -22,7 +22,12 @@ const DEM = ['s3.amazonaws.com/elevation-tiles-prod', 'elevation-tiles-prod.s3.a
 const ESRI_HOSTS = ['server', 'services'].map((h) => `https://${h}.arcgisonline.com/ArcGIS/rest/services`);
 const EXAGGERATION = 1.5;
 
-// Terrarium carries bathymetry: without flattening, oceans sink into trenches and ships sail underwater
+/** Terrarium carries bathymetry: without flattening, oceans sink into trenches and ships sail underwater */
+export function clampDemPixels(d: Uint8ClampedArray) {
+  for (let i = 0; i < d.length; i += 4) if (d[i] < 128) { d[i] = 128; d[i + 1] = 0; d[i + 2] = 0; }
+  return d;
+}
+
 maplibregl.addProtocol('dem', async ({ url }, ctrl) => {
   const res = await fetch(url.replace('dem://', 'https://'), { signal: ctrl.signal });
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
@@ -30,8 +35,7 @@ maplibregl.addProtocol('dem', async ({ url }, ctrl) => {
   const ctx = new OffscreenCanvas(bmp.width, bmp.height).getContext('2d', { willReadFrequently: true })!;
   ctx.drawImage(bmp, 0, 0);
   const img = ctx.getImageData(0, 0, bmp.width, bmp.height);
-  const d = img.data;
-  for (let i = 0; i < d.length; i += 4) if (d[i] < 128) { d[i] = 128; d[i + 1] = 0; d[i + 2] = 0; }
+  clampDemPixels(img.data);
   return { data: await createImageBitmap(img) };
 });
 
