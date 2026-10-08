@@ -3,6 +3,7 @@ import { slicePath, type Frame, type TLeg } from '../../../domain/timeline';
 import type { LngLat, Mode, Stop } from '../../../domain/types';
 
 const MODE_COLOR: Record<Mode, string> = { air: '#ffffff', ground: '#ffb703', water: '#4cc9f0' };
+const legColor = (l: TLeg) => l.color ?? MODE_COLOR[l.mode];
 const HIGHLIGHT = '#ff4d6d';
 
 type Features = GeoJSON.Feature[];
@@ -20,7 +21,7 @@ export function installRouteLayers(map: MlMap) {
   for (const id of ['context', 'route', 'highlight', 'trail', 'stops']) map.addSource(id, { type: 'geojson', data: empty });
   const round = { 'line-cap': 'round', 'line-join': 'round' } as const;
   map.addLayer({ id: 'context', type: 'line', source: 'context', layout: round, paint: { 'line-color': '#c8d0dc', 'line-width': 2, 'line-opacity': 0.35, 'line-dasharray': [1, 2] } });
-  const color: ExpressionSpecification = ['match', ['get', 'mode'], 'air', MODE_COLOR.air, 'water', MODE_COLOR.water, MODE_COLOR.ground];
+  const color: ExpressionSpecification = ['get', 'color'];
   map.addLayer({ id: 'route', type: 'line', source: 'route', layout: round, paint: { 'line-color': color, 'line-width': 2.5, 'line-opacity': 0.45, 'line-dasharray': [1.5, 1.5] } });
   map.addLayer({ id: 'highlight-glow', type: 'line', source: 'highlight', layout: round, paint: { 'line-color': '#ffffff', 'line-width': 16, 'line-opacity': 0.35, 'line-blur': 6 } });
   map.addLayer({ id: 'highlight', type: 'line', source: 'highlight', layout: round, paint: { 'line-color': HIGHLIGHT, 'line-width': 6 } });
@@ -36,7 +37,7 @@ export function installRouteLayers(map: MlMap) {
 
 /** ground and water legs as planned (air legs are 3D arcs) */
 export const setRoute = (map: MlMap, legs: TLeg[]) =>
-  set(map, 'route', legs.filter((l) => l.mode !== 'air').map((l) => line(l.path, { mode: l.mode })));
+  set(map, 'route', legs.filter((l) => l.mode !== 'air').map((l) => line(l.path, { color: legColor(l) })));
 
 export const setHighlight = (map: MlMap, leg: TLeg | undefined) =>
   set(map, 'highlight', leg && leg.mode !== 'air' ? [line(leg.path)] : []);
@@ -52,7 +53,7 @@ export function setTrail(map: MlMap, legs: TLeg[], f: Frame | undefined) {
   if (f) legs.forEach((leg, i) => {
     if (leg.mode === 'air' || i > f.legIndex) return;
     const coords = i < f.legIndex ? leg.path : slicePath(leg, f.progress).map(([x, y]) => [x, y]);
-    if (coords.length > 1) features.push(line(coords, { mode: leg.mode }));
+    if (coords.length > 1) features.push(line(coords, { color: legColor(leg) }));
   });
   set(map, 'trail', features);
 }

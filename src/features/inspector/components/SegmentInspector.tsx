@@ -1,7 +1,6 @@
 import { BackLink, IconButton, LinkButton, useViewportMode } from '../../../ds';
 import { useT } from '../../../i18n/react';
 import { FigurePicker } from '../../figures';
-import { SHOW_LINE_COLORS } from '../../settings';
 import type { SegmentInspectorProps } from '../types';
 import { useInspector } from '../useInspector';
 import { ColorSection } from './ColorSection';
@@ -34,16 +33,14 @@ export function SegmentInspector({ index, onClose, onManageFigures }: SegmentIns
           <LinkButton size="sm" onClick={onManageFigures}>{t('inspector.manageFigures')}</LinkButton>
         </div>
       </section>
-      {SHOW_LINE_COLORS && (
-        <ColorSection
-          mode={s.leg.mode}
-          color={s.color}
-          overridden={s.overridden}
-          onChange={s.setColor}
-          onUseDefault={s.useDefaultColor}
-          onApplyAll={s.applyColorToAll}
-        />
-      )}
+      <ColorSection
+        mode={s.leg.mode}
+        color={s.color}
+        overridden={s.overridden}
+        onChange={s.setColor}
+        onUseDefault={s.useDefaultColor}
+        onApplyAll={s.applyColorToAll}
+      />
       <PaceSection value={s.speed} onChange={s.previewSpeed} onCommit={s.commitSpeed} />
       <SmoothingSection mode={s.leg.mode} value={s.smooth} onChange={s.previewSmooth} onCommit={s.commitSmooth} />
     </div>
