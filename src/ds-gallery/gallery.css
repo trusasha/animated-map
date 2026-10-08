@@ -1,6 +1,6 @@
 .gallery { min-height: 100dvh; background: var(--surface-alt); }
 .gallery-toolbar {
-  position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  position: sticky; top: 0; z-index: var(--z-sheet); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
   padding: 10px 16px; background: var(--surface-card); border-bottom: var(--border-whisper);
 }
 .gallery-toolbar [role="group"] { display: flex; gap: 4px; }
