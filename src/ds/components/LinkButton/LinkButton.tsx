@@ -11,7 +11,7 @@ export interface LinkButtonProps extends Omit<ComponentProps<'button'>, 'ref' | 
   ref?: Ref<HTMLButtonElement | HTMLAnchorElement>;
 }
 
-export function LinkButton({ size = 'md', href, target, rel, className, ref, ...rest }: LinkButtonProps) {
+export function LinkButton({ size = 'md', href, target, rel, className, children, ref, ...rest }: LinkButtonProps) {
   const classes = cx(styles.link, className);
   if (href && !rest.disabled) {
     return (
@@ -23,8 +23,14 @@ export function LinkButton({ size = 'md', href, target, rel, className, ref, ...
         href={href}
         target={target}
         rel={rel ?? (target === '_blank' ? 'noreferrer' : undefined)}
-      />
+      >
+        {children}
+      </a>
     );
   }
-  return <button {...rest} ref={ref as Ref<HTMLButtonElement>} className={classes} data-size={size} type="button" />;
+  return (
+    <button {...rest} ref={ref as Ref<HTMLButtonElement>} className={classes} data-size={size} type="button">
+      {children}
+    </button>
+  );
 }
