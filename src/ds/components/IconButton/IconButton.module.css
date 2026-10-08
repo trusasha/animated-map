@@ -32,7 +32,7 @@
 
   .iconButton[data-active] {
     background: var(--surface-selected);
-    color: var(--focus);
+    color: var(--accent-active);
   }
 
   .iconButton:focus-visible {
