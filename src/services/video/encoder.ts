@@ -1,4 +1,5 @@
 import { ArrayBufferTarget, Muxer } from 'mp4-muxer';
+import { avcLevel } from '../../domain/video';
 import { VideoError } from './errors';
 
 export interface Mp4Encoder {
@@ -8,11 +9,13 @@ export interface Mp4Encoder {
   close(): void;
 }
 
-const CODECS = ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.640033'];
+const PROFILES = ['6400', '4d00', '42e0'];
+const hex = (n: number) => n.toString(16).padStart(2, '0');
 
 async function pickConfig(width: number, height: number, fps: number) {
   if (typeof VideoEncoder === 'undefined') throw new VideoError('codec-unsupported');
-  for (const codec of CODECS) {
+  const level = avcLevel(width, height);
+  for (const codec of [...PROFILES.map((p) => `avc1.${p}${hex(level)}`), 'avc1.640033']) {
     const cfg: VideoEncoderConfig = { codec, width, height, bitrate: 12_000_000, framerate: fps, avc: { format: 'avc' } };
     if ((await VideoEncoder.isConfigSupported(cfg)).supported) return cfg;
   }
