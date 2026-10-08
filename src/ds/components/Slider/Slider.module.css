@@ -70,8 +70,22 @@
     outline-offset: 2px;
   }
 
-  .root[data-disabled] {
-    opacity: 0.5;
+  .root[data-disabled] .label,
+  .root[data-disabled] .value {
+    color: var(--text-muted);
+  }
+
+  .root[data-disabled] .track {
+    background: var(--surface-alt);
+  }
+
+  .root[data-disabled] .indicator {
+    background: var(--text-decorative);
+  }
+
+  .root[data-disabled] .thumb {
+    border-color: var(--text-decorative);
+    box-shadow: none;
   }
 
   .ends,

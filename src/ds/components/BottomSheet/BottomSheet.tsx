@@ -79,7 +79,10 @@ export function BottomSheet({
       >
         <span className={styles.bar} aria-hidden="true" />
       </button>
-      <div className={styles.content}>{children}</div>
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- scrollable region must be keyboard-focusable */}
+      <div className={styles.content} role="region" aria-label={label} tabIndex={0}>
+        {children}
+      </div>
       {footer && <div className={styles.footer}>{footer}</div>}
     </section>
   );

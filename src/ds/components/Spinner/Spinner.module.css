@@ -1,4 +1,6 @@
 @layer ds.components {
+  .spinner[hidden] { display: none; }
+
   .spinner {
     display: inline-block;
     flex: none;

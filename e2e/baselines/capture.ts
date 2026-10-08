@@ -24,7 +24,7 @@ export async function boot(page: Page, path = '/') {
 export async function captureFrames(page: Page) {
   return page.evaluate(async ({ stops, legs, speed }) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { idle } = await load('/src/animator.ts');
+    const { idle } = await load('/src/services/map/createOffscreenMap.ts');
     const a = (window as any).__anim;
     a.stop();
     await a.setTrip(stops, legs, speed);
@@ -81,10 +81,10 @@ export async function captureMigrate(page: Page) {
 export async function captureDemClamp(page: Page) {
   return page.evaluate(async () => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { clampDemPixels } = await load('/src/animator.ts');
+    const { clampBathymetry } = await load('/src/domain/dem.ts');
     const input: number[] = [];
     for (let i = 0; i < 16; i++) input.push(i * 16 + (i % 2), (i * 37) % 256, (i * 91) % 256, 255);
-    const output = Array.from(clampDemPixels(new Uint8ClampedArray(input)) as Uint8ClampedArray);
+    const output = Array.from(clampBathymetry(new Uint8ClampedArray(input)) as Uint8ClampedArray);
     return { input, output };
   });
 }

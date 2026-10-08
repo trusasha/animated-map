@@ -1,4 +1,6 @@
 @layer ds.components {
+  .iconButton[hidden] { display: none; }
+
   .iconButton {
     display: inline-flex;
     flex: none;

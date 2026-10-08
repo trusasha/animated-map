@@ -13,7 +13,10 @@
   .row:hover { background: var(--surface-hover); }
   .row[data-selected] { background: var(--surface-selected); }
   .row[data-selected] .title { color: var(--accent-active); }
-  .row[data-out-of-range] { opacity: 0.45; }
+  .row[data-out-of-range] .leading { opacity: 0.45; }
+  .row[data-out-of-range] .title,
+  .row[data-out-of-range] .meta,
+  .row[data-out-of-range] .trailing { color: var(--text-muted); }
 
   .main {
     flex: 1;
