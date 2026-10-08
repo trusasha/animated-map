@@ -3,6 +3,8 @@ import type { Shape } from '../keys';
 
 export const preview: Shape<Dict['preview']> = {
   play: '▶ Превью',
+  resume: 'Играть',
+  position: 'Позиция воспроизведения',
   pause: 'Пауза',
   exit: 'Выйти из превью',
   loadingMap: 'Подгружаю карту… {percent}%',
