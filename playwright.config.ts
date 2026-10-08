@@ -4,8 +4,11 @@ import wipeE2eData from './e2e/global-setup';
 // webServers start before globalSetup would run, so the wipe happens at config load in the runner only
 if (!process.env.TEST_WORKER_INDEX) wipeE2eData();
 
-const PROD = 'http://127.0.0.1:5174';
-const DEV = 'http://127.0.0.1:5175';
+const PROD_PORT = process.env.E2E_PORT ?? '5174';
+const DEV_PORT = process.env.E2E_DEV_PORT ?? '5175';
+const HMR_PORT = process.env.E2E_HMR_PORT ?? '24679';
+const PROD = `http://127.0.0.1:${PROD_PORT}`;
+const DEV = `http://127.0.0.1:${DEV_PORT}`;
 
 const sizes = {
   desktop: { viewport: { width: 1440, height: 900 } },
@@ -47,14 +50,14 @@ export default defineConfig({
       url: `${PROD}/api/config`,
       reuseExistingServer: false,
       timeout: 180_000,
-      env: { NODE_ENV: 'production', PORT: '5174', DATA_DIR: '.e2e-data', DATABASE_URL: '' },
+      env: { NODE_ENV: 'production', PORT: PROD_PORT, DATA_DIR: `.e2e-data-${PROD_PORT}`, DATABASE_URL: '' },
     },
     {
       command: 'tsx server/index.ts',
       url: `${DEV}/api/config`,
       reuseExistingServer: false,
       timeout: 60_000,
-      env: { NODE_ENV: 'development', PORT: '5175', HMR_PORT: '24679', DATA_DIR: '.e2e-data-dev', DATABASE_URL: '' },
+      env: { NODE_ENV: 'development', PORT: DEV_PORT, HMR_PORT, DATA_DIR: `.e2e-data-dev-${DEV_PORT}`, DATABASE_URL: '' },
     },
   ],
 });
