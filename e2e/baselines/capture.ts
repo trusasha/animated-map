@@ -61,11 +61,10 @@ const MERCATOR_POINTS: [number, number, number][] = [
 export async function captureMercator(page: Page) {
   return page.evaluate(async (points) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const maplibreUrl = () => performance.getEntriesByType('resource').map((e) => e.name).find((n) => /maplibre-gl\.mjs/.test(n))!;
-    const { MercatorCoordinate } = await load(maplibreUrl());
+    const { mercatorCoord, meterInMercatorUnits } = await load('/src/domain/geo.ts');
     return points.map(([lng, lat, alt]) => {
-      const m = MercatorCoordinate.fromLngLat({ lng, lat }, alt);
-      return { lng, lat, alt, x: m.x, y: m.y, z: m.z, meterUnit: m.meterInMercatorCoordinateUnits() };
+      const m = mercatorCoord(lng, lat, alt);
+      return { lng, lat, alt, x: m.x, y: m.y, z: m.z, meterUnit: meterInMercatorUnits(lat) };
     });
   }, MERCATOR_POINTS);
 }
@@ -73,7 +72,7 @@ export async function captureMercator(page: Page) {
 export async function captureMigrate(page: Page) {
   return page.evaluate(async (inputs) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { migrate } = await load('/src/route.ts');
+    const { migrate } = await load('/src/domain/route.ts');
     return Object.fromEntries(inputs.map(([name, trip]) => [name, migrate(trip)]));
   }, MIGRATE_INPUTS);
 }
@@ -93,8 +92,7 @@ export async function captureDemClamp(page: Page) {
 export async function captureThumbs(page: Page) {
   return page.evaluate(async () => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { FIGURE_IDS } = await load('/src/figures.ts');
-    const { figureThumb } = await load('/src/thumbs.ts');
+    const { FIGURE_IDS, figureThumb } = await load('/src/services/scene3d/index.ts');
     const hex = async (s: string) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
     const out: Record<string, string> = {};
     for (const id of FIGURE_IDS as string[]) out[id] = await hex(await figureThumb(id));

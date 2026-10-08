@@ -4,11 +4,18 @@ import wipeE2eData from './e2e/global-setup';
 // webServers start before globalSetup would run, so the wipe happens at config load in the runner only
 if (!process.env.TEST_WORKER_INDEX) wipeE2eData();
 
+// each worktree/WP picks its own ports, e.g. E2E_PORT=5181 E2E_DEV_PORT=5182 E2E_HMR_PORT=24682
 const PROD_PORT = process.env.E2E_PORT ?? '5174';
 const DEV_PORT = process.env.E2E_DEV_PORT ?? '5175';
 const HMR_PORT = process.env.E2E_HMR_PORT ?? '24679';
 const PROD = `http://127.0.0.1:${PROD_PORT}`;
 const DEV = `http://127.0.0.1:${DEV_PORT}`;
+
+// only the servers the selected --project flags need are started; no flag starts both
+const argv = process.argv.slice(2);
+const selected = argv.flatMap((a, i) => (a.startsWith('--project=') ? [a.slice('--project='.length)] : a === '--project' && argv[i + 1] ? [argv[i + 1]] : []));
+const needProd = selected.length === 0 || selected.some((p) => p !== 'dev');
+const needDev = selected.length === 0 || selected.includes('dev');
 
 const sizes = {
   desktop: { viewport: { width: 1440, height: 900 } },
@@ -23,15 +30,14 @@ const projects: Project[] = Object.entries(sizes).flatMap(([size, device]) =>
     const name = `${size}-${colorScheme}`;
     return {
       name,
-      testIgnore: '**/*.dev.spec.ts',
+      // server routes don't depend on viewport or theme: run them in one project only
+      testIgnore: name === 'desktop-light' ? '**/*.dev.spec.ts' : ['**/*.dev.spec.ts', '**/server.spec.ts'],
       grepInvert: MAP_PROJECTS.includes(name) ? undefined : /@map/,
       use: { ...device, colorScheme, baseURL: PROD },
     };
   }),
 );
-// @pending-p1-05/06 specs target components not merged yet; the lead drops the tag after merging P1-05/P1-06
-const devGrepInvert = new RegExp(['@pending-p1-0[56]', process.env.RECORD ? '' : '@record'].filter(Boolean).join('|'));
-projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: devGrepInvert, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
+projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: process.env.RECORD ? undefined : /@record/, use: { ...sizes.desktop, colorScheme: 'light', baseURL: DEV } });
 
 export default defineConfig({
   testDir: 'e2e',
@@ -47,19 +53,23 @@ export default defineConfig({
   },
   projects,
   webServer: [
-    {
-      command: 'npm run build && tsx server/index.ts',
-      url: `${PROD}/api/config`,
-      reuseExistingServer: false,
-      timeout: 180_000,
-      env: { NODE_ENV: 'production', PORT: PROD_PORT, DATA_DIR: `.e2e-data-${PROD_PORT}`, DATABASE_URL: '' },
-    },
-    {
-      command: 'tsx server/index.ts',
-      url: `${DEV}/api/config`,
-      reuseExistingServer: false,
-      timeout: 60_000,
-      env: { NODE_ENV: 'development', PORT: DEV_PORT, HMR_PORT, DATA_DIR: `.e2e-data-dev-${DEV_PORT}`, DATABASE_URL: '' },
-    },
+    ...(needProd
+      ? [{
+          command: 'npm run build && tsx server/index.ts',
+          url: `${PROD}/api/config`,
+          reuseExistingServer: false,
+          timeout: 180_000,
+          env: { NODE_ENV: 'production', PORT: PROD_PORT, DATA_DIR: `.e2e-data-${PROD_PORT}`, DATABASE_URL: '' },
+        }]
+      : []),
+    ...(needDev
+      ? [{
+          command: 'tsx server/index.ts',
+          url: `${DEV}/api/config`,
+          reuseExistingServer: false,
+          timeout: 60_000,
+          env: { NODE_ENV: 'development', PORT: DEV_PORT, HMR_PORT, DATA_DIR: `.e2e-data-${DEV_PORT}`, DATABASE_URL: '' },
+        }]
+      : []),
   ],
 });

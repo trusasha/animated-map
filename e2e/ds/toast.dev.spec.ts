@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await openGallery(page);
 });
 
-test.describe('Toaster @pending-p1-05', () => {
+test.describe('Toaster', () => {
   test('the 4th toast evicts the oldest', async ({ page }) => {
     const section = demoSection(page, 'Toast');
     for (let i = 0; i < 4; i++) await section.getByRole('button', { name: 'With Undo' }).click();

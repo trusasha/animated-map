@@ -1,7 +1,8 @@
 // Dev page (/figures.html): every built-in figure from two angles; ?only=car&size=600 for a close look.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { animateFigure, createFigure, FIGURE_IDS } from './figures';
+import { animateFigure } from './figures/animate';
+import { createFigure, FIGURE_IDS } from './figures/registry';
 
 const params = new URLSearchParams(location.search);
 const ids = params.get('only')?.split(',') ?? FIGURE_IDS;

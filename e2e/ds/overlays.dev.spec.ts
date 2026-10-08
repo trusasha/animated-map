@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await openGallery(page);
 });
 
-test.describe('Dialog @pending-p1-06', () => {
+test.describe('Dialog', () => {
   const open = async (page: import('@playwright/test').Page, name: string) => {
     const trigger = demoSection(page, 'Dialog').getByRole('button', { name });
     await trigger.focus();
@@ -51,7 +51,7 @@ test.describe('Dialog @pending-p1-06', () => {
   });
 });
 
-test.describe('Menu @pending-p1-06', () => {
+test.describe('Menu', () => {
   const trigger = (page: import('@playwright/test').Page) => demoSection(page, 'Menu').getByRole('button', { name: 'Stop actions' });
 
   test('ArrowDown from the trigger opens the menu', async ({ page }) => {
@@ -89,7 +89,7 @@ test.describe('Menu @pending-p1-06', () => {
   });
 });
 
-test.describe('SearchCombobox @pending-p1-06', () => {
+test.describe('SearchCombobox', () => {
   const input = (page: import('@playwright/test').Page) => demoSection(page, 'SearchCombobox').getByRole('combobox', { name: 'Add the next stop' });
 
   test('ArrowDown then Enter picks the first result', async ({ page }) => {
@@ -112,7 +112,7 @@ test.describe('SearchCombobox @pending-p1-06', () => {
   });
 });
 
-test.describe('BottomSheet @pending-p1-06', () => {
+test.describe('BottomSheet', () => {
   test('tapping the grabber changes the snap and reported height', async ({ page }) => {
     const section = demoSection(page, 'BottomSheet');
     const readout = section.getByTestId('sheet-height');

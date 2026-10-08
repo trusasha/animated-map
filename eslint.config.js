@@ -26,6 +26,14 @@ const restrictedGlobals = (names) =>
     ? 'off'
     : ['error', ...names.map((name) => ({ name, message: `${name} is not allowed in this layer (see CLAUDE.md).` }))];
 
+// esquery regex literals cannot contain '/', hence \x2f
+const dynamicImportSelector = (packages) => {
+  const matchers = packages.map((p) =>
+    p.endsWith('/*') ? `[source.value=/^${p.slice(0, -2).replaceAll('/', '\\x2f')}\\x2f/]` : `[source.value="${p}"]`,
+  );
+  return `ImportExpression:matches(${matchers.join(', ')})`;
+};
+
 const layer = (name) => `**/${name}/**`;
 
 // flat config replaces a rule per matching block, so every block restates the full lists
@@ -40,9 +48,15 @@ const restrict = ({ packages = BASE_PACKAGES, groups = [], globals: extraGlobals
       ].filter((p) => p.group.length > 0),
     },
   ],
+  'no-restricted-syntax': [
+    'error',
+    { selector: dynamicImportSelector(packages), message: 'Dynamic import of this package is not allowed in this layer (see CLAUDE.md).' },
+  ],
   // a severity-only entry would inherit the previous block's options, so an empty list must be 'off'
   'no-restricted-globals': restrictedGlobals([...(webcodecs ? WEBCODECS : []), ...extraGlobals]),
 });
+
+const SERVICE_GROUPS = [layer('features'), layer('app'), layer('ds')];
 
 const without = (...names) => BASE_PACKAGES.filter((p) => !names.includes(p));
 
@@ -61,6 +75,7 @@ const boundaryZones = (root) => {
   return [
     ...forbid(['src/domain'], ['src/services', 'src/features', 'src/app', 'src/ds', 'src/i18n']),
     ...forbid(['src/ds'], ['src/domain', 'src/services', 'src/features', 'src/app', 'src/i18n']),
+    ...forbid(['src/lib'], ['src/domain', 'src/services', 'src/features', 'src/app', 'src/ds', 'src/i18n']),
     ...forbid(['src/services'], ['src/features', 'src/app', 'src/ds']),
     ...forbid(['src/services/map'], ['src/services/scene3d']),
     ...forbid(['src/services/scene3d'], ['src/services/map']),
@@ -98,15 +113,15 @@ const buildConfig = (root) => tseslint.config(
   { files: ['src/**/*.{ts,tsx}'], rules: restrict() },
   {
     files: ['src/services/map/**'],
-    rules: restrict({ packages: without('maplibre-gl', 'maplibre-gl/*'), groups: [layer('services/scene3d')] }),
+    rules: restrict({ packages: [...without('maplibre-gl', 'maplibre-gl/*'), ...REACT], groups: [layer('services/scene3d'), ...SERVICE_GROUPS] }),
   },
   {
     files: ['src/services/scene3d/**'],
-    rules: restrict({ packages: without('three', 'three/*'), groups: [layer('services/map')] }),
+    rules: restrict({ packages: [...without('three', 'three/*'), ...REACT], groups: [layer('services/map'), ...SERVICE_GROUPS] }),
   },
   {
     files: ['src/services/video/**'],
-    rules: restrict({ packages: without('mp4-muxer'), webcodecs: false }),
+    rules: restrict({ packages: [...without('mp4-muxer'), ...REACT], groups: SERVICE_GROUPS, webcodecs: false }),
   },
   {
     files: ['src/ds/**'],
@@ -125,8 +140,8 @@ const buildConfig = (root) => tseslint.config(
   },
   {
     files: ['src/services/**'],
-    ignores: ['src/services/map/**', 'src/services/scene3d/**', 'src/services/video/**', 'src/services/routing/**'],
-    rules: restrict({ packages: [...BASE_PACKAGES, ...REACT], groups: [layer('features'), layer('app'), layer('ds')] }),
+    ignores: ['src/services/map/**', 'src/services/scene3d/**', 'src/services/video/**'],
+    rules: restrict({ packages: [...BASE_PACKAGES, ...REACT], groups: SERVICE_GROUPS }),
   },
   {
     files: ['src/features/**'],
@@ -161,23 +176,37 @@ const buildConfig = (root) => tseslint.config(
       'src/legacy/**',
       'src/animator.ts',
       'src/exporter.ts',
-      'src/figures.ts',
-      'src/thumbs.ts',
-      'src/figures-gallery.ts',
       'src/ukiyoe.ts',
       'src/main.tsx',
-      'server/db.ts',
     ],
     rules: {
       'no-restricted-imports': 'off',
       'no-restricted-globals': 'off',
+      'no-restricted-syntax': 'off',
       'import-x/no-restricted-paths': 'off',
       'react-hooks/refs': 'off', // legacy App.tsx assigns refs during render
     },
   },
   {
-    // Temporary legacy quality debt (added 2026-10-08): demoted to warnings until each file is rewritten under the new layers
-    files: ['src/*.{ts,tsx}', 'server/*.ts'],
+    // Temporary legacy quality debt (files as of 2026-10-08; new top-level files get full errors): demoted to warnings until each file is rewritten under the new layers
+    files: [
+      'src/App.tsx',
+      'src/animator.ts',
+      'src/api.ts',
+      'src/exporter.ts',
+      'src/figures-gallery.ts',
+      'src/figures.ts',
+      'src/geo.ts',
+      'src/main.tsx',
+      'src/route.check.ts',
+      'src/route.ts',
+      'src/thumbs.ts',
+      'src/timeline.check.ts',
+      'src/timeline.ts',
+      'src/types.ts',
+      'src/ukiyoe.ts',
+      'server/ai.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-expressions': 'warn',

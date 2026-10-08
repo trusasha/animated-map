@@ -1,0 +1,43 @@
+@layer ds.components {
+  .toaster {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    width: min(440px, calc(100% - var(--space-24)));
+    pointer-events: none;
+  }
+
+  .toaster[data-placement='bottom'] { bottom: var(--space-20); flex-direction: column-reverse; }
+  .toaster[data-placement='top'] { top: var(--space-20); }
+
+  .toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    box-sizing: border-box;
+    padding: var(--space-10) var(--space-12);
+    border-radius: var(--radius-standard);
+    background: var(--surface-card);
+    border: var(--border-whisper);
+    box-shadow: var(--elevation-deep);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+  }
+
+  .toast[data-tone='error'] {
+    background: var(--surface-error);
+    border: 1px solid var(--border-error-color);
+    color: var(--text-error);
+  }
+
+  .message { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+
+  .toast[data-tone='error'] > button { color: var(--text-error); }
+}
