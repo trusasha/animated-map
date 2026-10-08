@@ -14,5 +14,6 @@ export async function probe(map: MlMap, padding: Padding, markers: number): Prom
     const data = await (map.getSource(id) as GeoJSONSource).getData();
     features[id] = data.type === 'FeatureCollection' ? data.features.length : 1;
   }
-  return { padding, visible, features, markers };
+  const { lng, lat } = map.getCenter();
+  return { padding, visible, features, markers, center: [lng, lat], zoom: map.getZoom() };
 }

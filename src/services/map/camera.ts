@@ -4,6 +4,8 @@ import type { CameraView, FitOptions, Padding } from './types';
 
 const ZERO: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
 const PADDING_MS = 300;
+// maplibre merges options over its defaults, so an explicit `curve: undefined` turns the flight into NaN
+const curveOf = (curve?: number) => (curve === undefined ? {} : { curve });
 
 /** resolves on moveend, or a little after the planned duration if none comes; a hidden tab jumps */
 function settle(map: maplibregl.Map, duration: number, run: (animate: boolean) => void) {
@@ -48,13 +50,13 @@ export function createCamera(map: maplibregl.Map) {
       const b = new maplibregl.LngLatBounds();
       for (const p of points) b.extend(p);
       return settle(map, o.duration, (animate) => map.fitBounds(b, {
-        padding, absolutePadding: true, maxZoom: o.maxZoom, pitch: 0, bearing: 0, duration: o.duration, curve: o.curve, animate,
+        padding, absolutePadding: true, maxZoom: o.maxZoom, pitch: 0, bearing: 0, duration: o.duration, ...curveOf(o.curve), animate,
       }));
     },
     flyTo(v: CameraView, o: { duration: number; curve?: number }) {
       const target = view(v);
       if (suspended) return Promise.resolve();
-      return settle(map, o.duration, (animate) => map.flyTo({ ...target, duration: o.duration, curve: o.curve, essential: true, animate }));
+      return settle(map, o.duration, (animate) => map.flyTo({ ...target, duration: o.duration, ...curveOf(o.curve), essential: true, animate }));
     },
     jumpTo(v: CameraView) {
       const target = view(v);
