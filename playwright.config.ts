@@ -16,6 +16,7 @@ const argv = process.argv.slice(2);
 const selected = argv.flatMap((a, i) => (a.startsWith('--project=') ? [a.slice('--project='.length)] : a === '--project' && argv[i + 1] ? [argv[i + 1]] : []));
 const needProd = selected.length === 0 || selected.some((p) => p !== 'dev');
 const needDev = selected.length === 0 || selected.includes('dev');
+if (needDev) process.env.E2E_WARM_DEV = '1';
 
 const sizes = {
   desktop: { viewport: { width: 1440, height: 900 } },
@@ -40,6 +41,7 @@ projects.push({ name: 'dev', testMatch: '**/*.dev.spec.ts', grepInvert: process.
 
 export default defineConfig({
   testDir: 'e2e',
+  globalSetup: './e2e/warm-dev.ts',
   fullyParallel: true,
   workers: 4,
   expect: { timeout: 15_000 },
