@@ -26,6 +26,14 @@ const restrictedGlobals = (names) =>
     ? 'off'
     : ['error', ...names.map((name) => ({ name, message: `${name} is not allowed in this layer (see CLAUDE.md).` }))];
 
+// esquery regex literals cannot contain '/', hence \x2f
+const dynamicImportSelector = (packages) => {
+  const matchers = packages.map((p) =>
+    p.endsWith('/*') ? `[source.value=/^${p.slice(0, -2).replaceAll('/', '\\x2f')}\\x2f/]` : `[source.value="${p}"]`,
+  );
+  return `ImportExpression:matches(${matchers.join(', ')})`;
+};
+
 const layer = (name) => `**/${name}/**`;
 
 // flat config replaces a rule per matching block, so every block restates the full lists
@@ -39,6 +47,10 @@ const restrict = ({ packages = BASE_PACKAGES, groups = [], globals: extraGlobals
         { group: groups, message: 'Forbidden dependency direction (see CLAUDE.md).' },
       ].filter((p) => p.group.length > 0),
     },
+  ],
+  'no-restricted-syntax': [
+    'error',
+    { selector: dynamicImportSelector(packages), message: 'Dynamic import of this package is not allowed in this layer (see CLAUDE.md).' },
   ],
   // a severity-only entry would inherit the previous block's options, so an empty list must be 'off'
   'no-restricted-globals': restrictedGlobals([...(webcodecs ? WEBCODECS : []), ...extraGlobals]),
@@ -171,6 +183,7 @@ const buildConfig = (root) => tseslint.config(
     rules: {
       'no-restricted-imports': 'off',
       'no-restricted-globals': 'off',
+      'no-restricted-syntax': 'off',
       'import-x/no-restricted-paths': 'off',
       'react-hooks/refs': 'off', // legacy App.tsx assigns refs during render
     },
