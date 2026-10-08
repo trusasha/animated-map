@@ -1,7 +1,53 @@
-import type { LngLat, MapStyle, Stop } from '../../domain/types';
+import type { LngLat, MapStyle, Mode, Stop } from '../../domain/types';
 import type { Frame, LegInput } from '../../domain/timeline';
 
 export type Padding = { top: number; bottom: number; left: number; right: number };
+
+export type MapMode = 'home' | 'editor';
+
+/** one leg as the editor draws it; colour, range and building state are the caller's decision */
+export interface EditorSegment { mode: Mode; path: LngLat[]; color: string; inRange: boolean; pending: boolean }
+
+/** a numbered stop marker */
+export interface EditorStop {
+  lngLat: LngLat;
+  label: string;
+  title: string;
+  /** first or last stop, drawn filled */
+  end: boolean;
+  approx: boolean;
+  /** endpoint of the selected segment, or the stop being placed */
+  active: boolean;
+  inRange: boolean;
+  draggable: boolean;
+}
+
+export interface EditorRouteView { segments: EditorSegment[]; stops: EditorStop[]; selected: number | null }
+
+/** a saved trip on the Home globe; fewer than 2 points are not drawn */
+export interface HomeTrip { id: string; points: LngLat[] }
+
+/** padding given here becomes the map's padding */
+export interface CameraView { center: LngLat; zoom: number; bearing?: number; pitch?: number; padding?: Padding }
+
+export interface FitOptions {
+  maxZoom: number;
+  duration: number;
+  /** zoom when there is a single point; defaults to maxZoom */
+  singleZoom?: number;
+  curve?: number;
+}
+
+/** what tests read through `window.__ta` */
+export interface MapProbe {
+  padding: Padding;
+  /** layout visibility of the player, editor and home layers */
+  visible: Record<string, boolean>;
+  /** feature count of each GeoJSON source */
+  features: Record<string, number>;
+  /** stop markers currently shown */
+  markers: number;
+}
 
 export interface TripPlayer {
   setTrip(stops: Stop[], legs: LegInput[], speed: number): Promise<void>;
