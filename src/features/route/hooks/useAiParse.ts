@@ -6,7 +6,13 @@ import { useT } from '../../../i18n/react';
 import { api } from '../../../services/api';
 import { useSettings } from '../../settings';
 import { useToasts } from '../../toasts';
-import type { ComposerTripApi } from '../types';
+
+/** what the composer needs from the open trip (P3-03's trip context provides it) */
+export interface ComposerTripApi {
+  trip: Trip;
+  /** applies `fn` to the latest trip, title included */
+  update: (fn: (t: Trip) => Trip) => void;
+}
 
 /** the parsed route replaces the stops and drops the video range; the title changes only while it is still a default one */
 const applyPlan = (t: Trip, plan: ParsedTrip, ids: string[], settings: Parameters<typeof chain>[1]): Trip => {
