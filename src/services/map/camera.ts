@@ -61,6 +61,14 @@ export function createCamera(map: maplibregl.Map) {
       if (!suspended) map.jumpTo(target);
     },
 
+    setGlobeRadius(px: number) {
+      if (suspended || px <= 0) return;
+      // maplibre's globe radius is worldSize / 2π / cos(centre latitude)
+      const lat = (map.getCenter().lat * Math.PI) / 180;
+      const zoom = Math.log2((px * 2 * Math.PI * Math.cos(lat)) / 512);
+      map.easeTo({ zoom, padding, duration: document.hidden ? 0 : PADDING_MS });
+    },
+
     /** playback on: zero padding; off: the UI padding comes back */
     suspend(on: boolean) {
       if (on === suspended) return;

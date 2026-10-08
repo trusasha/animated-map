@@ -2,6 +2,7 @@ import * as maplibregl from 'maplibre-gl';
 import type { MapOverlay3D } from '../../domain/overlay3d';
 import type { LngLat, MapStyle } from '../../domain/types';
 import { createCamera } from './camera';
+import { installControls } from './controls';
 import { installTripsLayer, setTrips } from './home/tripsLayer';
 import { startSpin } from './home/spin';
 import { installEditorLayers, setEditorSegments } from './layers/editorLayers';
@@ -28,10 +29,7 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
     maxTileCacheZoomLevels: TILE_CACHE_ZOOM_LEVELS, canvasContextAttributes: { antialias: true },
     attributionControl: false,
   });
-  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
-  map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
-  // compact attribution opens itself on first render and then covers the panels' tap targets on phones
-  map.once('load', () => container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'));
+  const setControlsInset = installControls(map, container);
   installImageResolver(map);
   const player = new MapPlayer(map, overlay);
   const camera = createCamera(map);
@@ -159,6 +157,8 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
     fitTo: (points, o) => camera.fitTo(points, o),
     flyTo: (v, o) => camera.flyTo(v, o),
     jumpTo: (v) => camera.jumpTo(v),
+    setGlobeRadius: (px) => camera.setGlobeRadius(px),
+    setControlsInset,
     probe: () => probe(map, camera.getPadding(), markers.visible),
   };
 }
