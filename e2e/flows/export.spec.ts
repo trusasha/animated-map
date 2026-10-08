@@ -29,7 +29,7 @@ async function openExport(page: Page, request: APIRequestContext, title: string,
   if (Object.keys(settings).length) await page.route('**/api/settings', (route) => route.request().method() === 'GET' ? route.fulfill({ json: settings, headers: { 'access-control-allow-origin': '*' } }) : route.fallback());
   const trip = await (await request.post('/api/trips', { data: { title, data: DATA } })).json();
   await page.goto(`/trip/${trip.id}?ui=next&e2e`);
-  const open = page.getByRole('button', { name: 'Экспорт видео' });
+  const open = page.getByRole('button', { name: /^Экспорт( видео)?$/ });
   await expect(open).toBeEnabled({ timeout: 60_000 });
   await open.click();
   const dialog = page.getByRole('dialog', { name: 'Экспорт видео' });
