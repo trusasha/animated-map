@@ -1,6 +1,9 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
 import tseslint from 'typescript-eslint';
+import { createNodeResolver, importX } from 'eslint-plugin-import-x';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 
@@ -43,7 +46,39 @@ const restrict = ({ packages = BASE_PACKAGES, groups = [], globals: extraGlobals
 
 const without = (...names) => BASE_PACKAGES.filter((p) => !names.includes(p));
 
-export default tseslint.config(
+const dirs = (dir) => {
+  try {
+    return readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+  } catch {
+    return [];
+  }
+};
+
+// resolver-based, so relative imports are caught too; `except` keeps a feature's index.ts public
+const boundaryZones = (root) => {
+  const forbid = (targets, froms) => targets.flatMap((target) => froms.map((from) => ({ target: `./${target}`, from: `./${from}` })));
+  const features = dirs(path.join(root, 'src/features'));
+  return [
+    ...forbid(['src/domain'], ['src/services', 'src/features', 'src/app', 'src/ds', 'src/i18n']),
+    ...forbid(['src/ds'], ['src/domain', 'src/services', 'src/features', 'src/app', 'src/i18n']),
+    ...forbid(['src/services'], ['src/features', 'src/app', 'src/ds']),
+    ...forbid(['src/services/map'], ['src/services/scene3d']),
+    ...forbid(['src/services/scene3d'], ['src/services/map']),
+    ...forbid(['src/features'], ['src/app']),
+    { target: './src/features', from: './src/ds/components', except: ['./index.ts', './index.tsx'] },
+    ...forbid(['src/i18n'], ['src/services', 'src/features', 'src/app']),
+    ...forbid(['server'], ['src/services', 'src/features']),
+    ...features.flatMap((f) =>
+      features.filter((g) => g !== f).map((g) => ({
+        target: `./src/features/${f}`,
+        from: `./src/features/${g}`,
+        except: ['./index.ts', './index.tsx'],
+      })),
+    ),
+  ];
+};
+
+const buildConfig = (root) => tseslint.config(
   {
     ignores: ['dist/**', 'node_modules/**', 'design/**', 'test-results/**', 'playwright-report/**', 'scripts/lint-fixtures/**'],
   },
@@ -51,6 +86,11 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
   jsxA11y.flatConfigs.recommended,
+  {
+    plugins: { 'import-x': importX },
+    settings: { 'import-x/resolver-next': [createNodeResolver({ extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs'] })] },
+    rules: { 'import-x/no-restricted-paths': ['error', { basePath: root, zones: boundaryZones(root) }] },
+  },
   {
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: { 'max-lines': ['warn', { max: 200 }] },
@@ -131,6 +171,7 @@ export default tseslint.config(
     rules: {
       'no-restricted-imports': 'off',
       'no-restricted-globals': 'off',
+      'import-x/no-restricted-paths': 'off',
       'react-hooks/refs': 'off', // legacy App.tsx assigns refs during render
     },
   },
@@ -149,3 +190,6 @@ export default tseslint.config(
     },
   },
 );
+
+export { buildConfig };
+export default buildConfig(import.meta.dirname);
