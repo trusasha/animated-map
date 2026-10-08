@@ -18,6 +18,7 @@ export default function Demo() {
       <Select label="Figure" hint="Shows up on matching segments." options={FIGURES} value={a} onChange={setA} />
       <Select label="Figure (native, 16px for phones)" native options={FIGURES} value={b} onChange={setB} />
       <Select label="With placeholder" placeholder="Choose a figure" options={FIGURES} value="" onChange={() => {}} />
+      <Select label="With error" error="Pick a figure for this segment." options={FIGURES} value="" onChange={() => {}} placeholder="Choose a figure" />
       <Select label="Disabled" options={FIGURES} value="boat" onChange={() => {}} disabled />
     </div>
   );

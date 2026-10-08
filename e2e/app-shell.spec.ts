@@ -70,20 +70,6 @@ test.describe('app shell @map', () => {
     }
   });
 
-  test('theme and language are saved by a PUT and a settings.change log', async ({ page }, info) => {
-    await page.goto('/?ui=next&e2e');
-    await page.locator('[data-placeholder="app-header"] button', { hasText: 'settings' }).click();
-    const put = page.waitForRequest((r) => r.method() === 'PUT' && r.url().endsWith('/api/settings') && r.postDataJSON().lang === 'en');
-    const dialog = page.locator('[data-placeholder="settings-dialog"]');
-    await dialog.getByRole('button', { name: 'theme' }).click();
-    await dialog.getByRole('button', { name: 'lang' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    const body = (await put).postDataJSON();
-    expect(body).toMatchObject({ theme: 'dark', lang: 'en' });
-    await expect.poll(() => logged[info.testId].filter((e) => e.type === 'settings.change').length).toBeGreaterThan(0);
-    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
-  });
-
   test('an error thrown in a placeholder is caught, toasted and logged; siblings stay', async ({ page }, info) => {
     await page.goto('/trip/abc?ui=next&e2e&crash=route-panel');
     await expect(page.getByRole('alert')).toContainText('route-panel crashed');

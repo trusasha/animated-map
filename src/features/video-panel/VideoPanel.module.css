@@ -1,0 +1,2 @@
+.panel { display: flex; flex-direction: column; gap: var(--space-12); }
+.title { margin: 0; font-size: var(--type-ui-size); font-weight: var(--weight-bold); color: var(--text-primary); }

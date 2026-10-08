@@ -11,6 +11,9 @@ const line = (coordinates: number[][], properties: GeoJSON.GeoJsonProperties = {
 const source = (map: MlMap, id: string) => map.getSource(id) as GeoJSONSource | undefined;
 const set = (map: MlMap, id: string, features: Features) => source(map, id)?.setData({ type: 'FeatureCollection', features });
 
+/** what playback draws; the editor hides these while editing */
+export const PLAYER_LAYERS = ['route', 'highlight-glow', 'highlight', 'trail-casing', 'trail', 'stops', 'stop-labels'];
+
 /** player sources and layers; the 3D overlay goes on top of them */
 export function installRouteLayers(map: MlMap) {
   const empty = { type: 'FeatureCollection', features: [] } as GeoJSON.FeatureCollection;

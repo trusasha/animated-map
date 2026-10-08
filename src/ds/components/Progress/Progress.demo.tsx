@@ -9,6 +9,7 @@ export default function Demo() {
       <Progress value={42} label="Rendering" showValue />
       <Progress value={100} label="Done" showValue />
       <Progress value={60} label="Overlay preview" size="sm" />
+      <Progress indeterminate label="Preparing" />
     </div>
   );
 }

@@ -30,7 +30,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
     const map = createMapService(el, overlay);
     const ta = { map, player: map.player, padding: undefined as Padding | undefined };
     if (exposeForTests) (window as unknown as { __ta: typeof ta }).__ta = ta;
-    setServices({ map, overlay, setPadding: (p) => { ta.padding = p; } });
+    setServices({ map, overlay, setPadding: (p) => { ta.padding = p; map.setPadding(p); } });
     return () => {
       setServices(null);
       map.destroy();

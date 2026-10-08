@@ -8,6 +8,9 @@ import { installLod, type LodState } from './lod';
 import { preload, type Prefetch, type PreloadTarget } from './preload';
 import type { TripPlayer } from './types';
 
+/** id of the 3D overlay layer; route lines go below it */
+export const OVERLAY_LAYER = 'three';
+
 /** plays a trip on a map it does not own: route layers, the 3D overlay layer, camera, tile streaming */
 export class MapPlayer implements TripPlayer, PreloadTarget {
   tl?: Timeline;
@@ -17,6 +20,8 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
   run = 0;
   onFrame?: (t: number) => void;
   onBuffering?: (waiting: boolean) => void;
+  /** a frame takes over the map (false) or editing resumes (true) */
+  onEditing?: (editing: boolean) => void;
   prefetch?: Prefetch<Timeline>;
   readonly lod: LodState = { detail: 0 };
   readonly fit: FitFn;
@@ -50,7 +55,7 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
 
   private overlayLayer(): CustomLayerInterface {
     return {
-      id: 'three', type: 'custom', renderingMode: '3d',
+      id: OVERLAY_LAYER, type: 'custom', renderingMode: '3d',
       // style reloads re-add the layer on the same canvas/context
       onAdd: (map, gl) => this.overlay.attach(map.getCanvas(), gl as WebGL2RenderingContext),
       render: (gl, args) => this.draw(gl as WebGL2RenderingContext, args.defaultProjectionData),
@@ -76,6 +81,7 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
 
   clear() {
     this.stop();
+    if (this.frame) this.onEditing?.(true);
     this.frame = undefined;
     this.lod.detail = 0;
     this.setContext([]);
@@ -95,7 +101,10 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
 
   setFrame(t: number | null) {
     const tl = this.tl;
-    if (t === null || !tl) {
+    const editing = t === null || !tl;
+    // before the camera jump: padding must already be zero
+    if (editing === !!this.frame) this.onEditing?.(editing);
+    if (editing) {
       this.frame = undefined;
       this.lod.detail = 0;
       this.refreshStatic();

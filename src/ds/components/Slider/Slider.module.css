@@ -99,13 +99,4 @@
     display: flex;
     justify-content: space-between;
   }
-
-  html[data-coarse] .control {
-    height: var(--hit-rail-touch);
-  }
-
-  html[data-coarse] .thumb {
-    width: var(--hit-rail-touch);
-    height: var(--hit-rail-touch);
-  }
 }

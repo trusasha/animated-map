@@ -85,9 +85,9 @@
     color: var(--text-muted);
   }
 
-  html[data-coarse] .track::after {
+  .track::after {
     content: '';
     position: absolute;
-    inset: -8px -4px;
+    inset: calc(-1 * var(--hit-slop-y)) calc(-1 * var(--hit-slop-x));
   }
 }

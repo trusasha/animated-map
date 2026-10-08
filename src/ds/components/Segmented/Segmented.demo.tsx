@@ -6,7 +6,7 @@ export const title = 'Segmented';
 export default function Demo() {
   const [mode, setMode] = useState<'air' | 'land' | 'water'>('land');
   const [theme, setTheme] = useState('system');
-  const [two, setTwo] = useState('a');
+  const [skip, setSkip] = useState('a');
   return (
     <div data-testid="demo-Segmented" style={{ display: 'grid', gap: 16, maxWidth: 320 }}>
       <Segmented
@@ -30,12 +30,23 @@ export default function Demo() {
         ]}
       />
       <Segmented
-        label="Two options, one disabled"
-        value={two}
-        onChange={setTwo}
+        label="Three options, middle disabled"
+        value={skip}
+        onChange={setSkip}
         options={[
           { value: 'a', label: 'Fast' },
           { value: 'b', label: 'Precise', disabled: true },
+          { value: 'c', label: 'Balanced' },
+        ]}
+      />
+      <Segmented
+        label="Whole group disabled"
+        value="air"
+        onChange={() => undefined}
+        disabled
+        options={[
+          { value: 'air', label: 'Air' },
+          { value: 'land', label: 'Land' },
         ]}
       />
     </div>

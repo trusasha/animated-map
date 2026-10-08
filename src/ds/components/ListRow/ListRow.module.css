@@ -26,7 +26,7 @@
     min-width: 0;
     box-sizing: border-box;
     margin: 0;
-    padding: var(--space-8);
+    padding: var(--hit-row-pad) var(--space-8);
     border: 0;
     border-radius: inherit;
     background: transparent;
@@ -81,6 +81,15 @@
     pointer-events: auto;
   }
 
-  :global(html[data-coarse]) .main { padding-block: var(--space-10); }
+  .menu { display: none; flex: none; padding-right: var(--space-4); }
+
+  @media (pointer: coarse) {
+    .actions { opacity: 1; pointer-events: auto; }
+    .row[data-has-menu] .menu { display: inline-flex; }
+    .row[data-has-menu]:not([data-actions-visible]) .actions { display: none; }
+  }
+
   :global(html[data-coarse]) .actions { opacity: 1; pointer-events: auto; }
+  :global(html[data-coarse]) .row[data-has-menu] .menu { display: inline-flex; }
+  :global(html[data-coarse]) .row[data-has-menu]:not([data-actions-visible]) .actions { display: none; }
 }
