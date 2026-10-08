@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { cx } from '../../lib/cx';
+import { wrapFocusFromGuard } from '../../lib/focusGuard';
 import { useViewportMode } from '../../hooks/useViewportMode';
 import { IconButton } from '../IconButton';
 import styles from './Dialog.module.css';
@@ -37,6 +38,7 @@ export function Dialog({
   children,
 }: DialogProps) {
   const { mode } = useViewportMode();
+  const popupRef = useRef<HTMLDivElement>(null);
   const fullScreen = fullScreenBelow === 'phone' && mode === 'phone';
   return (
     <BaseDialog.Root
@@ -50,9 +52,10 @@ export function Dialog({
         onOpenChange(next);
       }}
     >
-      <BaseDialog.Portal>
+      <BaseDialog.Portal onFocus={(event) => wrapFocusFromGuard(event, popupRef.current)}>
         <BaseDialog.Backdrop className={styles.backdrop} />
         <BaseDialog.Popup
+          ref={popupRef}
           className={cx(styles.popup, className)}
           style={{ '--dialog-width': `${width}px` } as React.CSSProperties}
           data-fullscreen={fullScreen || undefined}
