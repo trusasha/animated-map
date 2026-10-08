@@ -1,0 +1,7 @@
+@layer ds.tokens, ds.base, ds.components, app;
+
+@import "@fontsource-variable/inter/wght.css" layer(ds.tokens);
+@import "./tokens/primitive.css" layer(ds.tokens);
+@import "./tokens/semantic.css" layer(ds.tokens);
+@import "./tokens/semantic-dark.css" layer(ds.tokens);
+@import "./base.css" layer(ds.base);
