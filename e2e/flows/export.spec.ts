@@ -23,9 +23,10 @@ const logged = (page: Page) => {
   return events;
 };
 
-async function openExport(page: Page, request: APIRequestContext, title: string) {
+async function openExport(page: Page, request: APIRequestContext, title: string, settings: Record<string, unknown> = {}) {
   await stubNet(page);
   await defaultSettings(page);
+  if (Object.keys(settings).length) await page.route('**/api/settings', (route) => route.request().method() === 'GET' ? route.fulfill({ json: settings, headers: { 'access-control-allow-origin': '*' } }) : route.fallback());
   const trip = await (await request.post('/api/trips', { data: { title, data: DATA } })).json();
   await page.goto(`/trip/${trip.id}?ui=next&e2e`);
   const open = page.getByRole('button', { name: 'Экспорт видео' });
@@ -87,6 +88,22 @@ test.describe('export dialog @map', () => {
 
     await expect.poll(() => events.map((e) => e.type)).toEqual(expect.arrayContaining(['export.open', 'export.done', 'export.share']));
     expect(events.find((e) => e.type === 'export.done')!.data).toMatchObject({ trip: id, format: '9:16', width: 1080, height: 1920 });
+    await request.delete(`/api/trips/${id}`);
+  });
+
+  test('F10: long side 1080 renders a 608x1080 MP4 for 9:16', async ({ page, request }) => {
+    await page.goto('/');
+    const h264 = await page.evaluate(() => typeof VideoEncoder !== 'undefined' && VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: 608, height: 1080 }).then((r) => !!r.supported));
+    test.skip(!h264, 'this browser has no H.264 encoder (Chromium without proprietary codecs)');
+    const events = logged(page);
+    const { dialog, id } = await openExport(page, request, `Export 1080 ${Date.now()}`, { exportLongSide: 1080 });
+    await dialog.getByRole('radio', { name: /9:16/ }).check({ force: true });
+    await expect(dialog.getByRole('button', { name: 'Рендер видео' })).toBeDisabled();
+    await expect(dialog.getByRole('button', { name: 'Рендер видео' })).toBeEnabled({ timeout: 120_000 });
+    await dialog.getByRole('button', { name: 'Рендер видео' }).click();
+    await expect(dialog.getByRole('heading', { name: 'Видео готово' })).toBeVisible({ timeout: 780_000 });
+    await expect.poll(() => dialog.locator('video').evaluate((v: HTMLVideoElement) => [v.videoWidth, v.videoHeight])).toEqual([608, 1080]);
+    await expect.poll(() => events.find((e) => e.type === 'export.done')?.data).toMatchObject({ format: '9:16', width: 608, height: 1080 });
     await request.delete(`/api/trips/${id}`);
   });
 
