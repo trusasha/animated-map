@@ -1,0 +1,20 @@
+@layer ds.components {
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-8);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-sans);
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-lh);
+    letter-spacing: var(--type-caption-ls);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+  }
+
+  .badge[data-tone='blue'] { background: var(--surface-selected); color: var(--accent-active); }
+  .badge[data-tone='neutral'] { background: var(--surface-alt); color: var(--text-secondary); }
+  .badge[data-tone='success'] { background: var(--surface-success); color: var(--text-success); }
+  .badge[data-tone='warning'] { background: var(--surface-warning); color: var(--text-warning); }
+}

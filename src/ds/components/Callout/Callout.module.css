@@ -1,0 +1,22 @@
+@layer ds.components {
+  .callout {
+    box-sizing: border-box;
+    padding: var(--space-10) var(--space-12);
+    border-radius: var(--radius-standard);
+    font-family: var(--font-sans);
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+  }
+
+  .callout[data-tone='neutral'] { background: var(--surface-alt); color: var(--text-secondary); }
+  .callout[data-tone='warning'] { background: var(--surface-warning); color: var(--text-warning); }
+  .callout[data-tone='info'] {
+    background: var(--surface-card);
+    color: var(--text-secondary);
+    border: var(--border-whisper);
+  }
+
+  .title { font-weight: var(--weight-bold); color: inherit; }
+  .callout[data-tone='neutral'] .title,
+  .callout[data-tone='info'] .title { color: var(--text-primary); }
+}

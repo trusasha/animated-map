@@ -1,0 +1,57 @@
+@layer ds.components {
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-8) var(--space-10);
+    border: var(--border-whisper);
+    border-radius: var(--radius-standard);
+    background: var(--surface-card);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) var(--ease-standard),
+      background var(--duration-fast) var(--ease-standard);
+  }
+
+  .card:hover:not([data-selected], [data-disabled]) {
+    background: var(--surface-hover);
+  }
+
+  .card[data-selected] {
+    border: 1.5px solid var(--accent);
+    padding: calc(var(--space-8) - 0.5px) calc(var(--space-10) - 0.5px);
+    background: var(--surface-selected);
+  }
+
+  .card:has(:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .card[data-disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .radio {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .label {
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+  }
+
+  .sub {
+    font-size: var(--type-micro-size);
+    line-height: var(--type-micro-lh);
+    color: var(--text-secondary);
+  }
+}

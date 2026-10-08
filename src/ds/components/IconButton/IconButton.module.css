@@ -1,0 +1,52 @@
+@layer ds.components {
+  .iconButton {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--hit-icon);
+    height: var(--hit-icon);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-micro);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+
+  .iconButton[data-size='28'] { width: 28px; height: 28px; }
+  .iconButton[data-size='36'] { width: 36px; height: 36px; }
+  .iconButton[data-size='touch'] { width: var(--hit-icon-touch); height: var(--hit-icon-touch); }
+
+  :global(html[data-coarse]) .iconButton {
+    min-width: var(--hit-icon-touch);
+    min-height: var(--hit-icon-touch);
+  }
+
+  .iconButton:hover { background: var(--surface-hover); }
+
+  .iconButton[data-active] {
+    background: var(--surface-selected);
+    color: var(--accent-active);
+  }
+
+  .iconButton:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 1px;
+  }
+
+  .iconButton:disabled {
+    background: transparent;
+    color: var(--text-decorative);
+    cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .iconButton { transition: none; }
+  }
+}

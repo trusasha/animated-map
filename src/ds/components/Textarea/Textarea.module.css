@@ -1,0 +1,58 @@
+@layer ds.components {
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .label {
+    font-size: var(--type-ui-size);
+    line-height: var(--type-ui-lh);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+  }
+
+  .area {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: var(--space-6);
+    border-radius: var(--radius-micro);
+    border: var(--border-input);
+    background: var(--surface-input);
+    color: var(--text-input);
+    outline: none;
+    resize: vertical;
+  }
+
+  .area::placeholder {
+    color: var(--text-muted);
+  }
+
+  .area:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 0;
+  }
+
+  .area:disabled {
+    resize: none;
+    background: var(--surface-alt);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .area[aria-invalid='true'] {
+    border-color: var(--border-error-color);
+  }
+
+  .note {
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-lh);
+    color: var(--text-muted);
+  }
+
+  .note[data-error] {
+    color: var(--text-error);
+  }
+}

@@ -1,0 +1,33 @@
+@layer ds.components {
+  .stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-sans);
+  }
+
+  .step {
+    padding: var(--space-4) var(--space-10);
+    border-radius: var(--radius-pill);
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-lh);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+  }
+
+  .step[data-state='current'] { background: var(--surface-selected); color: var(--focus); }
+  .step[data-state='past'] { color: var(--text-secondary); }
+  .step[data-state='future'] { color: var(--text-muted); }
+
+  .compact {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-lh);
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+  }
+}

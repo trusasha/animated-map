@@ -1,0 +1,6 @@
+@layer ds.components {
+  .icon {
+    flex: none;
+    color: inherit;
+  }
+}
