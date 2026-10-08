@@ -4,9 +4,15 @@ export const settings = {
   appearance: { title: 'Appearance', light: 'Light', dark: 'Dark', system: 'System' },
   language: { title: 'Language', ru: 'Русский', en: 'English' },
   figures: { title: 'Default figures', help: 'Used for new segments of each type.' },
-  colors: { title: 'Line colors', help: 'Segments with their own color keep it.' },
+  colors: {
+    title: 'Line colors',
+    help: 'Segments with their own color keep it.',
+    custom: 'Custom color',
+    names: { charcoal: 'Charcoal', blue: 'Blue', teal: 'Teal', green: 'Green', orange: 'Orange', pink: 'Pink', purple: 'Purple', brown: 'Brown' },
+  },
   newSegments: {
     title: 'New segments',
+    km: '{value} km',
     flyWhen: 'Fly when the next stop is farther than {km}',
     help: 'Closer stops start as land segments.',
   },
