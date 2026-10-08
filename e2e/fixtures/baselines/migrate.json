@@ -1,0 +1,161 @@
+{
+  "trip-legs-v1": {
+    "id": "legacy-v1",
+    "title": "Legacy top-level legs",
+    "data": {
+      "stops": [
+        {
+          "id": "a",
+          "name": "A",
+          "lng": 2.35,
+          "lat": 48.85
+        },
+        {
+          "id": "b",
+          "name": "B",
+          "lng": 13.4,
+          "lat": 52.52,
+          "leg": {
+            "mode": "air",
+            "figure": "helicopter",
+            "speed": 1.5
+          }
+        },
+        {
+          "id": "c",
+          "name": "C",
+          "lng": 13.9,
+          "lat": 52.9,
+          "leg": {
+            "mode": "ground",
+            "figure": "car"
+          }
+        },
+        {
+          "id": "d",
+          "name": "D",
+          "lng": 14.2,
+          "lat": 53.1,
+          "leg": {
+            "mode": "water",
+            "figure": "sailboat",
+            "smooth": 0
+          }
+        }
+      ],
+      "style": "satellite",
+      "speed": 1,
+      "format": "9:16"
+    }
+  },
+  "trip-chained": {
+    "id": "chained",
+    "title": "Already chained",
+    "data": {
+      "stops": [
+        {
+          "id": "a",
+          "name": "A",
+          "lng": 2.35,
+          "lat": 48.85
+        },
+        {
+          "id": "b",
+          "name": "B",
+          "lng": 13.4,
+          "lat": 52.52,
+          "leg": {
+            "mode": "air",
+            "figure": "airplane",
+            "pathKey": "a>b:air"
+          }
+        },
+        {
+          "id": "c",
+          "name": "C",
+          "lng": 13.9,
+          "lat": 52.9,
+          "leg": {
+            "mode": "ground",
+            "figure": "bus",
+            "speed": 2
+          }
+        },
+        {
+          "id": "d",
+          "name": "D",
+          "lng": 14.2,
+          "lat": 53.1,
+          "leg": {
+            "mode": "water",
+            "figure": "ship"
+          }
+        }
+      ],
+      "style": "dark",
+      "speed": 1.25,
+      "format": "16:9",
+      "range": {
+        "from": "b",
+        "to": "d"
+      }
+    }
+  },
+  "trip-broken": {
+    "id": "broken",
+    "title": "Broken legs",
+    "data": {
+      "stops": [
+        {
+          "id": "a",
+          "name": "A",
+          "lng": 2.35,
+          "lat": 48.85
+        },
+        {
+          "id": "b",
+          "name": "B",
+          "lng": 13.4,
+          "lat": 52.52,
+          "leg": {
+            "mode": "air",
+            "figure": "airplane"
+          }
+        },
+        {
+          "id": "c",
+          "name": "C",
+          "lng": 13.5,
+          "lat": 52.6,
+          "leg": {
+            "mode": "ground",
+            "figure": "car"
+          }
+        },
+        {
+          "id": "d",
+          "name": "D",
+          "lng": 100.5,
+          "lat": 13.75,
+          "leg": {
+            "mode": "air",
+            "figure": "airplane"
+          }
+        },
+        {
+          "id": "e",
+          "name": "E",
+          "lng": 101,
+          "lat": 14,
+          "leg": {
+            "mode": "ground",
+            "figure": "car"
+          }
+        }
+      ],
+      "style": "streets",
+      "speed": 1,
+      "format": "1:1"
+    }
+  }
+}
