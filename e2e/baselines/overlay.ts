@@ -11,7 +11,7 @@ export interface Sample { name: string; x: number; y: number; rgba: number[] }
 export async function captureOverlay(page: Page, times: { ground: number; air: number } | null) {
   return page.evaluate(async ({ stops, legs, speed, times }) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { Animator } = await load('/src/animator.ts');
+    const { Animator } = await load('/src/legacy/animator.ts');
     const { idle } = await load('/src/services/map/createOffscreenMap.ts');
     const { loadStyle } = await load('/src/services/map/styles/loadStyle.ts');
     const { TILE_CACHE_ZOOM_LEVELS } = await load('/src/services/map/styles/hosts.ts');

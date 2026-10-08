@@ -8,6 +8,7 @@ import { buildPath } from './geo';
 import { chain, legsOf, migrate, pathKey, setLegAt } from './route';
 import { figureThumb } from './thumbs';
 import { FIGURES, type CustomModel, type Format, type ModelPose, type Overlay, type Leg, type LngLat, type MapStyle, type Mode, type Place, type Stop, type Trip, type TripData } from './types';
+import './legacy.css';
 
 const EMPTY: TripData = { stops: [], style: 'satellite', speed: 1, format: '9:16' };
 const MODES: { mode: Mode; icon: string; label: string }[] = [

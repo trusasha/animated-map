@@ -1,17 +1,17 @@
 // Legacy facade for App.tsx/exporter.ts until the cutover: the old Animator API over services/map + scene3d.
 import type * as maplibregl from 'maplibre-gl';
-import type { ProjectionData } from './domain/overlay3d';
-import type { LegInput, Timeline } from './domain/timeline';
-import type { LngLat, Stop } from './domain/types';
-import { MapPlayer } from './services/map/player';
-import { planTiles } from './services/map/preload';
-import { registerDemProtocol } from './services/map/styles/dem';
-import { installImageResolver } from './services/map/styles/imageResolver';
-import { createOverlay3D } from './services/scene3d/overlay/createOverlay3D';
+import type { ProjectionData } from '../domain/overlay3d';
+import type { LegInput, Timeline } from '../domain/timeline';
+import type { LngLat, Stop } from '../domain/types';
+import { MapPlayer } from '../services/map/player';
+import { planTiles } from '../services/map/preload';
+import { registerDemProtocol } from '../services/map/styles/dem';
+import { installImageResolver } from '../services/map/styles/imageResolver';
+import { createOverlay3D } from '../services/scene3d/overlay/createOverlay3D';
 
-export { idle } from './services/map/createOffscreenMap';
-export { TILE_CACHE_ZOOM_LEVELS } from './services/map/styles/hosts';
-export { loadStyle } from './services/map/styles/loadStyle';
+export { idle } from '../services/map/createOffscreenMap';
+export { TILE_CACHE_ZOOM_LEVELS } from '../services/map/styles/hosts';
+export { loadStyle } from '../services/map/styles/loadStyle';
 
 export class Animator {
   private player: MapPlayer;
