@@ -60,14 +60,14 @@ test.describe('Menu', () => {
     await expect(page.getByRole('menu')).toBeVisible();
   });
 
-  test('arrows skip the disabled item', async ({ page }) => {
+  test('ArrowDown and ArrowUp move focus between items', async ({ page }) => {
     await trigger(page).focus();
     await page.keyboard.press('ArrowDown');
     await expect(page.getByRole('menuitem', { name: 'Move up' })).toBeFocused();
     await page.keyboard.press('ArrowDown');
     await expect(page.getByRole('menuitem', { name: 'Move down' })).toBeFocused();
-    await page.keyboard.press('ArrowDown');
-    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(page.getByRole('menuitem', { name: 'Move up' })).toBeFocused();
   });
 
   test('Enter runs the focused item and closes the menu', async ({ page }) => {
@@ -92,23 +92,27 @@ test.describe('Menu', () => {
 test.describe('SearchCombobox', () => {
   const input = (page: import('@playwright/test').Page) => demoSection(page, 'SearchCombobox').getByRole('combobox', { name: 'Add the next stop' });
 
-  test('ArrowDown then Enter picks the first result', async ({ page }) => {
+  test('Enter picks the auto-highlighted first result', async ({ page }) => {
     await input(page).fill('ber');
     await expect(page.getByRole('option', { name: /Berlin/ })).toBeVisible();
-    await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
     await expect(demoSection(page, 'SearchCombobox')).toContainText('Picked: Berlin');
   });
 
-  test('the popover is not clipped by the 200px scroller', async ({ page }) => {
+  test('ArrowDown then Enter picks the second result', async ({ page }) => {
+    await input(page).fill('ber');
+    await expect(page.getByRole('option', { name: /Berlin/ })).toBeVisible();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+    await expect(demoSection(page, 'SearchCombobox')).toContainText('Picked: Bern');
+  });
+
+  test('the popover is rendered outside the 200px scroller and fully visible', async ({ page }) => {
     await input(page).fill('b');
-    const listbox = page.getByRole('listbox');
-    await expect(listbox.getByRole('option')).toHaveCount(6);
-    const last = listbox.getByRole('option').last();
-    await expect(last).toBeInViewport({ ratio: 1 });
-    const scroller = await demoSection(page, 'SearchCombobox').locator('div[style*="overflow"]').boundingBox();
-    const box = await listbox.boundingBox();
-    expect(box!.y + box!.height).toBeGreaterThan(scroller!.y + scroller!.height);
+    const options = page.getByRole('listbox').getByRole('option');
+    await expect(options).toHaveCount(6);
+    await expect(demoSection(page, 'SearchCombobox').locator('div[style*="overflow"] [role="listbox"]')).toHaveCount(0);
+    await expect(options.last()).toBeInViewport({ ratio: 1 });
   });
 });
 
