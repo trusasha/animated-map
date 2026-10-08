@@ -14,7 +14,13 @@ type Covering = (o: object) => TileID[];
 
 /** every tile URL the camera will need over the whole timeline; moves the camera without rendering */
 export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: () => boolean, onProgress: (p: number) => void): Promise<TilePlan | undefined> {
-  const sources = Object.keys(map.getStyle().sources).map((id) => map.getSource(id) as unknown as TileSource | undefined).filter((s) => s?.tiles) as TileSource[];
+  const spec = map.getStyle().sources as Record<string, { tiles?: string[] }>;
+  // a MapLibre 6 source object only carries `tiles` once loaded; the style spec always has them
+  const sources = Object.keys(spec).flatMap((id) => {
+    const src = map.getSource(id) as unknown as TileSource | undefined;
+    const tiles = src?.tiles ?? spec[id].tiles;
+    return src && tiles ? [{ type: src.type, tiles, tileSize: src.tileSize, minzoom: src.minzoom, maxzoom: src.maxzoom, scheme: src.scheme, calculateTileZoom: src.calculateTileZoom }] : [];
+  });
   const urls = new Set<string>();
   const times = preloadTimes(tl, FINE), cuts: number[] = [];
   const terrain = (map as unknown as { terrain: unknown }).terrain;
