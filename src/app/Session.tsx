@@ -31,7 +31,7 @@ export function Session({ tripId }: { tripId: string | null }) {
   return (
     <TripProvider tripId={tripId}>
       <div className={styles.header}>
-        <Boundary>
+        <Boundary name="app-header">
           <AppHeader
             tripId={tripId}
             onGoHome={() => navigate({ name: 'home' })}
