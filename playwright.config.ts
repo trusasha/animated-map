@@ -30,7 +30,8 @@ const projects: Project[] = Object.entries(sizes).flatMap(([size, device]) =>
     const name = `${size}-${colorScheme}`;
     return {
       name,
-      testIgnore: '**/*.dev.spec.ts',
+      // server routes don't depend on viewport or theme: run them in one project only
+      testIgnore: name === 'desktop-light' ? '**/*.dev.spec.ts' : ['**/*.dev.spec.ts', '**/server.spec.ts'],
       grepInvert: MAP_PROJECTS.includes(name) ? undefined : /@map/,
       use: { ...device, colorScheme, baseURL: PROD },
     };

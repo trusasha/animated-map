@@ -6,9 +6,6 @@ import { DEFAULT_SETTINGS } from '../src/domain/settings';
 import type { TripData } from '../src/domain/types';
 import { heicToJpeg } from '../server/files';
 
-test.beforeEach(({ request }, info) => {
-  test.skip(!request || info.project.name !== 'desktop-light', 'server routes are viewport-independent: run once');
-});
 test.describe.configure({ mode: 'serial' });
 
 const trip30: TripData = {
