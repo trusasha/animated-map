@@ -26,10 +26,10 @@ export async function openGallery(page: Page, { theme = 'light', viewport = 'des
   await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
   await page.goto('/ds.html');
   await page.getByTestId('gallery-frame').waitFor();
-  await page.getByRole('group', { name: 'Theme' }).getByRole('button', { name: theme, exact: true }).click();
-  await page.getByRole('group', { name: 'Width' }).getByRole('button', { name: String(VIEWPORTS[viewport].width), exact: true }).click();
   await page.addStyleTag({
     content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}',
   });
+  await page.getByRole('group', { name: 'Theme' }).getByRole('button', { name: theme, exact: true }).click();
+  await page.getByRole('group', { name: 'Width' }).getByRole('button', { name: String(VIEWPORTS[viewport].width), exact: true }).click();
   await page.evaluate(() => document.fonts.ready);
 }

@@ -115,6 +115,10 @@ test.describe('Select', () => {
 });
 
 test.describe('RangeRail', () => {
+  test('renders exactly two slider handles', async ({ page }) => {
+    await expect(demoSection(page, 'RangeRail').getByRole('slider')).toHaveCount(2);
+  });
+
   const handle = (page: import('@playwright/test').Page, name: string) =>
     demoSection(page, 'RangeRail').getByRole('slider', { name });
   const START = 'Drag to change where the video starts';
