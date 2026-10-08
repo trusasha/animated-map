@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, test, type Page, type Request } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { stubNet } from '../fixtures/net';
 
 type Model = { id: string; name: string; url: string | null; status: string; task_id: string | null; mode: string | null; pose: unknown };
