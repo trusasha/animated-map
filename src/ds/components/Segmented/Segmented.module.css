@@ -1,0 +1,62 @@
+@layer ds.components {
+  .track {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--surface-alt);
+    border-radius: var(--radius-6);
+  }
+
+  .option {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-micro);
+    font-size: var(--type-label-size);
+    line-height: var(--type-label-lh);
+    font-weight: var(--weight-medium);
+    text-align: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+
+  .option[data-selected] {
+    background: var(--surface-card);
+    border: var(--border-whisper);
+    box-shadow: var(--elevation-card);
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+  }
+
+  .option:hover:not([data-selected], [data-disabled]) {
+    color: var(--text-primary);
+  }
+
+  .option:has(:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: 0;
+  }
+
+  .option[data-disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .radio {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  html[data-coarse] .option {
+    padding-block: var(--space-10);
+  }
+}
