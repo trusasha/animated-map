@@ -2,6 +2,8 @@ export const exportDialog = {
   title: 'Export video',
   steps: { prepare: '1. Prepare', captions: '2. Captions', render: '3. Render', done: '4. Done' },
   stepOf: 'Step {step} of {total}',
+  stepperLabel: 'Export steps',
+  frameLabel: 'Video frame preview',
   prepare: { title: 'Loading the map for your video', cancel: 'Cancel' },
   captions: {
     title: 'Captions',
@@ -12,16 +14,15 @@ export const exportDialog = {
     attributionNote: 'always on, required by the map license',
     format: 'Format',
     formats: {
-      '9:16': '9:16 Reels · TikTok',
-      '4:5': '4:5 Instagram post',
-      '1:1': '1:1 Square',
-      '16:9': '16:9 YouTube',
+      '9:16': 'Reels · TikTok',
+      '4:5': 'Instagram post',
+      '1:1': 'Square',
+      '16:9': 'YouTube',
     },
     formatHelp: 'The frame reloads in a few seconds after you switch.',
     reloading: 'Reloading map…',
     render: 'Render video',
     cancel: 'Cancel',
-    segmentPill: '{mode} · {from} → {to}',
   },
   render: {
     title: 'Rendering frame by frame',
@@ -31,7 +32,7 @@ export const exportDialog = {
   },
   done: {
     title: 'Your video is ready',
-    fileName: '{name} · {format}.mp4',
+    video: 'Exported video',
     download: 'Download MP4',
     share: 'Share',
     done: 'Done',
@@ -42,5 +43,7 @@ export const exportDialog = {
     body: 'Something went wrong while rendering. Try again.',
     retry: 'Try again',
     close: 'Close',
+    codecTitle: 'This browser can’t encode H.264.',
+    codecBody: 'Use a recent Chrome, Safari or Edge.',
   },
 };
