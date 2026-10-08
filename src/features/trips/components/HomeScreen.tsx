@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ConfirmDialog } from '../../../ds';
 import { useT } from '../../../i18n/react';
 import type { TripListItem } from '../../../services/api';
 import { useHomeGlobe } from '../hooks/useHomeGlobe';
+import { useHomePadding } from '../hooks/useHomePadding';
 import { useTripActions } from '../hooks/useTripActions';
 import { useTrips } from '../hooks/useTrips';
 import type { HomeScreenProps } from '../types';
@@ -16,6 +17,8 @@ export function HomeScreen({ onOpenTrip, globe }: HomeScreenProps) {
   const { trips, failed, reload } = useTrips();
   const actions = useTripActions();
   const hover = useHomeGlobe(globe, trips);
+  const column = useRef<HTMLDivElement>(null);
+  useHomePadding(globe, column);
   const [renaming, setRenaming] = useState<TripListItem | null>(null);
   const [deleting, setDeleting] = useState<TripListItem | null>(null);
 
@@ -34,7 +37,7 @@ export function HomeScreen({ onOpenTrip, globe }: HomeScreenProps) {
 
   return (
     <div className={styles.home} data-testid="home-screen">
-      <div className={styles.column}>
+      <div ref={column} className={styles.column}>
         <div className={styles.content}>
           <HomeHero busy={actions.busy} onNewTrip={newTrip} />
           <TripList trips={trips} failed={failed} onOpen={onOpenTrip} onRename={setRenaming} onDelete={setDeleting} onHover={hover} />

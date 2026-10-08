@@ -6,6 +6,7 @@ export interface HomeGlobe {
   setHomeTrips: (trips: { id: string; points: LngLat[] }[]) => void;
   highlightTrip: (id: string | null) => void;
   setSpin: (on: boolean) => void;
+  setPadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
 }
 
 export interface HomeScreenProps { onOpenTrip: (id: string) => void; globe?: HomeGlobe }
