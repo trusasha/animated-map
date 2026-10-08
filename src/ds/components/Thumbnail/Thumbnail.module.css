@@ -14,7 +14,7 @@
     background: var(--surface-card);
     font-family: var(--font-sans);
     color: var(--text-body);
-    transition: border-color var(--duration-fast) var(--ease-standard), opacity var(--duration-fast) var(--ease-standard);
+    transition: border-color var(--duration-fast) var(--ease-standard);
   }
 
   .main {
@@ -42,7 +42,9 @@
   .tile[data-size='120'] .main { flex-direction: column; align-items: stretch; padding: 0; }
 
   .tile[data-selected] { border: 1.5px solid var(--accent); }
-  .tile[data-disabled] { opacity: 0.4; }
+  .tile[data-disabled] .well { opacity: 0.4; }
+  .tile[data-disabled] .name,
+  .tile[data-disabled] .sub { color: var(--text-muted); }
   .tile[data-add] { border: 1px dashed var(--border-dashed-color); background: transparent; }
 
   .well {

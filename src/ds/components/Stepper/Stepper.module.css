@@ -18,7 +18,7 @@
     white-space: nowrap;
   }
 
-  .step[data-state='current'] { background: var(--surface-selected); color: var(--focus); }
+  .step[data-state='current'] { background: var(--surface-selected); color: var(--accent-active); }
   .step[data-state='past'] { color: var(--text-secondary); }
   .step[data-state='future'] { color: var(--text-muted); }
 
