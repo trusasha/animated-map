@@ -21,7 +21,7 @@ export interface StepperProps {
 export function Stepper({ steps, current, compact, compactLabel, label, className, style, ref }: StepperProps) {
   if (compact) {
     return (
-      <p className={cx(styles.compact, className)} style={style} role="status" aria-label={label}>
+      <p className={cx(styles.compact, className)} style={style} role="status">
         {compactLabel ?? steps[current]}
       </p>
     );
