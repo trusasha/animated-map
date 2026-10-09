@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { EditorShell } from '../features/editor';
 import { ExportDialog } from '../features/export';
 import { FiguresDialog } from '../features/figures';
@@ -23,6 +23,7 @@ export function Session({ tripId }: { tripId: string | null }) {
   const [previewing, setPreviewing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [picking, setPicking] = useState(false);
+  const [fitKey, refit] = useReducer((n: number) => n + 1, 0);
 
   useEffect(() => { if (tripId === null) map.setMode('home'); }, [map, tripId]);
 
@@ -53,7 +54,7 @@ export function Session({ tripId }: { tripId: string | null }) {
         ) : (<>
           <TripMapStyle map={map} />
           <EditorShell
-            routePanel={<Boundary name="route-panel"><RoutePanel selected={selected} onSelect={setSelected} onPickChange={setPicking} map={map} /></Boundary>}
+            routePanel={<Boundary name="route-panel"><RoutePanel selected={selected} onSelect={setSelected} onPickChange={setPicking} map={map} fitKey={fitKey} /></Boundary>}
             videoPanel={<Boundary name="video-panel"><ConnectedVideoPanel onPreview={onPreview} onExport={onExport} /></Boundary>}
             inspector={selected === null ? null : <Boundary name="segment-inspector"><SegmentInspector index={selected} onClose={() => setSelected(null)} onManageFigures={onOpenFigures} /></Boundary>}
             transport={previewing ? <Boundary name="preview-transport"><PreviewTransport player={map.player} onExit={() => setPreviewing(false)} /></Boundary> : null}
@@ -61,6 +62,7 @@ export function Session({ tripId }: { tripId: string | null }) {
             picking={picking}
             onPaddingChange={setPadding}
             onControlsInsetChange={map.setControlsInset}
+            onRefit={refit}
           />
         </>)}
         <div className={styles.dialogs}>

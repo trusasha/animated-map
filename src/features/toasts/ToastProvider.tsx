@@ -9,6 +9,11 @@ import { ToastContext } from './useToasts';
 const PHONE_HEADER = 'calc(var(--space-48) + env(safe-area-inset-top))';
 // narrow enough to stay clear of the map controls in the top-right corner
 const PHONE_WIDTH = { width: 'min(440px, calc(100% - 2 * var(--space-56)))' };
+// centred in the map strip the editor panels leave free (vars set by the editor shell)
+const FREE_AREA = {
+  left: 'calc((100% + var(--map-free-left, 0px) - var(--map-free-right, 0px)) / 2)',
+  width: 'min(440px, calc(100% - var(--map-free-left, 0px) - var(--map-free-right, 0px) - var(--space-24)))',
+};
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const { toasts, push, dismiss } = useToastQueue();
@@ -25,7 +30,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext value={api}>
       {children}
       {createPortal(
-        <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel={t('common.actions.close')} placement={mode === 'phone' ? 'top' : 'bottom'} topInset={PHONE_HEADER} style={mode === 'phone' ? PHONE_WIDTH : undefined} />,
+        <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel={t('common.actions.close')} placement={mode === 'phone' ? 'top' : 'bottom'} topInset={PHONE_HEADER} style={mode === 'phone' ? PHONE_WIDTH : FREE_AREA} />,
         document.body,
       )}
     </ToastContext>

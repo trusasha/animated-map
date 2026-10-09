@@ -7,7 +7,9 @@ export function useEditorPadding(
   state: ChromeState & { sheetSettled: number },
   onPadding: (p: Padding) => void,
   onControls: (i: ControlsInset) => void,
+  onRefit: () => void,
 ) {
+  const emitRefit = useEffectEvent(onRefit);
   const emitPadding = useEffectEvent(onPadding);
   const emitControls = useEffectEvent(onControls);
   const padding = paddingFor({ ...state, sheet: state.sheetSettled });
@@ -19,4 +21,6 @@ export function useEditorPadding(
   // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by value, the objects are rebuilt every render
   useEffect(() => emitControls(controls), [c]);
   useEffect(() => () => emitControls({ bottom: 0, right: 0 }), []);
+  // after the padding effect above, so the fit uses the new padding
+  useEffect(() => { if (state.sheetSettled > 0) emitRefit(); }, [state.sheetSettled]);
 }

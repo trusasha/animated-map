@@ -20,11 +20,11 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api/settings', (r) => (r.request().method() === 'GET' ? r.fulfill({ json: { flyKm: 2000 } }) : r.fallback()));
 });
 
-async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[0]['request']) {
+async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[0]['request'], query = '') {
   const trip = await (await request.post('/api/trips', {
     data: { title: 'Shell flow', data: { stops: SEED, style: 'satellite', speed: 1, format: '9:16' } },
   })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.goto(`/trip/${trip.id}?ui=next&e2e${query}`);
   await expect(page.getByTestId('stop-list')).toBeVisible();
   return { done: () => request.delete(`/api/trips/${trip.id}`) };
 }
@@ -86,7 +86,7 @@ test.describe('editor shell (F12)', () => {
     test.skip(width(page) < 700 || width(page) >= 1100, 'tablet only');
     const t = await open(page, request);
     await expect(page.getByTestId('route-column')).toBeVisible();
-    await expect.poll(() => padding(page)).toEqual({ top: 50, bottom: 50, left: 380, right: 60 });
+    await expect.poll(() => padding(page)).toEqual({ top: 50, bottom: 50, left: 380, right: 80 });
     await page.getByTestId('segment-row').first().click();
     const column = page.getByTestId('inspector-column');
     await expect(column.getByTestId('segment-inspector')).toBeVisible();
@@ -97,10 +97,20 @@ test.describe('editor shell (F12)', () => {
     await t.done();
   });
 
+  test('tablet: toasts sit in the free map area, not over the column', async ({ page, request }) => {
+    test.skip(width(page) < 700 || width(page) >= 1100, 'tablet only');
+    const t = await open(page, request, '&crash=video-panel');
+    const toaster = page.locator('[aria-live="polite"]').filter({ has: page.getByRole('button') });
+    await expect(toaster).toBeVisible();
+    const column = (await page.getByTestId('route-column').boundingBox())!;
+    expect((await toaster.boundingBox())!.x).toBeGreaterThanOrEqual(column.x + column.width);
+    await t.done();
+  });
+
   test('desktop: the inspector floats on the right and the camera and controls make room', async ({ page, request }) => {
     test.skip(width(page) < 1100, 'desktop only');
     const t = await open(page, request);
-    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 60 });
+    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 80 });
     await page.getByTestId('segment-row').first().click();
     const right = page.getByTestId('inspector-column');
     await expect(right.getByTestId('segment-inspector')).toBeVisible();
@@ -110,7 +120,7 @@ test.describe('editor shell (F12)', () => {
     const card = (await right.boundingBox())!;
     await expect.poll(async () => { const c = await controls(page); return c.x + c.width; }).toBeLessThanOrEqual(card.x + 1);
     await right.getByRole('button', { name: 'Снять выделение' }).click();
-    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 60 });
+    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 80 });
     await t.done();
   });
 

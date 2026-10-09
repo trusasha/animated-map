@@ -17,4 +17,6 @@ export interface EditorShellProps {
   onPaddingChange: (padding: Padding) => void;
   /** keeps the bottom-right map controls clear of the panels */
   onControlsInsetChange: (inset: ControlsInset) => void;
+  /** the phone sheet settled at a new height: the route should be re-fitted to the new padding */
+  onRefit: () => void;
 }

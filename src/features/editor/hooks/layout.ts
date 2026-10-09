@@ -16,13 +16,15 @@ export interface ChromeState {
 
 const ZERO: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
 const column = EDGE + COLUMN;
+/** clears the bottom-right controls column, plus the ~20px the globe-projection fit overshoots */
+const CONTROLS_CLEARANCE = 80;
 const rightCard = (s: ChromeState) => (s.mode === 'desktop' && s.inspector ? EDGE + INSPECTOR : 0);
 
 /** camera padding that keeps the route clear of the visible panels and the bottom-right controls */
 export function paddingFor(s: ChromeState): Padding {
   if (s.previewing) return ZERO;
-  if (s.mode === 'desktop') return { top: 60, bottom: 60, left: column + 18, right: s.inspector ? rightCard(s) + 48 : 60 };
-  if (s.mode === 'tablet') return { top: 50, bottom: 50, left: column + 8, right: 60 };
+  if (s.mode === 'desktop') return { top: 60, bottom: 60, left: column + 18, right: s.inspector ? rightCard(s) + 48 : CONTROLS_CLEARANCE };
+  if (s.mode === 'tablet') return { top: 50, bottom: 50, left: column + 8, right: CONTROLS_CLEARANCE };
   return { top: 40, bottom: s.sheet + EDGE, left: 32, right: 56 };
 }
 
@@ -30,6 +32,12 @@ export function paddingFor(s: ChromeState): Padding {
 export function controlsFor(s: ChromeState): ControlsInset {
   if (s.mode === 'phone') return { top: 0, bottom: 0, right: 0 };
   return { bottom: 0, right: s.previewing ? 0 : rightCard(s) };
+}
+
+/** map width the panels leave uncovered on each side, px; the phone sheet covers the bottom instead */
+export function freeArea(s: ChromeState): { left: number; right: number } {
+  if (s.mode === 'phone' || s.previewing) return { left: 0, right: 0 };
+  return { left: column, right: rightCard(s) };
 }
 
 /** horizontal centre of the free map area, for the pick banner */

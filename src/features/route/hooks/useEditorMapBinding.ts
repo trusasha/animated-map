@@ -19,12 +19,14 @@ export interface EditorMapBindingArgs {
   onStopDrag: (index: number, p: LngLat) => void;
   /** null until the figure poses are loaded: a player trip built earlier would draw models unposed */
   poseKey: string | null;
+  /** changing it re-fits the route, e.g. once the panels covering the map have settled */
+  fitKey?: number;
 }
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fitOptions = (leg: boolean) => ({ maxZoom: leg ? 13 : 9, duration: reduced() ? 0 : 800 });
 
-export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, onStopDrag, poseKey }: EditorMapBindingArgs) {
+export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, onStopDrag, poseKey, fitKey = 0 }: EditorMapBindingArgs) {
   const { t } = useT();
   const { settings } = useSettings();
   const host = useRef({ onSelect, onStopDrag });
@@ -83,4 +85,10 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
     void map.fitTo(fitPoints(data, selected), fitOptions(selected !== null));
   // eslint-disable-next-line react-hooks/exhaustive-deps -- fits when the selection changes, not on every edit
   }, [map, selected]);
+
+  useEffect(() => {
+    if (!map || !data || fitKey === 0 || data.stops.length === 0) return;
+    void map.fitTo(fitPoints(data, selected), fitOptions(selected !== null));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only a new key re-fits
+  }, [map, fitKey]);
 }
