@@ -8,7 +8,7 @@ export interface HomeGlobe {
   setSpin: (on: boolean) => void;
   setPadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
   setGlobeRadius: (px: number) => void;
-  setControlsInset: (inset: { bottom: number; right: number }) => void;
+  setControlsInset: (inset: { bottom: number; right: number; top?: number }) => void;
 }
 
 export interface HomeScreenProps { onOpenTrip: (id: string) => void; globe?: HomeGlobe }

@@ -1,13 +1,8 @@
-import { useEffect } from 'react';
-import { useTripContext } from '../features/trips';
+import { useTripMapStyle } from '../features/editor';
 import type { MapService } from '../services/map';
-import { reportError } from '../features/toasts';
 
-/** the shared map shows the open trip's style */
+/** runs the style binding inside the trip provider */
 export function TripMapStyle({ map }: { map: MapService }) {
-  const style = useTripContext().trip?.data.style;
-  useEffect(() => {
-    if (style) map.setStyle(style).catch(reportError);
-  }, [map, style]);
+  useTripMapStyle(map);
   return null;
 }

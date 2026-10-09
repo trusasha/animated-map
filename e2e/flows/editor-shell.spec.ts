@@ -50,11 +50,13 @@ test.describe('editor shell (F12)', () => {
     await sheet.getByRole('button', { name: 'Развернуть панель' }).click();
     await expect(sheet).toHaveAttribute('data-snap', 'collapsed');
 
-    // the camera keeps the route above the sheet, the controls ride on top of it
+    // the camera keeps the route above the sheet; the controls sit top-right, clear of it
     await expect.poll(async () => {
       const h = (await sheet.boundingBox())!.height;
       return Math.abs((await padding(page))!.bottom - (h + 16));
     }).toBeLessThan(2);
+    const shell = (await page.getByTestId('editor-shell').boundingBox())!;
+    await expect.poll(async () => (await controls(page)).y - shell.y).toBeLessThan(20);
     await expect.poll(async () => (await controls(page)).y + (await controls(page)).height).toBeLessThanOrEqual((await sheet.boundingBox())!.y + 1);
 
     await page.getByTestId('segment-row').first().click();
@@ -63,6 +65,10 @@ test.describe('editor shell (F12)', () => {
     await expect(inspector.getByRole('button', { name: 'Все точки' })).toBeVisible();
     await expect(page.getByTestId('stop-list')).toHaveCount(0);
     await expect(footer.getByRole('button', { name: 'Превью' })).toBeVisible();
+    // focusing a control deep in the inspector must not scroll the page under the header
+    await inspector.getByRole('slider', { name: 'Темп' }).focus();
+    await expect(page.getByRole('banner')).toBeInViewport();
+    expect(await page.evaluate(() => document.scrollingElement!.scrollTop)).toBe(0);
     await inspector.getByRole('button', { name: 'Все точки' }).click();
     await expect(page.getByTestId('segment-inspector')).toHaveCount(0);
     await expect(page.getByTestId('stop-list')).toBeVisible();
@@ -118,5 +124,7 @@ test.describe('editor shell (F12)', () => {
       return Math.abs(p.bottom - (await card.boundingBox())!.height);
     }).toBeLessThan(2);
     await expect.poll(async () => { const c = await controls(page); return c.y + c.height; }).toBeLessThanOrEqual((await card.boundingBox())!.y + 1);
+    const host = (await page.getByTestId('map-host').boundingBox())!;
+    await expect.poll(async () => (await controls(page)).y - host.y).toBeLessThan(20);
   });
 });
