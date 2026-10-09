@@ -1,5 +1,5 @@
 import type { Map as MlMap } from 'maplibre-gl';
-import { cursor, trackCoveringTiles } from './stable/cursor';
+import { cursor } from './stable/cursor';
 import { pinnedZoom, type Pins } from './stable/pins';
 
 /** how many levels finer than the view tiles may be pulled to hold one detail level through a zoom; each level = 4× tiles */
@@ -16,7 +16,6 @@ export const lodBias = (map: MlMap, lod: LodState) => Math.min(MAX_LOD_BIAS, Mat
 /** run on every style load: sources are recreated with the style */
 export function installLod(map: MlMap, lod: LodState) {
   lod.pins = undefined;
-  if (lod.stable) trackCoveringTiles(map);
   for (const id of Object.keys(map.getStyle().sources)) {
     // calculateTileZoom is internal to MapLibre's source classes, absent from the public typing
     const src = map.getSource(id) as unknown as { type?: string; calculateTileZoom: (z: number, ...rest: [number, number, number, number]) => number } | undefined;
@@ -28,7 +27,11 @@ export function installLod(map: MlMap, lod: LodState) {
       // pins hold the detail through a zoom on their own
       const level = base(z + (lod.stable ? 0 : lodBias(map, lod)), ...rest);
       const pins = lod.pins?.[id];
-      return pins && rest[0] === cursor.d ? pinnedZoom(pins, cursor.z, cursor.x, cursor.y, level) : level;
+      if (!pins) return level;
+      cursor.calls++;
+      if (rest[0] !== cursor.d) return level;
+      cursor.hits++;
+      return pinnedZoom(pins, cursor.z, cursor.x, cursor.y, level);
     };
   }
 }

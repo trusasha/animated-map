@@ -2,6 +2,7 @@ import type { Map as MlMap } from 'maplibre-gl';
 import { detailZoom, sample, type Timeline } from '../../../domain/timeline';
 import { jumpToCamera } from '../fit';
 import type { LodState } from '../lod';
+import { cursor, trackCoveringTiles } from '../stable/cursor';
 import { addTile, createPins, type Pins } from '../stable/pins';
 import { FINE, preloadTimes } from './times';
 
@@ -57,11 +58,14 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
   try {
     if (lod.stable) {
       // first the levels the camera alone would load, then each place keeps the finest of them throughout
+      // here rather than on style load, so a MapLibre that moved its internals fails the export loudly
+      trackCoveringTiles(map);
       const pins: Record<string, Pins> = {};
       lod.pins = undefined;
       const ok = await sweep((s, { canonical: c }) => addTile((pins[s.id] ??= createPins()), c.z, c.x, c.y), () => {}, 0, 0.5);
       if (!ok) return undefined;
       lod.pins = pins;
+      cursor.calls = cursor.hits = 0;
     }
     const urls = new Set<string>(), cuts: number[] = [];
     const add = (s: TileSource, c: TileID['canonical']) => urls.add(c.url(s.tiles, map.getPixelRatio(), s.scheme).replace('dem://', 'https://'));
@@ -74,6 +78,8 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
       () => cuts.push(urls.size),
       lod.stable ? 0.5 : 0, lod.stable ? 0.5 : 1,
     );
+    // the zoom function ran but never knew its tile: the pins silently did nothing
+    if (lod.stable && cursor.calls > 0 && cursor.hits === 0) throw new Error('stable tiles: MapLibre covering internals changed');
     return ok ? { times, cuts, urls: [...urls] } : undefined;
   } finally {
     lod.detail = detail;
