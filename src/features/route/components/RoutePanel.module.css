@@ -20,3 +20,4 @@
 .sample[data-mode='water'] { border-left-style: dashed; }
 .sample[data-mode='air'] { border-left-style: dotted; }
 .banner { position: fixed; top: calc(var(--overlay-top, 0px) + var(--space-16)); left: var(--overlay-x, 50%); transform: translateX(-50%); z-index: var(--z-overlay); max-width: calc(100% - 24px); }
+[data-mode='phone'] .banner { max-width: calc(100% - 112px); }
