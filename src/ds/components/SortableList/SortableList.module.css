@@ -1,0 +1,50 @@
+@layer ds.components {
+  .item {
+    position: relative;
+    border-radius: var(--radius-standard);
+  }
+
+  .item[data-dragging] {
+    z-index: var(--z-sheet);
+    background: var(--surface-card);
+    box-shadow: var(--shadow-deep);
+    cursor: grabbing;
+  }
+
+  .handle {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--hit-handle);
+    height: var(--hit-icon);
+    margin: 0 var(--space-4) 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-micro);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: grab;
+    touch-action: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+  }
+
+  .handle:hover { color: var(--text-secondary); }
+  .handle:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+
+  .item:hover .handle,
+  .item[data-dragging] .handle,
+  .handle:focus-visible { opacity: 1; }
+
+  @media (pointer: coarse) {
+    .handle { opacity: 1; width: var(--hit-grabber); }
+  }
+
+  :global(html[data-coarse]) .handle { opacity: 1; width: var(--hit-grabber); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .handle { transition: none; }
+  }
+}

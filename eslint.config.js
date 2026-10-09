@@ -17,6 +17,7 @@ const BASE_PACKAGES = [
   'lucide-react',
   'pg',
   '@electric-sql/pglite',
+  '@dnd-kit/*',
 ];
 const WEBCODECS = ['VideoEncoder', 'VideoFrame', 'EncodedVideoChunk', 'VideoDecoder'];
 const REACT = ['react', 'react/*', 'react-dom', 'react-dom/*'];
@@ -126,7 +127,7 @@ const buildConfig = (root) => tseslint.config(
   {
     files: ['src/ds/**'],
     rules: restrict({
-      packages: without('@base-ui/*', 'lucide-react'),
+      packages: without('@base-ui/*', 'lucide-react', '@dnd-kit/*'),
       groups: [layer('domain'), layer('services'), layer('features'), layer('app'), layer('i18n')],
     }),
   },
