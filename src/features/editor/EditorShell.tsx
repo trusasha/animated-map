@@ -15,14 +15,12 @@ export function EditorShell({
   const previewing = transport !== null;
   const sheet = useSheet(picking);
   const shellRef = useRef<HTMLDivElement>(null);
-  const transportRef = useRef<HTMLDivElement>(null);
   const shellBox = useElementBox(shellRef);
-  const transportBox = useElementBox(transportRef, previewing);
   const phone = mode === 'phone';
 
   const state = {
     mode, inspector: inspector !== null, previewing,
-    sheet: phone && !previewing ? sheet.height.live : 0, transport: transportBox.height,
+    sheet: phone && !previewing ? sheet.height.live : 0,
   };
   useEditorPadding({ ...state, sheetSettled: phone && !previewing ? sheet.height.settled : 0 }, onPaddingChange, onControlsInsetChange);
 
@@ -34,7 +32,7 @@ export function EditorShell({
   return (
     <div ref={shellRef} className={styles.shell} style={overlay} data-mode={mode} data-testid="editor-shell">
       {previewing ? (
-        <div ref={transportRef} className={styles.transport}>{transport}</div>
+        <div className={styles.transport}>{transport}</div>
       ) : phone ? (
         <PhoneSheet snap={sheet.snap} onSnapChange={sheet.setSnap} onHeightChange={sheet.onHeightChange} footer={footer} content={inspector ? 'inspector' : 'route'}>
           {inspector ?? <>{routePanel}<div className={styles.divider} />{videoPanel}</>}

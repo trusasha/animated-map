@@ -14,7 +14,7 @@ export function useHomePadding(globe: HomeGlobe | undefined, column: RefObject<H
       const card = el.offsetLeft <= 0 && el.offsetWidth >= w - 1;
       const pad = card ? { ...ZERO, bottom: el.offsetHeight } : { ...ZERO, left: el.offsetLeft + el.offsetWidth };
       globe.setHomePadding(pad);
-      globe.setControlsInset({ bottom: pad.bottom, right: 0 });
+      globe.setControlsInset(card ? { top: 0, bottom: 0, right: 0 } : { bottom: 0, right: 0 });
     });
     ro.observe(el);
     ro.observe(area);

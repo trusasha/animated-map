@@ -2,6 +2,53 @@
   transition: bottom var(--duration-base) var(--ease-standard), right var(--duration-base) var(--ease-standard);
 }
 
+.maplibregl-ctrl-bottom-right[data-top] .maplibregl-ctrl {
+  margin: var(--space-10) var(--space-10) 0 0;
+}
+
+.maplibregl-map .maplibregl-ctrl-group {
+  overflow: hidden;
+  border: var(--border-whisper);
+  border-radius: var(--radius-standard);
+  background: var(--surface-card);
+  box-shadow: var(--elevation-card);
+}
+
+.maplibregl-map .maplibregl-ctrl-group button + button {
+  border-top: var(--border-whisper);
+}
+
+.maplibregl-map .maplibregl-ctrl-group button:not(:disabled):hover {
+  background-color: var(--surface-hover);
+}
+
+.maplibregl-map .maplibregl-ctrl-group button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.maplibregl-map .maplibregl-ctrl-icon,
+.maplibregl-map .maplibregl-ctrl-attrib-button {
+  filter: var(--glyph-filter);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib,
+.maplibregl-map .maplibregl-ctrl-attrib.maplibregl-compact {
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--type-micro-size);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib.maplibregl-compact {
+  border: var(--border-whisper);
+  box-shadow: var(--elevation-card);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .maplibregl-ctrl-bottom-right { transition: none; }
 }

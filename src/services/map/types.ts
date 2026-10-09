@@ -3,8 +3,8 @@ import type { Frame, LegInput } from '../../domain/timeline';
 
 export type Padding = { top: number; bottom: number; left: number; right: number };
 
-/** how far the bottom-right map controls sit from the container's bottom and right edges, px */
-export type ControlsInset = { bottom: number; right: number };
+/** where the right-hand map controls sit, px from the container edges; `top` pins them to the top-right corner instead */
+export type ControlsInset = { bottom: number; right: number; top?: number };
 
 export type MapMode = 'home' | 'editor';
 

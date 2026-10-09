@@ -9,7 +9,7 @@ export interface HomeGlobe {
   setPadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
   /** padding that also sizes the globe to the free area */
   setHomePadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
-  setControlsInset: (inset: { bottom: number; right: number }) => void;
+  setControlsInset: (inset: { bottom: number; right: number; top?: number }) => void;
 }
 
 export interface HomeScreenProps { onOpenTrip: (id: string) => void; globe?: HomeGlobe }

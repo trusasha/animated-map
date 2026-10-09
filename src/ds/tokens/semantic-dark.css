@@ -56,6 +56,7 @@
   --text-on-danger: #101418;
   --ui-handle: var(--text-muted);
   --ui-handle-hover: var(--text-secondary);
+  --glyph-filter: invert(0.86);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -117,5 +118,6 @@
     --text-on-danger: #101418;
     --ui-handle: var(--text-muted);
     --ui-handle-hover: var(--text-secondary);
+  --glyph-filter: invert(0.86);
   }
 }
