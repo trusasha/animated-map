@@ -15,10 +15,7 @@
 
 .pose { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); }
 .stage {
-  width: 192px; height: 192px; max-width: 100%; border-radius: var(--radius-large);
-  background: var(--surface-alt); display: flex; align-items: center; justify-content: center;
+  width: 100%; aspect-ratio: 1; max-height: 280px; border-radius: var(--radius-large);
+  background: var(--surface-alt); overflow: hidden;
 }
-.stageImg { width: 100%; height: 100%; object-fit: contain; }
-.legend { display: flex; gap: var(--space-16); flex-wrap: wrap; justify-content: center; font-size: var(--type-caption-size); color: var(--text-secondary); }
-.poseTools { display: flex; flex-wrap: wrap; gap: var(--space-8); justify-content: center; }
 .pose > :last-child { align-self: stretch; }

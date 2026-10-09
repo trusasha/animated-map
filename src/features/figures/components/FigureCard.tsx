@@ -23,6 +23,7 @@ export function FigureCard({ name, mode, status, src, onEdit, onDelete }: Figure
   return (
     <ThumbnailTile
       size={120}
+      onSelect={status.kind === 'ready' ? onEdit : undefined}
       src={src}
       name={name}
       sub={sub}

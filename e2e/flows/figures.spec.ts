@@ -60,7 +60,6 @@ const openFigures = async (page: Page, request: APIRequestContext) => {
 };
 
 const card = (dialog: ReturnType<Page['getByRole']>, name: string) => dialog.getByTestId('figures-list').locator('> div').filter({ hasText: name });
-const thumbSrc = (dialog: ReturnType<Page['getByRole']>, name: string) => card(dialog, name).locator('img').getAttribute('src');
 
 test.beforeEach(async ({ page }) => {
   await stubNet(page);
@@ -109,20 +108,26 @@ test.describe('figures library', () => {
     expect(server.refreshed()).toBe(true);
   });
 
-  test('editing the pose saves it and changes the thumbnail', async ({ page, request }) => {
-    const server = await stubServer(page, [ready('m1', 'Truck')]);
+  test('opening a figure shows a live viewer that survives a drag, and saving keeps the pose', async ({ page, request }) => {
+    const server = await stubServer(page, [{ ...ready('m1', 'Truck'), pose: { rx: 0, ry: 90, rz: 0, scale: 1 } }]);
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
     const dialog = await openFigures(page, request);
-    await expect(card(dialog, 'Truck').locator('img')).toBeVisible();
-    const before = await thumbSrc(dialog, 'Truck');
-    await card(dialog, 'Truck').getByRole('button', { name: 'Edit' }).click();
-    await expect(dialog.getByTestId('figure-pose-preview')).toBeVisible();
-    await dialog.getByRole('button', { name: 'Turn 90°' }).click();
+    await card(dialog, 'Truck').getByRole('button', { name: 'Truck' }).click();
+    const canvas = dialog.getByTestId('figure-viewer').locator('canvas');
+    await expect(canvas).toBeVisible();
+    const box = (await canvas.boundingBox())!;
+    expect(box.width).toBeGreaterThan(50);
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2 + 20, { steps: 5 });
+    await page.mouse.up();
+    await expect(canvas).toBeVisible();
     await dialog.getByRole('button', { name: 'Save' }).click();
     await expect.poll(() => server.requests('PUT').find((r) => r.url === '/api/models/m1')).toBeTruthy();
     const put = server.requests('PUT').find((r) => r.url === '/api/models/m1')!.body as { pose: { ry: number } };
     expect(put.pose.ry).toBe(90);
-    await expect(card(dialog, 'Truck')).toBeVisible();
-    await expect.poll(() => thumbSrc(dialog, 'Truck')).not.toBe(before);
+    expect(errors).toEqual([]);
   });
 
   test('delete then Undo never reaches the server', async ({ page, request }) => {
@@ -147,7 +152,7 @@ test.describe('figures library', () => {
     await expect.poll(() => (server.requests('PUT').find((r) => r.url === '/api/settings')?.body as { figures: { ground: string } } | undefined)?.figures.ground).toBe('car');
   });
 
-  test('@needs-p3-04 pose edit rebuilds the player trip', async ({ page, request }) => {
+  test('@needs-p3-04 size edit rebuilds the player trip', async ({ page, request }) => {
     await stubServer(page, [ready('m1', 'Truck')]);
     const trip = await (await request.post('/api/trips', { data: { title: 'Figures trip', data: EMPTY_TRIP } })).json();
     await page.goto(`/trip/${trip.id}?ui=next&e2e`);
@@ -163,7 +168,7 @@ test.describe('figures library', () => {
     await page.getByRole('menuitem', { name: 'Your figures' }).click();
     const dialog = page.getByRole('dialog');
     await card(dialog, 'Truck').getByRole('button', { name: 'Edit' }).click();
-    await dialog.getByRole('button', { name: 'Turn 90°' }).click();
+    await dialog.getByRole('slider', { name: 'Size' }).press('ArrowRight');
     await dialog.getByRole('button', { name: 'Save' }).click();
     await expect.poll(calls).toBe(before + 1);
   });
