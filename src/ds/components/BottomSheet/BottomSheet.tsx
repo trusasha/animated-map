@@ -23,6 +23,8 @@ export interface BottomSheetProps {
   /** Always-interactive row above the content; the content is inert while peeking. */
   header?: ReactNode;
   footer?: ReactNode;
+  /** Changing it scrolls the content back to the top, e.g. when other content swaps in. */
+  contentKey?: string | number;
   className?: string;
   style?: CSSProperties;
   ref?: Ref<HTMLElement>;
@@ -41,6 +43,7 @@ export function BottomSheet({
   collapseLabel,
   header,
   footer,
+  contentKey,
   className,
   style,
   ref: forwardedRef,
@@ -65,6 +68,10 @@ export function BottomSheet({
     observer.observe(parent);
     return () => observer.disconnect();
   }, []);
+
+  useLayoutEffect(() => {
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [contentKey]);
 
   useSettledHeight(ref, height, container > 0, dragHeight !== null, onHeightChange);
   useContentDrag(contentRef, snap, drag);

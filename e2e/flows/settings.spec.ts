@@ -43,12 +43,12 @@ test('theme, language, default figure and fly threshold persist across reload', 
   await expect(dialog.getByRole('group', { name: 'Air' }).getByRole('button', { name: /Helicopter/ })).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('hidden sections stay hidden and Reset restores defaults', async ({ page }) => {
+test('line colors and export quality show; Reset restores defaults', async ({ page }) => {
   await page.request.put('/api/settings', { data: { ...DEFAULTS, theme: 'dark', lang: 'en', flyKm: 900 } });
   await page.goto('/?ui=next&e2e');
   const dialog = await openSettings(page);
-  await expect(dialog.getByText('Line colors')).toHaveCount(0);
-  await expect(dialog.getByText('Export quality')).toHaveCount(0);
+  await expect(dialog.getByText('Line colors')).toBeVisible();
+  await expect(dialog.getByText('Export quality').first()).toBeVisible();
 
   await dialog.getByRole('button', { name: 'Reset to defaults' }).click();
   await expect(dialog.getByRole('heading', { name: 'Настройки' })).toBeVisible();

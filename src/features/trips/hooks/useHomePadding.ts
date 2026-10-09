@@ -3,17 +3,21 @@ import type { HomeGlobe } from '../types';
 
 const ZERO = { top: 0, bottom: 0, left: 0, right: 0 };
 
-/** keeps the globe centred in the map area the Home column leaves free */
+/** keeps the globe centred and sized in the map area the Home column (or the phone card) leaves free */
 export function useHomePadding(globe: HomeGlobe | undefined, column: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const el = column.current;
-    if (!globe || !el) return;
+    const area = el?.parentElement;
+    if (!globe || !el || !area) return;
     const ro = new ResizeObserver(() => {
-      const r = el.getBoundingClientRect();
-      const sheet = r.left <= 0 && r.width >= window.innerWidth - 1;
-      globe.setHomePadding(sheet ? { ...ZERO, bottom: r.height } : { ...ZERO, left: r.right });
+      const w = area.clientWidth;
+      const card = el.offsetLeft <= 0 && el.offsetWidth >= w - 1;
+      const pad = card ? { ...ZERO, bottom: el.offsetHeight } : { ...ZERO, left: el.offsetLeft + el.offsetWidth };
+      globe.setHomePadding(pad);
+      globe.setControlsInset({ bottom: pad.bottom, right: 0 });
     });
     ro.observe(el);
-    return () => { ro.disconnect(); globe.setPadding(ZERO); };
+    ro.observe(area);
+    return () => { ro.disconnect(); globe.setPadding(ZERO); globe.setControlsInset({ bottom: 0, right: 0 }); };
   }, [globe, column]);
 }

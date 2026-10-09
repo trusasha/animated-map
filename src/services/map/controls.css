@@ -1,0 +1,7 @@
+.maplibregl-ctrl-bottom-right {
+  transition: bottom var(--duration-base) var(--ease-standard), right var(--duration-base) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maplibregl-ctrl-bottom-right { transition: none; }
+}

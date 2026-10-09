@@ -34,7 +34,7 @@ export function createPreviewSession(player: TripPlayer, h: PreviewHandlers) {
     player.play();
   };
 
-  const start = async () => {
+  const start = async (): Promise<void> => {
     const t0 = performance.now();
     log('preview.start', { ready: player.ready });
     if (!player.ready) {
@@ -43,7 +43,9 @@ export function createPreviewSession(player: TripPlayer, h: PreviewHandlers) {
       const from = player.time >= player.duration ? 0 : player.time;
       const done = await player.preload(h.onProgress, ctl.signal, undefined, from);
       log('preview.preloaded', { done, seconds: Math.round((performance.now() - t0) / 1000) });
-      if (!done || ctl.signal.aborted) return;
+      if (ctl.signal.aborted) return;
+      // the editor rebuilt the player's trip mid-preload: plan again on the new timeline
+      if (!done) return start();
       h.onProgress(null);
     }
     resume();

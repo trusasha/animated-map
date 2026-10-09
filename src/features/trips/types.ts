@@ -9,6 +9,7 @@ export interface HomeGlobe {
   setPadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
   /** padding that also sizes the globe to the free area */
   setHomePadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
+  setControlsInset: (inset: { bottom: number; right: number }) => void;
 }
 
 export interface HomeScreenProps { onOpenTrip: (id: string) => void; globe?: HomeGlobe }
@@ -22,6 +23,14 @@ export interface AppHeaderProps {
   onExport: () => void;
   onOpenSettings: () => void;
   onOpenFigures: () => void;
+}
+
+export interface VideoActionsProps {
+  onPreview: () => void;
+  onExport: () => void;
+  /** "Export" instead of "Export video" */
+  short?: boolean;
+  className?: string;
 }
 
 /** loads and autosaves the trip for `tripId`, exposes it to the features below; null = Home */

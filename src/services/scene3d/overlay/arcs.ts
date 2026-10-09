@@ -24,13 +24,16 @@ function setLine(l: Line2, positions: number[]) {
   l.geometry = new LineGeometry().setPositions(positions);
 }
 
+const legColor = (leg: TLeg) => leg.color ? new THREE.Color(leg.color).getHex() : undefined;
+const plannedColor = (leg: TLeg) => legColor(leg) ?? 0xb9c4d2;
+
 /** air legs as planned/travelled 3D lines; same widths as the ground/water trail layers */
 export function createArcs(legs: TLeg[]): Arc[] {
   return legs.flatMap((leg, index) => leg.mode !== 'air' ? [] : [{
     leg, index,
-    planned: line(0xb9c4d2, 3, 0),
+    planned: line(plannedColor(leg), 3, 0),
     casing: line(0x1c2230, 7.5, 1),
-    done: line(0xffffff, 4.5, 2),
+    done: line(legColor(leg) ?? 0xffffff, 4.5, 2),
   }]);
 }
 

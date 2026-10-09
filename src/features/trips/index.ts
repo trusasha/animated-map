@@ -1,8 +1,9 @@
 export { AppHeader } from './header/AppHeader';
 export { HomeScreen } from './components/HomeScreen';
 export { SaveStatusLabel } from './header/SaveStatusLabel';
+export { VideoActions } from './header/VideoActions';
 export { TripProvider } from './components/TripProvider';
 export { useTripContext } from './hooks/useTripContext';
 export type {
-  AppHeaderProps, HomeGlobe, HomeScreenProps, SaveStatus, TripContextValue, TripProviderProps,
+  AppHeaderProps, HomeGlobe, HomeScreenProps, SaveStatus, TripContextValue, TripProviderProps, VideoActionsProps,
 } from './types';

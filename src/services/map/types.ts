@@ -3,6 +3,9 @@ import type { Frame, LegInput } from '../../domain/timeline';
 
 export type Padding = { top: number; bottom: number; left: number; right: number };
 
+/** how far the bottom-right map controls sit from the container's bottom and right edges, px */
+export type ControlsInset = { bottom: number; right: number };
+
 export type MapMode = 'home' | 'editor';
 
 /** one leg as the editor draws it; colour, range and building state are the caller's decision */
@@ -45,8 +48,12 @@ export interface MapProbe {
   visible: Record<string, boolean>;
   /** feature count of each GeoJSON source */
   features: Record<string, number>;
+  /** `color` property of each GeoJSON source's features */
+  colors: Record<string, string[]>;
   /** stop markers currently shown */
   markers: number;
+  center: LngLat;
+  zoom: number;
 }
 
 export interface TripPlayer {
@@ -110,6 +117,7 @@ export interface MapService {
   fitTo(points: LngLat[], o: FitOptions): Promise<void>;
   flyTo(v: CameraView, o: { duration: number; curve?: number }): Promise<void>;
   jumpTo(v: CameraView): void;
+  setControlsInset(inset: ControlsInset): void;
   probe(): Promise<MapProbe>;
 }
 

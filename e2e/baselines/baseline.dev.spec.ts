@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { BASELINES, boot, captureDemClamp, captureFigures, captureFrames, captureMercator, captureMigrate, capturePreload, captureThumbs, pngDiff } from './capture';
+import { DEFAULT_SETTINGS } from '../../src/domain/settings';
 import { assertFigureVisible, captureOverlay, type Sample } from './overlay';
 
 test.describe.configure({ mode: 'serial' });
@@ -89,5 +90,21 @@ test.describe('pre-refactor baselines @baseline', () => {
         expectClose(s.rgba, e.rgba, 6, `${key}.${s.name}`);
       });
     }
+  });
+
+  test('overlay with the default segment colours: figure unchanged, trail and arc take the colour', async ({ page }) => {
+    await boot(page);
+    const expected = json('overlay-pixels.json');
+    const actual = await captureOverlay(page, expected.times, DEFAULT_SETTINGS.colors);
+    const hex = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+    const sample = (key: 'ground' | 'air', name: string) => actual[key].samples.find((s: Sample) => s.name === name)!.rgba;
+    for (const key of ['ground', 'air'] as const) {
+      const figure = expected[key].find((s: Sample) => s.name === 'figure');
+      expectClose(sample(key, 'figure'), figure.rgba, 6, `${key}.figure`);
+    }
+    expectClose(actual.ground.core.slice(0, 3), hex(DEFAULT_SETTINGS.colors.ground), 8, 'ground.trail');
+    const air = hex(DEFAULT_SETTINGS.colors.air);
+    const hit = actual.air.core.some((px: number[]) => px.every((v, k) => Math.abs(v - air[k]) <= 8));
+    expect(hit, `no pixel near the arc midpoint is ${DEFAULT_SETTINGS.colors.air}`).toBe(true);
   });
 });

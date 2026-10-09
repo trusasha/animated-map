@@ -12,6 +12,9 @@ export const LINE_PALETTE = [
 /** the segment's own colour, else the default of its mode */
 export const segColor = (leg: Leg, settings: UserSettings = DEFAULT_SETTINGS) => leg.color ?? settings.colors[leg.mode];
 
+/** legs with their effective colour, as the player and the export draw them */
+export const withColors = <L extends Leg>(legs: L[], settings: UserSettings) => legs.map((l) => ({ ...l, color: segColor(l, settings) }));
+
 const mapLegs = (d: TripData, fn: (l: Leg, i: number) => Leg): TripData =>
   ({ ...d, stops: d.stops.map((s, k) => { const leg = k > 0 && s.leg ? fn(s.leg, k - 1) : s.leg; return leg === s.leg ? s : { ...s, leg }; }) });
 

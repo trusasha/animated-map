@@ -1,7 +1,8 @@
 import { span } from '../../../domain/trips';
+import { withColors } from '../../../domain/legs';
 import { legsOf } from '../../../domain/route';
 import { videoSize } from '../../../domain/video';
-import type { Format, LngLat, Mode, Overlay, Trip } from '../../../domain/types';
+import type { Format, LngLat, Mode, Overlay, Trip, UserSettings } from '../../../domain/types';
 import { createOffscreenMap } from '../../../services/map';
 import { createOverlay3D } from '../../../services/scene3d';
 import { attributionOf, drawOverlay, isVideoError, renderVideo } from '../../../services/video';
@@ -44,7 +45,7 @@ function distinctColors(ctx: CanvasRenderingContext2D, w: number, h: number) {
 
 /** loads the offscreen map for the trip's video stretch and stops on a preview frame */
 export async function prepareExport(o: {
-  host: HTMLElement; trip: Trip; format: Format; longSide: number; onProgress: (p: number) => void; signal: AbortSignal;
+  host: HTMLElement; trip: Trip; format: Format; longSide: number; settings: UserSettings; onProgress: (p: number) => void; signal: AbortSignal;
 }): Promise<PreparedExport> {
   const d = o.trip.data, [s0, s1] = span(d);
   const { width, height } = videoSize(o.format, o.longSide);
@@ -58,7 +59,7 @@ export async function prepareExport(o: {
     if (o.signal.aborted) throw aborted();
     const { player, idle, canvas } = map;
     const stops = d.stops.slice(s0, s1 + 1);
-    const legs = legsOf(d).slice(s0, s1).map((l, i) => ({ ...l, path: l.path ?? [[stops[i].lng, stops[i].lat], [stops[i + 1].lng, stops[i + 1].lat]] as LngLat[] }));
+    const legs = withColors(legsOf(d).slice(s0, s1), o.settings).map((l, i) => ({ ...l, path: l.path ?? [[stops[i].lng, stops[i].lat], [stops[i + 1].lng, stops[i + 1].lat]] as LngLat[] }));
     await player.setTrip(stops, legs, d.speed);
     await player.preload(o.onProgress, o.signal);
     if (o.signal.aborted) throw aborted();

@@ -5,6 +5,9 @@ import { useT } from '../../i18n/react';
 import { registerErrorSink } from './reportError';
 import { ToastContext } from './useToasts';
 
+// below the phone header: back button row plus its padding
+const PHONE_HEADER = 'calc(var(--space-48) + env(safe-area-inset-top))';
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const { toasts, push, dismiss } = useToastQueue();
   const { mode } = useViewportMode();
@@ -20,7 +23,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext value={api}>
       {children}
       {createPortal(
-        <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel={t('common.actions.close')} placement={mode === 'phone' ? 'top' : 'bottom'} />,
+        <Toaster toasts={toasts} onDismiss={dismiss} dismissLabel={t('common.actions.close')} placement={mode === 'phone' ? 'top' : 'bottom'} topInset={PHONE_HEADER} />,
         document.body,
       )}
     </ToastContext>

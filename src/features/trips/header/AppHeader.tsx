@@ -6,19 +6,19 @@ import { useTripContext } from '../hooks/useTripContext';
 import type { AppHeaderProps } from '../types';
 import { HeaderOverflowMenu } from './HeaderOverflowMenu';
 import { SaveStatusLabel } from './SaveStatusLabel';
+import { VideoActions } from './VideoActions';
 import styles from './AppHeader.module.css';
 
 export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, onOpenSettings, onOpenFigures }: AppHeaderProps) {
   const { t } = useT();
   const { mode } = useViewportMode();
-  const { trip, setTitle, discard, routing } = useTripContext();
+  const { trip, setTitle, discard } = useTripContext();
   const actions = useTripActions();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const editing = tripId !== null;
   const phone = mode === 'phone';
   const desktop = mode === 'desktop';
-  const canShow = !!trip && trip.data.stops.length >= 2 && !routing;
 
   const newTrip = async () => {
     const id = await actions.create(trip ? { style: trip.data.style, format: trip.data.format } : undefined);
@@ -54,12 +54,7 @@ export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, o
       )}
       <div className={styles.spacer} />
       {editing && desktop && <Button variant="ghost" size="sm" loading={actions.busy} onClick={newTrip}>{t('trips.header.newTrip')}</Button>}
-      {editing && !phone && (
-        <>
-          <Button variant="secondary" disabled={!canShow} onClick={onPreview}>{t('trips.header.preview')}</Button>
-          <Button disabled={!canShow} onClick={onExport}>{t(desktop ? 'trips.header.exportVideo' : 'trips.header.export')}</Button>
-        </>
-      )}
+      {editing && !phone && <VideoActions onPreview={onPreview} onExport={onExport} short={!desktop} />}
       {editing && <HeaderOverflowMenu onNewTrip={desktop ? undefined : newTrip} onDelete={() => setConfirmingDelete(true)} onOpenFigures={onOpenFigures} />}
       <IconButton icon="settings" label={t('trips.header.settings')} size={36} onClick={onOpenSettings} />
       <ConfirmDialog
