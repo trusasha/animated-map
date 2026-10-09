@@ -12,8 +12,6 @@ export interface ChromeState {
   previewing: boolean;
   /** phone sheet height, px */
   sheet: number;
-  /** preview transport height, px */
-  transport: number;
 }
 
 const ZERO: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
@@ -28,9 +26,10 @@ export function paddingFor(s: ChromeState): Padding {
   return { top: 40, bottom: s.sheet + EDGE, left: 32, right: 56 };
 }
 
+/** phone: top-right, clear of the sheet; elsewhere bottom-right, left of the desktop inspector */
 export function controlsFor(s: ChromeState): ControlsInset {
-  if (s.previewing) return { bottom: s.mode === 'phone' ? s.transport + EDGE : 0, right: 0 };
-  return { bottom: s.mode === 'phone' ? s.sheet : 0, right: rightCard(s) };
+  if (s.mode === 'phone') return { top: 0, bottom: 0, right: 0 };
+  return { bottom: 0, right: s.previewing ? 0 : rightCard(s) };
 }
 
 /** horizontal centre of the free map area, for the pick banner */
