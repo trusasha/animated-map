@@ -46,6 +46,8 @@ function distinctColors(ctx: CanvasRenderingContext2D, w: number, h: number) {
 /** loads the offscreen map for the trip's video stretch and stops on a preview frame */
 export async function prepareExport(o: {
   host: HTMLElement; trip: Trip; format: Format; longSide: number; settings: UserSettings; onProgress: (p: number) => void; signal: AbortSignal;
+  /** each place keeps one tile level for the whole video instead of swapping imagery as the camera moves */
+  stableTiles?: boolean;
 }): Promise<PreparedExport> {
   const d = o.trip.data, [s0, s1] = span(d);
   const { width, height } = videoSize(o.format, o.longSide);
@@ -54,7 +56,7 @@ export async function prepareExport(o: {
   o.host.style.width = `${hostWidth}px`;
   o.host.style.height = `${hostHeight}px`;
 
-  const map = await createOffscreenMap(o.host, { style: d.style, pixelRatio: pr }, createOverlay3D());
+  const map = await createOffscreenMap(o.host, { style: d.style, pixelRatio: pr, stableTiles: o.stableTiles }, createOverlay3D());
   try {
     if (o.signal.aborted) throw aborted();
     const { player, idle, canvas } = map;

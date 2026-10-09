@@ -34,8 +34,10 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
   private context: LngLat[][] = [];
   private contextShown = true;
 
-  constructor(readonly map: MlMap, private overlay: MapOverlay3D) {
+  /** stableTiles: each place keeps one tile level for the whole timeline (export) */
+  constructor(readonly map: MlMap, private overlay: MapOverlay3D, opts: { stableTiles?: boolean } = {}) {
     this.fit = containerFit(map);
+    this.lod.stable = opts.stableTiles;
     map.on('style.load', () => this.install());
     // the tile set depends on the viewport
     map.on('resize', () => { this.prefetch = undefined; });

@@ -34,6 +34,8 @@ export interface ExportController {
 
 const exposeForTests = import.meta.env.DEV || new URLSearchParams(location.search).has('e2e');
 const CANCEL = 'cancel';
+// `?tiles=live` renders with the camera-driven tile levels, for comparison
+const stableTiles = new URLSearchParams(location.search).get('tiles') !== 'live';
 
 const probeForTests = exposeForTests
   ? (p: FrameProbe) => { const w = window as unknown as { __ta?: Record<string, unknown> }; (w.__ta ??= {}).exportProbe = p; }
@@ -71,7 +73,7 @@ export function useExport(trip: Trip): ExportController {
   };
 
   const prepare = useEffectEvent((el: HTMLDivElement, signal: AbortSignal) =>
-    prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, settings, onProgress: setProgress, signal }));
+    prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, settings, onProgress: setProgress, signal, stableTiles }));
   const onPrepareError = useEffectEvent((e: unknown) => fail(e, 'prepare'));
 
   useEffect(() => {
