@@ -3,7 +3,8 @@ import { Card, useViewportMode } from '../../ds';
 import { PhoneSheet } from './components/PhoneSheet';
 import { useEditorPadding } from './hooks/useEditorPadding';
 import { useElementBox } from './hooks/useElementBox';
-import { overlayCenter } from './hooks/layout';
+import { freeArea, overlayCenter } from './hooks/layout';
+import { useFreeAreaVars } from './hooks/useFreeAreaVars';
 import { useSheet } from './hooks/useSheet';
 import styles from './EditorShell.module.css';
 import type { EditorShellProps } from './types';
@@ -23,6 +24,8 @@ export function EditorShell({
     sheet: phone && !previewing ? sheet.height.live : 0,
   };
   useEditorPadding({ ...state, sheetSettled: phone && !previewing ? sheet.height.settled : 0 }, onPaddingChange, onControlsInsetChange, onRefit);
+
+  useFreeAreaVars(freeArea(state));
 
   const overlay = { '--overlay-top': `${shellBox.top}px`, '--overlay-x': overlayCenter(state) } as CSSProperties;
   const route = <Card className={`${styles.card} ${styles.route}`} scroll>{routePanel}</Card>;

@@ -32,6 +32,12 @@ export function controlsFor(s: ChromeState): ControlsInset {
   return { bottom: 0, right: s.previewing ? 0 : rightCard(s) };
 }
 
+/** map width the panels leave uncovered on each side, px; the phone sheet covers the bottom instead */
+export function freeArea(s: ChromeState): { left: number; right: number } {
+  if (s.mode === 'phone' || s.previewing) return { left: 0, right: 0 };
+  return { left: column, right: rightCard(s) };
+}
+
 /** horizontal centre of the free map area, for the pick banner */
 export function overlayCenter(s: ChromeState): string {
   if (s.mode === 'phone' || s.previewing) return '50%';
