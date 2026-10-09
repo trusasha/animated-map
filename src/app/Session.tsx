@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from 'react';
 import { EditorShell } from '../features/editor';
 import { ExportDialog } from '../features/export';
-import { FiguresDialog } from '../features/figures';
+import { FiguresDialog, useModels } from '../features/figures';
 import { SegmentInspector } from '../features/inspector';
 import { PreviewTransport } from '../features/preview';
 import { RoutePanel } from '../features/route';
@@ -19,6 +19,7 @@ type Dialog = 'settings' | 'figures' | 'export';
 /** one screen visit: remounted per trip (and for Home) so selection, preview and dialogs reset */
 export function Session({ tripId }: { tripId: string | null }) {
   const { map, setPadding } = useServices();
+  const { models } = useModels();
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [previewing, setPreviewing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
@@ -66,7 +67,7 @@ export function Session({ tripId }: { tripId: string | null }) {
           />
         </>)}
         <div className={styles.dialogs}>
-          <Boundary name="settings-dialog"><SettingsDialog open={dialog === 'settings'} onClose={close} /></Boundary>
+          <Boundary name="settings-dialog"><SettingsDialog open={dialog === 'settings'} onClose={close} models={models} /></Boundary>
           <Boundary name="figures-dialog"><FiguresDialog open={dialog === 'figures'} onClose={close} /></Boundary>
           <Boundary name="export-dialog"><ExportDialog open={dialog === 'export'} onClose={close} /></Boundary>
         </div>
