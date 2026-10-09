@@ -10,7 +10,7 @@ export interface TilePlan { times: number[]; cuts: number[]; urls: string[] }
 
 // coveringTiles options and source fields beyond the public typing
 type TileSource = { id: string; type: string; tiles: string[]; tileSize?: number; minzoom: number; maxzoom: number; scheme?: string; calculateTileZoom: unknown };
-type TileID = { canonical: { z: number; x: number; y: number; url(tiles: string[], pixelRatio: number, scheme?: string): string } };
+type TileID = { canonical: { z: number; x: number; y: number; url(tiles: string[], pixelRatio: number, scheme?: string): string }; scaledTo(z: number): TileID };
 type Covering = (o: object) => TileID[];
 
 /** every tile URL the camera will need over the whole timeline; moves the camera without rendering */
@@ -23,7 +23,13 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
     return src && tiles ? [{ id, type: src.type, tiles, tileSize: src.tileSize, minzoom: src.minzoom, maxzoom: src.maxzoom, scheme: src.scheme, calculateTileZoom: src.calculateTileZoom }] : [];
   });
   const times = preloadTimes(tl, FINE);
-  const terrain = (map as unknown as { terrain: unknown }).terrain;
+  const terrain = (map as unknown as { terrain?: { tileManager: { tileSize: number } } }).terrain;
+  const terrainSource = map.getTerrain()?.source;
+  // raster rounds the zoom, vector floors it; DEM serves both hillshade and terrain, which differ, so take both
+  const legacy = (s: TileSource) => (s.type === 'raster' ? [true] : s.type === 'vector' ? [false] : [false, true]).map((roundZoom) => ({ tileSize: s.tileSize ?? 512, roundZoom }));
+  // exactly what the renderer asks for: terrain floors the zoom at its own tile size
+  const exact = (s: TileSource) => [s.id === terrainSource && terrain ? { tileSize: terrain.tileManager.tileSize, roundZoom: false } : { tileSize: s.tileSize ?? 512, roundZoom: s.type !== 'vector' }];
+  const options = lod.stable ? exact : legacy;
   const covering = map.coveringTiles.bind(map) as unknown as Covering;
   const detail = lod.detail;
 
@@ -33,10 +39,9 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
       jumpToCamera(map, sample(tl, t).camera);
       lod.detail = detailZoom(tl, t);
       for (const s of sources) {
-        // raster rounds the zoom, vector floors it; DEM serves both hillshade and terrain, which differ, so take both
-        for (const roundZoom of s.type === 'raster' ? [true] : s.type === 'vector' ? [false] : [false, true]) {
+        for (const o of options(s)) {
           // terrain and the source's own zoom function: the same tile choice the renderer makes
-          for (const id of covering({ tileSize: s.tileSize ?? 512, minzoom: s.minzoom, maxzoom: s.maxzoom, roundZoom, terrain, calculateTileZoom: s.calculateTileZoom })) each(s, id);
+          for (const id of covering({ ...o, minzoom: s.minzoom, maxzoom: s.maxzoom, terrain, calculateTileZoom: s.calculateTileZoom })) each(s, id);
         }
       }
       afterFrame();
@@ -59,8 +64,13 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
       lod.pins = pins;
     }
     const urls = new Set<string>(), cuts: number[] = [];
+    const add = (s: TileSource, c: TileID['canonical']) => urls.add(c.url(s.tiles, map.getPixelRatio(), s.scheme).replace('dem://', 'https://'));
     const ok = await sweep(
-      (s, id) => urls.add(id.canonical.url(s.tiles, map.getPixelRatio(), s.scheme).replace('dem://', 'https://')),
+      (s, id) => {
+        add(s, id.canonical);
+        // the terrain also loads each tile's parent and a low-zoom ancestor
+        if (lod.stable && s.id === terrainSource && id.canonical.z > s.minzoom) for (const z of [id.canonical.z - 1, Math.max(s.minzoom, Math.min(id.canonical.z, 5))]) add(s, id.scaledTo(z).canonical);
+      },
       () => cuts.push(urls.size),
       lod.stable ? 0.5 : 0, lod.stable ? 0.5 : 1,
     );
