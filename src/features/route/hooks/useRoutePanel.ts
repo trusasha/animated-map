@@ -16,7 +16,7 @@ import { useRouteBuilding } from './useRouteBuilding';
 import { useRouteEditing } from './useRouteEditing';
 
 /** everything the route panel shows and does for the open trip */
-export function useRoutePanel({ selected, onSelect, onPickChange, map }: RoutePanelProps, trip: Trip) {
+export function useRoutePanel({ selected, onSelect, onPickChange, map, fitKey }: RoutePanelProps, trip: Trip) {
   const { t } = useT();
   const { settings } = useSettings();
   const { coarse } = useViewportMode();
@@ -30,7 +30,7 @@ export function useRoutePanel({ selected, onSelect, onPickChange, map }: RoutePa
   const pick = usePick(map, data.stops, onPickChange, editing.moveTo);
   const search = usePlaceSearch(editing.add);
   useEditorMapBinding({
-    map, data, selected, pickingId: pick.pickingId, onSelect, poseKey,
+    map, data, selected, pickingId: pick.pickingId, onSelect, poseKey, fitKey,
     onStopDrag: (i, p) => editing.moveTo(data.stops[i].id, p),
   });
 

@@ -8,4 +8,6 @@ export interface RoutePanelProps {
   onPickChange: (picking: boolean) => void;
   /** the editor map; without it the panel still edits the route but cannot draw it or pick on it */
   map?: MapService;
+  /** changing it re-fits the route to the current camera padding (e.g. after the phone sheet settles) */
+  fitKey?: number;
 }
