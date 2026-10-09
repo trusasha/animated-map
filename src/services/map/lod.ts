@@ -25,7 +25,8 @@ export function installLod(map: MlMap, lod: LodState) {
     map.setSourceTileLodParams(9.314, 3, id);
     const base = src.calculateTileZoom;
     src.calculateTileZoom = (z, ...rest) => {
-      const level = base(z + lodBias(map, lod), ...rest);
+      // pins hold the detail through a zoom on their own
+      const level = base(z + (lod.stable ? 0 : lodBias(map, lod)), ...rest);
       const pins = lod.pins?.[id];
       return pins && rest[0] === cursor.d ? pinnedZoom(pins, cursor.z, cursor.x, cursor.y, level) : level;
     };

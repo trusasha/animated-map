@@ -6,7 +6,7 @@
 export interface Pins { need: Map<number, number>; leaf: Set<number> }
 
 /** tile levels may go at most this many levels finer than the camera alone would load (each level = 4× tiles) */
-export const PIN_CAP = 4;
+export const PIN_CAP = 3;
 
 const index = (z: number, x: number, y: number) => (4 ** z - 1) / 3 + y * 2 ** z + x;
 
