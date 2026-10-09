@@ -143,6 +143,7 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
   stop() { cancelAnimationFrame(this.raf); this.raf = 0; this.run++; }
   get playing() { return this.raf !== 0; }
   get duration() { return this.tl?.duration ?? 0; }
+  get paths() { return this.tl?.legs.map((l) => l.path) ?? []; }
   get ready() { return !!this.tl && this.buffered >= this.tl.duration; }
   get buffered() { return this.tl && this.prefetch?.tl === this.tl ? this.prefetch.buffered : -1; }
 

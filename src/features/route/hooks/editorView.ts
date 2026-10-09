@@ -10,14 +10,16 @@ export interface EditorViewArgs {
   selected: number | null;
   pickingId: string | null;
   titleOf: (name: string) => string;
+  /** the player's smoothed path per raw leg path, so the line shows the road the figure takes */
+  travelled?: WeakMap<LngLat[], LngLat[]>;
 }
 
 /** what the map draws while editing: colours, range dimming, pending legs and numbered markers */
-export function editorView({ data, settings, selected, pickingId, titleOf }: EditorViewArgs): EditorRouteView {
+export function editorView({ data, settings, selected, pickingId, titleOf, travelled }: EditorViewArgs): EditorRouteView {
   const [s0, s1] = span(data), last = data.stops.length - 1;
   const segments = data.stops.length > 1
     ? legsOf(data).map((leg, i) => ({
-      mode: leg.mode, path: leg.path ?? [], color: segColor(leg, settings), inRange: i >= s0 && i < s1, pending: legMeta(data, i).building,
+      mode: leg.mode, path: (leg.path && travelled?.get(leg.path)) ?? leg.path ?? [], color: segColor(leg, settings), inRange: i >= s0 && i < s1, pending: legMeta(data, i).building,
     }))
     : [];
   const stops = data.stops.map((s, k) => {

@@ -70,6 +70,8 @@ export interface TripPlayer {
   /** timeline seconds up to which every tile is cached */
   readonly buffered: number;
   readonly duration: number;
+  /** each timeline leg's path as the figure travels it (ground and water smoothed) */
+  readonly paths: LngLat[][];
   readonly time: number;
   readonly playing: boolean;
   onFrame?: (t: number) => void;

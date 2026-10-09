@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { legMeta, withColors } from '../../../domain/legs';
 import { legsOf } from '../../../domain/route';
 import { span } from '../../../domain/trips';
@@ -33,11 +33,12 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
   useEffect(() => { host.current = { onSelect, onStopDrag }; });
 
   useEffect(() => { map?.setMode('editor'); }, [map]);
+  const [travelled, setTravelled] = useState<WeakMap<LngLat[], LngLat[]>>();
 
   useEffect(() => {
     if (!map || !data) return;
-    map.setEditorRoute(editorView({ data, settings, selected, pickingId, titleOf: (name) => t('route.markerTitle', { name }) }));
-  }, [map, data, settings, selected, pickingId, t]);
+    map.setEditorRoute(editorView({ data, settings, selected, pickingId, titleOf: (name) => t('route.markerTitle', { name }), travelled }));
+  }, [map, data, settings, selected, pickingId, t, travelled]);
 
   useEffect(() => {
     if (!map) return;
@@ -65,6 +66,9 @@ export function useEditorMapBinding({ map, data, selected, pickingId, onSelect, 
       map.player.stop();
       await map.player.setTrip(stops.slice(s0, s1 + 1), withColors(legs.slice(s0, s1), settings).map((l) => ({ ...l, path: l.path! })), data.speed);
       if (cancelled) return;
+      const paths = map.player.paths, next = new WeakMap<LngLat[], LngLat[]>();
+      legs.slice(s0, s1).forEach((l, i) => { if (l.mode !== 'air' && l.path && paths[i]) next.set(l.path, paths[i]); });
+      setTravelled(next);
       map.setContext(legs.flatMap((l, i) => (i < s0 || i >= s1) && l.path ? [l.path] : []));
       map.player.setFrame(null);
       const key = stops.slice(s0, s1 + 1).map((s) => `${s.id}@${s.lng},${s.lat}`).join();
