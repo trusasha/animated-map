@@ -5,6 +5,7 @@ import { useAddFigure } from '../hooks/useAddFigure';
 import { useEditFigure } from '../hooks/useEditFigure';
 import { useFigureThumbs } from '../hooks/useFigureThumbs';
 import { useFiguresDialog } from '../hooks/useFiguresDialog';
+import { useModelViewer } from '../hooks/useModelViewer';
 import { useModels } from '../hooks/useModels';
 import type { FiguresDialogProps } from '../types';
 import { AddFigureView } from './AddFigureView';
@@ -26,12 +27,12 @@ function AddFigure({ models, onDone }: { models: Models; onDone: () => void }) {
 
 function EditFigure({ model, models, onDone }: { model: CustomModel; models: Models; onDone: () => void }) {
   const form = useEditFigure(model, models.edit, onDone);
-  const thumb = useFigureThumbs([{ id: `model:${model.url}`, pose: form.pose }]);
+  const stageRef = useModelViewer(`model:${model.url}`, form.pose);
   return (
     <EditFigureView
-      src={thumb({ id: `model:${model.url}`, pose: form.pose })}
+      stageRef={stageRef}
       name={form.name} mode={form.mode} pose={form.pose} busy={form.busy} error={form.error} canSubmit={form.canSubmit}
-      onName={form.setName} onMode={form.setMode} onRotate={form.rotate} onScale={form.setScale} onReset={form.reset}
+      onName={form.setName} onMode={form.setMode} onScale={form.setScale}
       onSubmit={form.submit} onDelete={() => { models.remove(model); onDone(); }}
     />
   );
