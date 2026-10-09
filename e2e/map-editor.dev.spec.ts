@@ -7,7 +7,7 @@ const TRIP = JSON.parse(readFileSync(new URL('./fixtures/trips/three-legs.json',
 const PADDING = { top: 60, bottom: 60, left: 390, right: 60 };
 const ZERO = { top: 0, bottom: 0, left: 0, right: 0 };
 const PLAYER = ['route', 'trail', 'stops', 'stop-labels'];
-const EDITOR = ['seg-casing', 'seg-ground', 'seg-water', 'seg-air', 'seg-pending', 'seg-hit'];
+const EDITOR = ['seg-casing', 'seg-ground', 'seg-water', 'seg-air', 'seg-pending'];
 
 /** a MapService on a bare dev-server page, showing the three-leg trip in editing mode */
 async function mount(page: Page) {

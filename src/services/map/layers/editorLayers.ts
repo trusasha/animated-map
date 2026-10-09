@@ -4,12 +4,11 @@ import type { EditorSegment } from '../types';
 import { DASH, PENDING_DASH } from './dash';
 
 export const EDITOR_SOURCE = 'editor-route';
-export const HIT_LAYER = 'seg-hit';
 const MODES: Mode[] = ['ground', 'water', 'air'];
-export const EDITOR_LAYERS = ['seg-casing', ...MODES.map((m) => `seg-${m}`), 'seg-pending', HIT_LAYER];
+export const EDITOR_LAYERS = ['seg-casing', ...MODES.map((m) => `seg-${m}`), 'seg-pending'];
 
 const OPACITY = { in: 0.92, out: 0.25, pending: 0.5 };
-const WIDTH = { normal: 3.5, selected: 5.5, casing: 12, hit: 22 };
+const WIDTH = { normal: 3.5, selected: 5.5, casing: 12 };
 
 const round = { 'line-cap': 'round', 'line-join': 'round' } as const;
 const selected: ExpressionSpecification = ['==', ['get', 'sel'], true];
@@ -30,8 +29,6 @@ export function installEditorLayers(map: MlMap, before?: string) {
   }, before);
   for (const m of MODES) add(`seg-${m}`, ['all', ['==', ['get', 'mode'], m], ['!', ['get', 'pend']]], DASH[m]);
   add('seg-pending', ['get', 'pend'], PENDING_DASH);
-  // near-transparent rather than 0 so it stays a rendered, queryable layer
-  map.addLayer({ id: HIT_LAYER, type: 'line', source: EDITOR_SOURCE, layout: round, paint: { 'line-width': WIDTH.hit, 'line-opacity': 0.01 } }, before);
 }
 
 const opacity = (s: EditorSegment) => (!s.inRange ? OPACITY.out : s.pending ? OPACITY.pending : OPACITY.in);

@@ -66,6 +66,7 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
     active: () => mode === 'editor' && editing,
     segment: (i) => on.segment.forEach((cb) => cb(i)),
     empty: () => on.empty.forEach((cb) => cb()),
+    paths: () => route.segments.map((s) => s.path),
   });
 
   let current: MapStyle | undefined;
