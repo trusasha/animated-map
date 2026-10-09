@@ -20,11 +20,11 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api/settings', (r) => (r.request().method() === 'GET' ? r.fulfill({ json: { flyKm: 2000 } }) : r.fallback()));
 });
 
-async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[0]['request']) {
+async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[0]['request'], query = '') {
   const trip = await (await request.post('/api/trips', {
     data: { title: 'Shell flow', data: { stops: SEED, style: 'satellite', speed: 1, format: '9:16' } },
   })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.goto(`/trip/${trip.id}?ui=next&e2e${query}`);
   await expect(page.getByTestId('stop-list')).toBeVisible();
   return { done: () => request.delete(`/api/trips/${trip.id}`) };
 }
@@ -94,6 +94,16 @@ test.describe('editor shell (F12)', () => {
     await expect(column.getByRole('button', { name: 'Все точки' })).toBeVisible();
     await column.getByRole('button', { name: 'Все точки' }).click();
     await expect(page.getByTestId('route-column')).toBeVisible();
+    await t.done();
+  });
+
+  test('tablet: toasts sit in the free map area, not over the column', async ({ page, request }) => {
+    test.skip(width(page) < 700 || width(page) >= 1100, 'tablet only');
+    const t = await open(page, request, '&crash=video-panel');
+    const toaster = page.locator('[aria-live="polite"]').filter({ has: page.getByRole('button') });
+    await expect(toaster).toBeVisible();
+    const column = (await page.getByTestId('route-column').boundingBox())!;
+    expect((await toaster.boundingBox())!.x).toBeGreaterThanOrEqual(column.x + column.width);
     await t.done();
   });
 
