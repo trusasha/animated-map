@@ -1,4 +1,4 @@
-import { IconButton, ListRow, Menu, useViewportMode } from '../../../ds';
+import { Icon, IconButton, ListRow, Menu, useViewportMode } from '../../../ds';
 import { formatRelativeTime } from '../../../i18n/format';
 import { useT } from '../../../i18n/react';
 import type { TripListItem } from '../../../services/api';
@@ -27,7 +27,12 @@ export function TripRow({ trip, onOpen, onRename, onDelete, onHover }: TripRowPr
       className={styles.row}
       title={trip.title}
       meta={meta}
-      trailing={formatRelativeTime(lang, t, trip.updated_at)}
+      trailing={(
+        <span className={styles.trailing}>
+          {formatRelativeTime(lang, t, trip.updated_at)}
+          <Icon name="arrow-right" size={16} />
+        </span>
+      )}
       actionsVisible={coarse}
       onSelect={() => onOpen(trip.id)}
       onMouseEnter={() => hover?.(trip.id)}

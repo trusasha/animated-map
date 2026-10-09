@@ -15,7 +15,9 @@
 .noteText { flex: 1; }
 .role { margin-left: var(--space-6); font-size: var(--type-caption-size); font-weight: var(--weight-regular); color: var(--text-muted); }
 .picking { color: var(--accent-active); }
-.sample { display: block; width: 26px; border-top: 2px solid; }
-.sample[data-mode='water'] { border-top-style: dashed; }
-.sample[data-mode='air'] { border-top-style: dotted; }
+.sampleBox { display: flex; justify-content: center; width: var(--space-24); }
+.sample { display: block; height: 26px; border-left: 2px solid; }
+.sample[data-mode='water'] { border-left-style: dashed; }
+.sample[data-mode='air'] { border-left-style: dotted; }
 .banner { position: fixed; top: calc(var(--overlay-top, 0px) + var(--space-16)); left: var(--overlay-x, 50%); transform: translateX(-50%); z-index: var(--z-overlay); max-width: calc(100% - 24px); }
+[data-mode='phone'] .banner { max-width: calc(100% - 112px); }

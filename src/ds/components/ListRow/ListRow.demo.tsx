@@ -36,6 +36,11 @@ export default function Demo() {
           />
         ))}
       </div>
+      <div>
+        {[['Air · Plane', ''], ['Water · Liner', '×1.5'], ['Land · Sport bike', 'Building…']].map(([label, meta], i) => (
+          <ListRow key={label} compact title={label} trailing={meta || undefined} selected={i === 1} outOfRange={i === 2} onSelect={() => undefined} />
+        ))}
+      </div>
     </div>
   );
 }

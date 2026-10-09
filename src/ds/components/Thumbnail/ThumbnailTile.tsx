@@ -4,6 +4,7 @@ import { Icon } from '../Icon';
 import styles from './Thumbnail.module.css';
 
 export type ThumbnailSize = 40 | 60 | 120;
+export type ThumbnailLayout = 'inline' | 'stacked';
 
 export interface ThumbnailTileProps {
   /** Resolved image URL; thumbnails are produced by feature hooks, never here. */
@@ -11,6 +12,8 @@ export interface ThumbnailTileProps {
   name: ReactNode;
   sub?: ReactNode;
   size?: ThumbnailSize;
+  /** 40 and 60 only: `stacked` puts a full-width well over a one-line name (pickers); 120 is always a card. */
+  layout?: ThumbnailLayout;
   selected?: boolean;
   disabled?: boolean;
   /** Dashed "add" tile: plus glyph instead of an image. */
@@ -26,7 +29,7 @@ export interface ThumbnailTileProps {
 }
 
 export function ThumbnailTile({
-  src, name, sub, size = 60, selected, disabled, add, badge, footer, onSelect, className, ref,
+  src, name, sub, size = 60, layout = 'inline', selected, disabled, add, badge, footer, onSelect, className, ref,
 }: ThumbnailTileProps) {
   const content = (
     <>
@@ -47,6 +50,7 @@ export function ThumbnailTile({
       ref={ref}
       className={cx(styles.tile, className)}
       data-size={size}
+      data-layout={size === 120 ? undefined : layout}
       data-selected={selected || undefined}
       data-disabled={disabled || undefined}
       data-add={add || undefined}

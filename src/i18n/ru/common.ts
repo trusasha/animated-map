@@ -4,7 +4,7 @@ import type { Shape } from '../keys';
 export const common: Shape<Dict['common']> = {
   appName: 'Trip Animator',
   actions: {
-    done: 'Готово', cancel: 'Отмена', close: 'Закрыть', delete: 'Удалить', save: 'Сохранить', edit: 'Редактировать', back: 'Назад',
+    done: 'Готово', cancel: 'Отмена', close: 'Закрыть', delete: 'Удалить', save: 'Сохранить', edit: 'Изменить', back: 'Назад',
     reset: 'Сбросить', apply: 'Применить', retry: 'Повторить', undo: 'Отменить', more: 'Ещё', loading: 'Загрузка…',
   },
   mode: { air: 'Воздух', ground: 'Земля', water: 'Вода', any: 'Любой' },

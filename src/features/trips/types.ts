@@ -7,7 +7,8 @@ export interface HomeGlobe {
   highlightTrip: (id: string | null) => void;
   setSpin: (on: boolean) => void;
   setPadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
-  setGlobeRadius: (px: number) => void;
+  /** padding that also sizes the globe to the free area */
+  setHomePadding: (p: { top: number; bottom: number; left: number; right: number }) => void;
   setControlsInset: (inset: { bottom: number; right: number; top?: number }) => void;
 }
 

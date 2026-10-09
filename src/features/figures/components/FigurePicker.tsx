@@ -12,6 +12,7 @@ export function FigurePicker({ mode, value, onChange, onAddOwn }: FigurePickerPr
         <ThumbnailTile
           key={tile.id}
           size={60}
+          layout="stacked"
           src={tile.src}
           name={tile.name}
           sub={tile.sub}
@@ -20,7 +21,7 @@ export function FigurePicker({ mode, value, onChange, onAddOwn }: FigurePickerPr
           onSelect={() => onChange(tile.id)}
         />
       ))}
-      {onAddOwn && <ThumbnailTile size={60} add name={t('inspector.addOwn')} onSelect={onAddOwn} />}
+      {onAddOwn && <ThumbnailTile size={60} layout="stacked" add name={t('inspector.addOwn')} onSelect={onAddOwn} />}
     </ThumbnailGrid>
   );
 }

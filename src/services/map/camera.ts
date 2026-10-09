@@ -6,7 +6,6 @@ const ZERO: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
 const PADDING_MS = 300;
 // maplibre merges options over its defaults, so an explicit `curve: undefined` turns the flight into NaN
 const curveOf = (curve?: number) => (curve === undefined ? {} : { curve });
-const DISC_SHARE = 0.8;
 
 /** resolves on moveend, or a little after the planned duration if none comes; a hidden tab jumps */
 function settle(map: maplibregl.Map, duration: number, run: (animate: boolean) => void) {
@@ -36,6 +35,11 @@ export function createCamera(map: maplibregl.Map) {
       padding = { ...p };
       if (!suspended && !map.isMoving()) map.easeTo({ padding, duration: PADDING_MS });
     },
+    /** like setPadding, but also zooms and supersedes a move in flight, so the last call always lands */
+    setPaddingAndZoom(p: Padding, zoom: number) {
+      padding = { ...p };
+      if (!suspended) map.easeTo({ padding, zoom, duration: document.hidden ? 0 : PADDING_MS });
+    },
     resetPadding() { this.setPadding(ZERO); },
     getPadding(): Padding {
       const { top = 0, bottom = 0, left = 0, right = 0 } = map.getPadding();
@@ -62,14 +66,6 @@ export function createCamera(map: maplibregl.Map) {
     jumpTo(v: CameraView) {
       const target = view(v);
       if (!suspended) map.jumpTo(target);
-    },
-
-    setGlobeRadius(px: number) {
-      if (suspended || px <= 0) return;
-      // maplibre's globe radius is worldSize / 2π / cos(centre latitude); seen in perspective its disc is ~0.8 of that
-      const lat = (map.getCenter().lat * Math.PI) / 180;
-      const zoom = Math.log2((px / DISC_SHARE) * 2 * Math.PI * Math.cos(lat) / 512);
-      map.easeTo({ zoom, padding, duration: document.hidden ? 0 : PADDING_MS });
     },
 
     /** playback on: zero padding; off: the UI padding comes back */

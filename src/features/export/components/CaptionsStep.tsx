@@ -23,10 +23,11 @@ export function CaptionsStep({ overlay, onOverlayChange, format, onFormatChange,
       <div className={styles.group}>
         <h3 className={styles.heading}>{t('export.captions.title')}</h3>
         {TOGGLES.map(([key, label]) => (
-          <Switch key={key} checked={overlay[key]} onChange={(on) => onOverlayChange({ ...overlay, [key]: on })} label={t(`export.captions.${label}`)} />
+          <Switch key={key} placement="start" checked={overlay[key]} onChange={(on) => onOverlayChange({ ...overlay, [key]: on })} label={t(`export.captions.${label}`)} />
         ))}
-        <Switch checked locked label={t('export.captions.attribution')} sub={t('export.captions.attributionNote')} />
+        <Switch placement="start" checked locked label={t('export.captions.attribution')} sub={t('export.captions.attributionNote')} />
       </div>
+      <div className={styles.divided}>
       <fieldset className={styles.group}>
         <legend className={styles.heading}>{t('export.captions.format')}</legend>
         <div className={styles.formats}>
@@ -36,6 +37,7 @@ export function CaptionsStep({ overlay, onOverlayChange, format, onFormatChange,
         </div>
         <p className={styles.help} role="status">{t(reloading ? 'export.captions.reloading' : 'export.captions.formatHelp')}</p>
       </fieldset>
+      </div>
       <div className={styles.actions}>
         <Button disabled={reloading} onClick={onRender}>{t('export.captions.render')}</Button>
         <Button variant="ghost" onClick={onCancel}>{t('export.captions.cancel')}</Button>

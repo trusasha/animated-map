@@ -2,7 +2,6 @@ import { useEffect, type RefObject } from 'react';
 import type { HomeGlobe } from '../types';
 
 const ZERO = { top: 0, bottom: 0, left: 0, right: 0 };
-const GLOBE_SHARE = 0.4;
 
 /** keeps the globe centred and sized in the map area the Home column (or the phone card) leaves free */
 export function useHomePadding(globe: HomeGlobe | undefined, column: RefObject<HTMLElement | null>) {
@@ -11,12 +10,11 @@ export function useHomePadding(globe: HomeGlobe | undefined, column: RefObject<H
     const area = el?.parentElement;
     if (!globe || !el || !area) return;
     const ro = new ResizeObserver(() => {
-      const w = area.clientWidth, h = area.clientHeight;
+      const w = area.clientWidth;
       const card = el.offsetLeft <= 0 && el.offsetWidth >= w - 1;
       const pad = card ? { ...ZERO, bottom: el.offsetHeight } : { ...ZERO, left: el.offsetLeft + el.offsetWidth };
-      globe.setPadding(pad);
+      globe.setHomePadding(pad);
       globe.setControlsInset(card ? { top: 0, bottom: 0, right: 0 } : { bottom: 0, right: 0 });
-      globe.setGlobeRadius(GLOBE_SHARE * Math.min(w - pad.left, h - pad.bottom));
     });
     ro.observe(el);
     ro.observe(area);

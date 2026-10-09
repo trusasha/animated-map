@@ -106,6 +106,8 @@ export interface MapService {
   highlightTrip(id: string | null): void;
   /** the Home globe turns slowly while nothing else moves it */
   setSpin(on: boolean): void;
+  /** padding plus the zoom that sizes the Home globe to the area the padding leaves free */
+  setHomePadding(p: Padding): void;
 
   /** UI padding for editing; playback always runs with zero padding */
   setPadding(p: Padding): void;
@@ -115,8 +117,6 @@ export interface MapService {
   fitTo(points: LngLat[], o: FitOptions): Promise<void>;
   flyTo(v: CameraView, o: { duration: number; curve?: number }): Promise<void>;
   jumpTo(v: CameraView): void;
-  /** zooms so the globe's radius is about `px` on screen */
-  setGlobeRadius(px: number): void;
   setControlsInset(inset: ControlsInset): void;
   probe(): Promise<MapProbe>;
 }

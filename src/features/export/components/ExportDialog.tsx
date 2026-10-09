@@ -34,10 +34,11 @@ function ExportFlow({ trip, onClose }: { trip: Trip; onClose: () => void }) {
       onOpenChange={(o) => !o && onClose()}
       title={t('export.title')}
       width={900}
-      dismissible={x.phase !== 'render'}
+      dismissible={x.phase === 'render' ? false : 'escape'}
+      closeButton={false}
       fullScreenBelow="phone"
       closeLabel={t('common.aria.close')}
-      headerExtra={<ExportStepper current={STEP[x.phase]} compact={mode === 'phone'} />}
+      actions={<ExportStepper className={styles.stepper} current={STEP[x.phase]} compact={mode === 'phone'} />}
     >
       <div className={styles.layout} data-wide={withFrame ? undefined : ''}>
         <FrameWell

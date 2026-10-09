@@ -18,6 +18,9 @@
     line-height: var(--type-label-lh);
     font-weight: var(--weight-medium);
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--text-secondary);
     cursor: pointer;
     user-select: none;

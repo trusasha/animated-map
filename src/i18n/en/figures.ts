@@ -7,6 +7,7 @@ export const figures = {
     title: 'Your figures',
     subtitle: 'Shared across all your trips.',
     add: 'Add figure',
+    addShort: 'Add',
     empty: 'No figures yet. Upload a .glb model or a photo.',
     travelsBy: 'Travels by: {mode}',
     generatingMeta: 'About 2 minutes. You can keep working.',

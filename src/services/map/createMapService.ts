@@ -5,6 +5,7 @@ import { createCamera } from './camera';
 import { installControls } from './controls';
 import { installTripsLayer, setTrips } from './home/tripsLayer';
 import { startSpin } from './home/spin';
+import { homeZoom } from './home/zoom';
 import { installEditorLayers, setEditorSegments } from './layers/editorLayers';
 import { applyVisibility } from './layers/visibility';
 import { createMarkers } from './markers';
@@ -151,13 +152,13 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
       if (!spin) { stopSpin?.(); stopSpin = undefined; }
     },
 
+    setHomePadding: (p) => camera.setPaddingAndZoom(p, homeZoom(map, p)),
     setPadding: (p) => camera.setPadding(p),
     resetPadding: () => camera.resetPadding(),
     getPadding: () => camera.getPadding(),
     fitTo: (points, o) => camera.fitTo(points, o),
     flyTo: (v, o) => camera.flyTo(v, o),
     jumpTo: (v) => camera.jumpTo(v),
-    setGlobeRadius: (px) => camera.setGlobeRadius(px),
     setControlsInset,
     probe: () => probe(map, camera.getPadding(), markers.visible),
   };

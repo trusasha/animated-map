@@ -7,6 +7,7 @@ export default function Demo() {
   const [mode, setMode] = useState<'air' | 'land' | 'water'>('land');
   const [theme, setTheme] = useState('system');
   const [skip, setSkip] = useState('a');
+  const [ru, setRu] = useState('system');
   return (
     <div data-testid="demo-Segmented" style={{ display: 'grid', gap: 16, maxWidth: 320 }}>
       <Segmented
@@ -27,6 +28,16 @@ export default function Demo() {
           { value: 'light', label: 'Light' },
           { value: 'dark', label: 'Dark' },
           { value: 'system', label: 'System' },
+        ]}
+      />
+      <Segmented
+        label="Long labels stay on one line"
+        value={ru}
+        onChange={setRu}
+        options={[
+          { value: 'light', label: 'Светлое' },
+          { value: 'dark', label: 'Тёмное' },
+          { value: 'system', label: 'Как в системе' },
         ]}
       />
       <Segmented
