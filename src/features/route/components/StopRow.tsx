@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Stop } from '../../../domain/types';
 import { Badge, IconButton, ListRow, Menu, NumberBadge, type MenuEntry } from '../../../ds';
 import { useT } from '../../../i18n/react';
@@ -14,12 +15,13 @@ export interface StopRowProps {
   touch: boolean;
   canPick: boolean;
   outOfRange: boolean;
-  onMove: (dir: -1 | 1) => void;
+  /** drag handle from the sortable list */
+  handle: ReactNode;
   onPick: () => void;
   onDelete: () => void;
 }
 
-export function StopRow({ index, stop, count, endpoint, picking, touch, canPick, outOfRange, onMove, onPick, onDelete }: StopRowProps) {
+export function StopRow({ index, stop, count, endpoint, picking, touch, canPick, outOfRange, handle, onPick, onDelete }: StopRowProps) {
   const { t } = useT();
   const first = index === 0, last = index === count - 1;
   const variant = stop.approx ? 'approximate' : endpoint || picking ? 'selected' : first || last ? 'filled' : 'outline';
@@ -27,11 +29,7 @@ export function StopRow({ index, stop, count, endpoint, picking, touch, canPick,
   const meta = picking ? <span className={styles.picking}>{t(touch ? 'route.stop.pickingTouch' : 'route.stop.picking')}</span>
     : stop.approx ? t('route.stop.approximateHint') : stop.sub;
 
-  const up = { label: t('route.stop.moveUp'), disabled: first, onSelect: () => onMove(-1) };
-  const down = { label: t('route.stop.moveDown'), disabled: last, onSelect: () => onMove(1) };
   const menu: MenuEntry[] = [
-    { key: 'up', icon: 'arrow-up', ...up },
-    { key: 'down', icon: 'arrow-down', ...down },
     { key: 'move', icon: 'map-pin', label: t('route.stop.moveOnMap'), disabled: !canPick, onSelect: onPick },
     { key: 'delete', icon: 'trash-2', label: t('route.stop.delete'), danger: true, onSelect: onDelete },
   ];
@@ -40,7 +38,7 @@ export function StopRow({ index, stop, count, endpoint, picking, touch, canPick,
     <ListRow
       data-testid="stop-row"
       data-idx={index}
-      leading={<NumberBadge value={index + 1} variant={variant} />}
+      leading={<>{handle}<NumberBadge value={index + 1} variant={variant} /></>}
       title={<>{stop.name}{role && <span className={styles.role}>{role}</span>}</>}
       meta={meta}
       trailing={stop.approx ? <Badge tone="warning">{t('route.stop.approximate')}</Badge> : undefined}
@@ -48,8 +46,6 @@ export function StopRow({ index, stop, count, endpoint, picking, touch, canPick,
       actionsVisible={picking}
       actions={
         <>
-          <IconButton icon="arrow-up" label={up.label} disabled={up.disabled} onClick={up.onSelect} />
-          <IconButton icon="arrow-down" label={down.label} disabled={down.disabled} onClick={down.onSelect} />
           <IconButton icon="map-pin" label={t('route.stop.move')} active={picking} disabled={!canPick} onClick={onPick} />
           <IconButton icon="trash-2" label={t('route.stop.delete')} onClick={onDelete} />
         </>

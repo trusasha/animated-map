@@ -1,5 +1,5 @@
 import { Fragment, useRef } from 'react';
-import { RangeRail, SearchCombobox } from '../../../ds';
+import { RangeRail, SearchCombobox, SortableItem, SortableList, type SortableListLabels } from '../../../ds';
 import { useT } from '../../../i18n/react';
 import { useTripContext } from '../../trips';
 import { useRoutePanel } from '../hooks/useRoutePanel';
@@ -19,6 +19,10 @@ function Loaded(props: RoutePanelProps & { trip: Trip }) {
   const p = useRoutePanel(props, props.trip);
   const listRef = useRef<HTMLDivElement>(null);
   const { stops } = p;
+  const reorder: SortableListLabels = {
+    instructions: t('route.reorder.instructions'),
+    announce: (event, id, position) => t(`route.reorder.${event}`, { name: stops.find((s) => s.id === id)?.name ?? '', position }),
+  };
   const search = (
     <SearchCombobox
       className={styles.search}
@@ -46,24 +50,30 @@ function Loaded(props: RoutePanelProps & { trip: Trip }) {
       {stops.length >= 3 && <RangeNote range={p.range} onUseWhole={p.editing.clearRange} />}
       {!empty && (
         <div ref={listRef} className={styles.list} data-testid="stop-list">
-          {stops.map((stop, i) => (
-            <Fragment key={stop.id}>
-              <StopRow
-                index={i}
-                stop={stop}
-                count={stops.length}
-                endpoint={p.selectedEndpoint(i)}
-                picking={p.pick.pickingId === stop.id}
-                touch={p.touch}
-                canPick={p.pick.canPick}
-                outOfRange={i < p.span.from || i > p.span.to}
-                onMove={(dir) => p.editing.move(i, i + dir)}
-                onPick={() => (p.pick.pickingId === stop.id ? p.pick.stop() : p.pick.start(stop.id))}
-                onDelete={() => p.editing.remove(i)}
-              />
-              {i < stops.length - 1 && <SegmentRow {...p.segments[i]} onSelect={() => props.onSelect(props.selected === i ? null : i)} />}
-            </Fragment>
-          ))}
+          <SortableList ids={stops.map((s) => s.id)} onMove={p.editing.move} labels={reorder}>
+            {stops.map((stop, i) => (
+              <Fragment key={stop.id}>
+                <SortableItem id={stop.id} handleLabel={t('route.stop.reorder', { name: stop.name })}>
+                  {(handle) => (
+                    <StopRow
+                      index={i}
+                      stop={stop}
+                      count={stops.length}
+                      endpoint={p.selectedEndpoint(i)}
+                      picking={p.pick.pickingId === stop.id}
+                      touch={p.touch}
+                      canPick={p.pick.canPick}
+                      outOfRange={i < p.span.from || i > p.span.to}
+                      handle={handle}
+                      onPick={() => (p.pick.pickingId === stop.id ? p.pick.stop() : p.pick.start(stop.id))}
+                      onDelete={() => p.editing.remove(i)}
+                    />
+                  )}
+                </SortableItem>
+                {i < stops.length - 1 && <SegmentRow {...p.segments[i]} onSelect={() => props.onSelect(props.selected === i ? null : i)} />}
+              </Fragment>
+            ))}
+          </SortableList>
           <RangeRail
             count={stops.length}
             from={p.span.from}
