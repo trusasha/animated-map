@@ -40,7 +40,7 @@ export const figures = {
     viewerHint: 'Drag to rotate',
     size: 'Size',
     sizeValue: '×{value}',
-    note: 'Pose and size apply everywhere this figure is used: thumbnails, the map and the video.',
+    note: 'Size applies everywhere this figure is used: thumbnails, the map and the video.',
     save: 'Save',
     delete: 'Delete figure',
   },
