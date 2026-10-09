@@ -57,7 +57,7 @@ function Loaded(props: RoutePanelProps & { trip: Trip }) {
                 touch={p.touch}
                 canPick={p.pick.canPick}
                 outOfRange={i < p.span.from || i > p.span.to}
-                onMove={(dir) => p.editing.move(i, dir)}
+                onMove={(dir) => p.editing.move(i, i + dir)}
                 onPick={() => (p.pick.pickingId === stop.id ? p.pick.stop() : p.pick.start(stop.id))}
                 onDelete={() => p.editing.remove(i)}
               />
