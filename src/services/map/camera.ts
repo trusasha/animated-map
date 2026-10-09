@@ -1,10 +1,11 @@
 import * as maplibregl from 'maplibre-gl';
 import type { LngLat } from '../../domain/types';
+import { fitView } from './fitView';
 import type { CameraView, FitOptions, Padding } from './types';
 
 const ZERO: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
 const PADDING_MS = 300;
-// fitBounds on the globe lands up to ~20 px past its padding, which put leg ends under the panels
+// breathing room so leg ends and their markers sit clear of the panels
 const FIT_MARGIN = 28;
 const withMargin = (p: Padding): Padding =>
   ({ top: p.top + FIT_MARGIN, bottom: p.bottom + FIT_MARGIN, left: p.left + FIT_MARGIN, right: p.right + FIT_MARGIN });
@@ -63,14 +64,9 @@ export function createCamera(map: maplibregl.Map) {
           map.easeTo({ center: points[0], zoom: o.singleZoom ?? o.maxZoom, padding, duration: o.duration, animate });
           return;
         }
-        const b = new maplibregl.LngLatBounds();
-        for (const p of points) b.extend(p);
-        const fit = { padding: withMargin(padding), maxZoom: o.maxZoom, bearing: 0 };
-        const cam = map.cameraForBounds(b, { ...fit, absolutePadding: true });
-        if (!cam) return;
-        // maplibre's globe fit sizes the zoom to the whole canvas when the padding is absolute; the relative fit gets it right
-        const zoom = map.getProjection()?.type === 'globe' ? map.cameraForBounds(b, fit)?.zoom ?? cam.zoom : cam.zoom;
-        map.flyTo({ ...cam, zoom, padding, pitch: 0, duration: o.duration, ...curveOf(o.curve), essential: true, animate });
+        const { clientWidth: w, clientHeight: h } = map.getContainer();
+        const { center, zoom } = fitView(points, w, h, withMargin(padding), o.maxZoom);
+        map.flyTo({ center, zoom, padding, bearing: 0, pitch: 0, duration: o.duration, ...curveOf(o.curve), essential: true, animate });
       };
       return settle(map, o.duration, run).then(() => { if (fitting === job) fitting = null; });
     },
