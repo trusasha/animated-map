@@ -21,18 +21,23 @@ test('stable tiles: the export map pins tile levels, so its plan differs from th
       try {
         const player = map.player as any;
         await player.setTrip(stops, legs, speed);
+        player.map.jumpTo({ center: legs[0].path[0], zoom: 12, pitch: 55, bearing: 0 });
+        const sat = player.map.getSource('sat');
+        const levels = new Set(player.map.coveringTiles({ tileSize: 256, roundZoom: true, maxzoom: 19, terrain: player.map.terrain, calculateTileZoom: sat.calculateTileZoom }).map((t: any) => t.canonical.z)).size;
         const planned = await planTiles(player.map, player.lod, player.tl, () => true, () => {});
-        return { urls: planned.urls as string[], pinned: Object.keys(player.lod.pins ?? {}).length, hits: cursor.hits };
+        return { urls: planned.urls as string[], pinned: Object.keys(player.lod.pins ?? {}).length, hits: cursor.hits, levels };
       } finally {
         map.destroy();
         host.remove();
       }
     };
     const live = await plan(false), stable = await plan(true);
-    return { live: live.urls.length, stable: stable.urls.length, pinned: stable.pinned, hits: stable.hits, same: live.urls.join() === stable.urls.join() };
+    return { live: live.urls.length, stable: stable.urls.length, pinned: stable.pinned, hits: stable.hits, levels: { live: live.levels, stable: stable.levels }, same: live.urls.join() === stable.urls.join() };
   }, { stops: THREE_LEGS.stops, legs: THREE_LEGS.legs, speed: THREE_LEGS.speed });
   expect(result.pinned, 'every tiled source has pins').toBeGreaterThan(0);
   expect(result.hits, 'the zoom function knew its tile, so the pins applied').toBeGreaterThan(0);
+  expect(result.levels.live, 'a pitched live view loads coarser tiles far away').toBeGreaterThan(1);
+  expect(result.levels.stable, 'a pitched stable view loads one level, near and far').toBe(1);
   expect(result.stable, 'the stable plan has tiles').toBeGreaterThan(0);
   expect(result.same, `stable (${result.stable} tiles) and live (${result.live}) plans must differ`).toBe(false);
 });

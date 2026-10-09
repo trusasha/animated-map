@@ -23,13 +23,15 @@ export function installLod(map: MlMap, lod: LodState) {
     // MapLibre's own tile-zoom function, fetched via the public API rather than copied, then nudged up by the bias
     map.setSourceTileLodParams(9.314, 3, id);
     const base = src.calculateTileZoom;
-    src.calculateTileZoom = (z, ...rest) => {
-      // pins hold the detail through a zoom on their own
-      const level = base(z + (lod.stable ? 0 : lodBias(map, lod)), ...rest);
+    src.calculateTileZoom = (z, tile2d, dz, center3d, fov) => {
+      // stable: one level per frame, the centre's, so the far ground gets no coarser band; pins hold detail through zooms
+      const level = lod.stable
+        ? base(z, Math.sqrt(Math.max(0, center3d * center3d - dz * dz)), dz, center3d, fov)
+        : base(z + lodBias(map, lod), tile2d, dz, center3d, fov);
       const pins = lod.pins?.[id];
       if (!pins) return level;
       cursor.calls++;
-      if (rest[0] !== cursor.d) return level;
+      if (tile2d !== cursor.d) return level;
       cursor.hits++;
       return pinnedZoom(pins, cursor.z, cursor.x, cursor.y, level);
     };
