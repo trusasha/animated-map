@@ -60,7 +60,6 @@ const openFigures = async (page: Page, request: APIRequestContext) => {
 };
 
 const card = (dialog: ReturnType<Page['getByRole']>, name: string) => dialog.getByTestId('figures-list').locator('> div').filter({ hasText: name });
-const thumbSrc = (dialog: ReturnType<Page['getByRole']>, name: string) => card(dialog, name).locator('img').getAttribute('src');
 
 test.beforeEach(async ({ page }) => {
   await stubNet(page);
