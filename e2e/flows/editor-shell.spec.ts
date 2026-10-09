@@ -86,7 +86,7 @@ test.describe('editor shell (F12)', () => {
     test.skip(width(page) < 700 || width(page) >= 1100, 'tablet only');
     const t = await open(page, request);
     await expect(page.getByTestId('route-column')).toBeVisible();
-    await expect.poll(() => padding(page)).toEqual({ top: 50, bottom: 50, left: 380, right: 60 });
+    await expect.poll(() => padding(page)).toEqual({ top: 50, bottom: 50, left: 380, right: 80 });
     await page.getByTestId('segment-row').first().click();
     const column = page.getByTestId('inspector-column');
     await expect(column.getByTestId('segment-inspector')).toBeVisible();
@@ -110,7 +110,7 @@ test.describe('editor shell (F12)', () => {
   test('desktop: the inspector floats on the right and the camera and controls make room', async ({ page, request }) => {
     test.skip(width(page) < 1100, 'desktop only');
     const t = await open(page, request);
-    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 60 });
+    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 80 });
     await page.getByTestId('segment-row').first().click();
     const right = page.getByTestId('inspector-column');
     await expect(right.getByTestId('segment-inspector')).toBeVisible();
@@ -120,7 +120,7 @@ test.describe('editor shell (F12)', () => {
     const card = (await right.boundingBox())!;
     await expect.poll(async () => { const c = await controls(page); return c.x + c.width; }).toBeLessThanOrEqual(card.x + 1);
     await right.getByRole('button', { name: 'Снять выделение' }).click();
-    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 60 });
+    await expect.poll(() => padding(page)).toEqual({ top: 60, bottom: 60, left: 390, right: 80 });
     await t.done();
   });
 
