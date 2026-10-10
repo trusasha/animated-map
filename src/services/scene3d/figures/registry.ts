@@ -12,11 +12,6 @@ const builders: Record<string, () => THREE.Group> = Object.fromEntries(ORDER.map
 
 export const FIGURE_IDS = Object.keys(builders);
 
-export const FIGURE_LABELS: Record<string, string> = {
-  airplane: 'Самолёт', helicopter: 'Вертолёт', car: 'Машина', motorcycle: 'Мотоцикл-эндуро',
-  sportbike: 'Спортбайк', bus: 'Автобус', train: 'Поезд', bicycle: 'Велосипед', ship: 'Лайнер', sailboat: 'Парусник',
-};
-
 /** figure id → object; custom ids are `model:<url>` */
 export async function createFigure(id: string, pose?: ModelPose): Promise<THREE.Group> {
   if (id.startsWith('model:')) {
