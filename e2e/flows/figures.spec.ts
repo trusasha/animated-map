@@ -53,7 +53,7 @@ const EMPTY_TRIP = { stops: [], style: 'satellite', speed: 1, format: '9:16' };
 /** opens a trip the test created, then the Figures dialog from the header overflow menu */
 const openFigures = async (page: Page, request: APIRequestContext) => {
   const trip = await (await request.post('/api/trips', { data: { title: 'Figures trip', data: EMPTY_TRIP } })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.goto(`/trip/${trip.id}?e2e`);
   await page.getByRole('button', { name: 'More', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Your figures' }).click();
   return page.getByRole('dialog');
@@ -155,7 +155,7 @@ test.describe('figures library', () => {
   test('@needs-p3-04 size edit rebuilds the player trip', async ({ page, request }) => {
     await stubServer(page, [ready('m1', 'Truck')]);
     const trip = await (await request.post('/api/trips', { data: { title: 'Figures trip', data: EMPTY_TRIP } })).json();
-    await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+    await page.goto(`/trip/${trip.id}?e2e`);
     await page.evaluate(() => {
       const w = window as unknown as { __ta: { player: { setTrip: (...a: unknown[]) => unknown } }; __setTripCalls: number };
       const original = w.__ta.player.setTrip.bind(w.__ta.player);

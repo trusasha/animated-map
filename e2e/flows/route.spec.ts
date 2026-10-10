@@ -21,7 +21,7 @@ async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[
   const logged: Logged[] = [];
   await page.route('**/api/log', async (r) => { logged.push(r.request().postDataJSON()); await r.fulfill({ json: {} }); });
   const trip = await (await request.post('/api/trips', { data: { title: 'Route flow', data: { ...EMPTY, stops } } })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.goto(`/trip/${trip.id}?e2e`);
   const stored = async () => (await (await request.get(`/api/trips/${trip.id}`)).json()).data;
   return { id: trip.id as string, logged, stored, done: () => request.delete(`/api/trips/${trip.id}`) };
 }

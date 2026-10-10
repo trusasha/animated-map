@@ -24,7 +24,7 @@ const time = (page: Page) => page.evaluate(() => (window as any).__ta.player.tim
 
 async function openTrip(page: Page, request: any) {
   const trip = await (await request.post('/api/trips', { data: { title: 'Preview trip', data: DATA } })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.goto(`/trip/${trip.id}?e2e`);
   await expect(page.getByRole('textbox', { name: 'Название путешествия' })).toHaveValue('Preview trip');
   await expect.poll(() => page.evaluate(() => (window as any).__ta.player.duration as number), { timeout: 90_000 }).toBeGreaterThan(0);
   await expect.poll(() => probe(page).then((p) => p.markers, () => -1), { timeout: 90_000 }).toBe(3);

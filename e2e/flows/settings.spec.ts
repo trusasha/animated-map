@@ -17,7 +17,7 @@ test.afterAll(async ({ request }) => {
 });
 
 test('theme, language, default figure and fly threshold persist across reload', async ({ page }) => {
-  await page.goto('/?ui=next&e2e');
+  await page.goto('/?e2e');
   let dialog = await openSettings(page);
   await expect(dialog.getByRole('heading', { name: 'Настройки' })).toBeVisible();
 
@@ -45,7 +45,7 @@ test('theme, language, default figure and fly threshold persist across reload', 
 
 test('line colors and export quality show; Reset restores defaults', async ({ page }) => {
   await page.request.put('/api/settings', { data: { ...DEFAULTS, theme: 'dark', lang: 'en', flyKm: 900 } });
-  await page.goto('/?ui=next&e2e');
+  await page.goto('/?e2e');
   const dialog = await openSettings(page);
   await expect(dialog.getByText('Line colors')).toBeVisible();
   await expect(dialog.getByText('Export quality').first()).toBeVisible();
@@ -60,7 +60,7 @@ test('line colors and export quality show; Reset restores defaults', async ({ pa
 });
 
 test('Done closes the dialog', async ({ page }) => {
-  await page.goto('/?ui=next&e2e');
+  await page.goto('/?e2e');
   const dialog = await openSettings(page);
   await dialog.getByRole('button', { name: 'Готово' }).click();
   await expect(dialog).toBeHidden();
@@ -68,7 +68,7 @@ test('Done closes the dialog', async ({ page }) => {
 
 test('theme and language changes are logged as settings.change', async ({ page }) => {
   const log = await collectLog(page);
-  await page.goto('/?ui=next&e2e');
+  await page.goto('/?e2e');
   const dialog = await openSettings(page);
   await dialog.getByRole('radio', { name: 'Тёмное' }).check({ force: true });
   await dialog.getByRole('radio', { name: 'English' }).check({ force: true });

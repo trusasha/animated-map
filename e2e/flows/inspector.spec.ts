@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 
 async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[0]['request']) {
   const trip = await (await request.post('/api/trips', { data: { title: 'Inspector flow', data: { ...EMPTY, stops: SEED } } })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e`);
+  await page.goto(`/trip/${trip.id}?e2e`);
   const leg = async (i: number) => (await (await request.get(`/api/trips/${trip.id}`)).json()).data.stops[i + 1].leg;
   const select = async (i: number) => {
     await page.getByTestId('segment-row').nth(i).click();

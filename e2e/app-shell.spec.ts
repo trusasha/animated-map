@@ -20,7 +20,7 @@ test.describe('app shell @map', () => {
     await openHome(page);
     await mapCanvas(page).evaluate((el) => { (el as HTMLElement).dataset.keep = '1'; });
     await page.getByRole('button', { name: 'Новое путешествие' }).click();
-    await expect(page).toHaveURL(/\/trip\/[^/?]+\?ui=next&e2e$/);
+    await expect(page).toHaveURL(/\/trip\/[^/?]+\?e2e$/);
     await expect(page.getByTestId('editor-shell')).toBeVisible();
     await expect(mapCanvas(page)).toHaveAttribute('data-keep', '1');
     await page.goBack();
@@ -66,21 +66,12 @@ test.describe('app shell @map', () => {
   test('an error thrown in one slot is caught, toasted and logged; siblings stay', async ({ page, request }) => {
     const log = await collectLog(page);
     const trip = await seedTrip(request);
-    await page.goto(`/trip/${trip.id}?ui=next&e2e&crash=video-panel`);
+    await page.goto(`/trip/${trip.id}?e2e&crash=video-panel`);
     await expect(page.getByRole('alert')).toContainText('video-panel crashed');
     await expect(page.getByRole('heading', { name: 'Видео' })).toHaveCount(0);
     await expect(page.getByTestId('editor-shell')).toBeVisible();
     await expect(header(page)).toBeVisible();
     await log.waitFor('error', (d) => String(d.message).includes('video-panel crashed'));
     await removeTrip(request, trip.id);
-  });
-
-  test('ui choice is remembered and ?ui=legacy returns to the legacy app', async ({ page }) => {
-    await openHome(page);
-    await page.goto('/?e2e');
-    await expect(page.getByTestId('home-screen')).toBeVisible();
-    await page.goto('/?ui=legacy&e2e');
-    await expect(page.locator('.map canvas.maplibregl-canvas')).toBeVisible();
-    await expect(page.getByTestId('home-screen')).toHaveCount(0);
   });
 });

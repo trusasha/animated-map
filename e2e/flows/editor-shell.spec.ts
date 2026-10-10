@@ -24,7 +24,7 @@ async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[
   const trip = await (await request.post('/api/trips', {
     data: { title: 'Shell flow', data: { stops: SEED, style: 'satellite', speed: 1, format: '9:16' } },
   })).json();
-  await page.goto(`/trip/${trip.id}?ui=next&e2e${query}`);
+  await page.goto(`/trip/${trip.id}?e2e${query}`);
   await expect(page.getByTestId('stop-list')).toBeVisible();
   return { done: () => request.delete(`/api/trips/${trip.id}`) };
 }
@@ -126,7 +126,7 @@ test.describe('editor shell (F12)', () => {
 
   test('phone Home: the globe sits above the card and the controls clear it', async ({ page }) => {
     test.skip(width(page) >= 700, 'phone only');
-    await page.goto('/?ui=next&e2e');
+    await page.goto('/?e2e');
     const card = page.getByTestId('home-screen').locator(':scope > div').first();
     await expect(card).toBeVisible();
     await expect.poll(async () => {

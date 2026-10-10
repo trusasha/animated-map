@@ -11,7 +11,7 @@ export const parseRoute = (path: string): Route => {
 
 export const pathFor = (route: Route) => (route.name === 'trip' ? `/trip/${encodeURIComponent(route.id)}` : '/');
 
-/** keeps the query string so `?ui=next` and `?e2e` survive navigation */
+/** keeps the query string so `?e2e` survives navigation */
 export function navigate(route: Route, replace = false) {
   const url = pathFor(route) + location.search;
   if (url === location.pathname + location.search) return;

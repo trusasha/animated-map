@@ -9,13 +9,13 @@ test.beforeEach(async ({ page }) => {
 test.describe('home @map', () => {
   test('F1: no trips shows the empty copy, New trip opens a new trip', async ({ page }) => {
     await emptyTrips(page);
-    await page.goto('/?ui=next&e2e');
+    await page.goto('/?e2e');
     await expect(page.getByText('Путешествий пока нет. Они сохраняются здесь автоматически.')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Превратите путешествие в видео.');
     const created = page.waitForRequest((r) => r.method() === 'POST' && r.url().endsWith('/api/trips'));
     await page.getByRole('button', { name: 'Новое путешествие' }).click();
     expect((await created).postDataJSON().title).toBe('Новое путешествие');
-    await expect(page).toHaveURL(/\/trip\/[^/?]+\?ui=next&e2e$/);
+    await expect(page).toHaveURL(/\/trip\/[^/?]+\?e2e$/);
     await expect(page.getByRole('textbox', { name: 'Название путешествия' })).toHaveValue('Новое путешествие');
   });
 
@@ -28,7 +28,7 @@ test.describe('home @map', () => {
       style: 'satellite', speed: 1, format: '9:16',
     };
     const trip = await (await request.post('/api/trips', { data: { title: 'Home row trip', data } })).json();
-    await page.goto('/?ui=next&e2e');
+    await page.goto('/?e2e');
     const row = page.getByTestId('trip-row').filter({ hasText: 'Home row trip' });
     await expect(row).toContainText('2 точки');
     await expect(row).toContainText('Воздух');

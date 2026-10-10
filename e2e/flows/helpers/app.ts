@@ -16,12 +16,12 @@ export async function prepare(page: Page) {
 export const mapCanvas = (page: Page) => page.getByTestId('map-host').locator('canvas.maplibregl-canvas');
 
 export async function openHome(page: Page) {
-  await page.goto('/?ui=next&e2e');
+  await page.goto('/?e2e');
   await expect(page.getByTestId('home-screen')).toBeVisible();
 }
 
 export async function openEditor(page: Page, tripId: string) {
-  await page.goto(`/trip/${tripId}?ui=next&e2e`);
+  await page.goto(`/trip/${tripId}?e2e`);
   await expect(page.getByTestId('editor-shell')).toBeVisible();
 }
 
