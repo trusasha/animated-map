@@ -3,8 +3,9 @@ import { detailZoom, sample, type Timeline } from '../../../domain/timeline';
 import { jumpToCamera } from '../fit';
 import type { LodState } from '../lod';
 import { cursor, trackCoveringTiles } from '../stable/cursor';
+import { applyStretch, planLegLevels, withSwitches } from '../stable/levels';
 import { addTile, createPins, type Pins } from '../stable/pins';
-import { FINE, preloadTimes } from './times';
+import { DENSE, FINE, preloadTimes } from './times';
 
 /** tile URLs in timeline order; cuts[k] = how many of them cover everything up to times[k] */
 export interface TilePlan { times: number[]; cuts: number[]; urls: string[] }
@@ -23,7 +24,7 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
     const tiles = src?.tiles ?? spec[id].tiles;
     return src && tiles ? [{ id, type: src.type, tiles, tileSize: src.tileSize, minzoom: src.minzoom, maxzoom: src.maxzoom, scheme: src.scheme, calculateTileZoom: src.calculateTileZoom }] : [];
   });
-  const times = preloadTimes(tl, FINE);
+  const times = lod.stable ? withSwitches(tl, preloadTimes(tl, DENSE)) : preloadTimes(tl, FINE);
   const terrain = (map as unknown as { terrain?: { tileManager: { tileSize: number } } }).terrain;
   const terrainSource = map.getTerrain()?.source;
   // raster rounds the zoom, vector floors it; DEM serves both hillshade and terrain, which differ, so take both
@@ -32,19 +33,20 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
   const exact = (s: TileSource) => [s.id === terrainSource && terrain ? { tileSize: terrain.tileManager.tileSize, roundZoom: false } : { tileSize: s.tileSize ?? 512, roundZoom: s.type !== 'vector' }];
   const options = lod.stable ? exact : legacy;
   const covering = map.coveringTiles.bind(map) as unknown as Covering;
+  const cover = (s: TileSource, o: { tileSize: number; roundZoom: boolean }) => covering({ ...o, minzoom: s.minzoom, maxzoom: s.maxzoom, terrain, calculateTileZoom: s.calculateTileZoom });
   const detail = lod.detail;
+  const at = (t: number) => {
+    jumpToCamera(map, sample(tl, t).camera);
+    lod.detail = detailZoom(tl, t);
+    applyStretch(lod, tl, t);
+  };
 
   /** every planned camera's tiles per source; false if interrupted */
   const sweep = async (each: (s: TileSource, id: TileID) => void, afterFrame: () => void, from: number, span: number) => {
     for (const [i, t] of times.entries()) {
-      jumpToCamera(map, sample(tl, t).camera);
-      lod.detail = detailZoom(tl, t);
-      for (const s of sources) {
-        for (const o of options(s)) {
-          // terrain and the source's own zoom function: the same tile choice the renderer makes
-          for (const id of covering({ ...o, minzoom: s.minzoom, maxzoom: s.maxzoom, terrain, calculateTileZoom: s.calculateTileZoom })) each(s, id);
-        }
-      }
+      at(t);
+      // terrain and the source's own zoom function: the same tile choice the renderer makes
+      for (const s of sources) for (const o of options(s)) for (const id of cover(s, o)) each(s, id);
       afterFrame();
       if (i % 100 === 0) {
         onProgress(from + (span * i) / times.length);
@@ -60,9 +62,18 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
       // first the levels the camera alone would load, then each place keeps the finest of them throughout
       // here rather than on style load, so a MapLibre that moved its internals fails the export loudly
       trackCoveringTiles(map);
+      lod.pins = lod.legLevels = undefined;
+      lod.legLevels = planLegLevels(tl, times, (t) => {
+        at(t);
+        lod.forced = undefined;
+        return Object.fromEntries(sources.flatMap((s) => { const ids = cover(s, exact(s)[0]); return ids.length ? [[s.id, Math.max(...ids.map((id) => id.canonical.z))]] : []; }));
+      }, (t, levels) => {
+        at(t);
+        lod.forced = levels;
+        return Math.max(...sources.map((s) => cover(s, exact(s)[0]).length));
+      });
       const pins: Record<string, Pins> = {};
-      lod.pins = undefined;
-      const ok = await sweep((s, { canonical: c }) => addTile((pins[s.id] ??= createPins()), c.z, c.x, c.y), () => {}, 0, 0.5);
+      const ok = await sweep((s, { canonical: c }) => { if (lod.usePins) addTile((pins[s.id] ??= createPins()), c.z, c.x, c.y); }, () => {}, 0, 0.5);
       if (!ok) return undefined;
       lod.pins = pins;
       cursor.calls = cursor.hits = 0;

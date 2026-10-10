@@ -8,6 +8,8 @@ const PRELOAD_STEP = 1 / 15;
  * screen and the detail lock keeps tile levels steady between them, so nothing in between is missed
  */
 export const FINE = [250, 0.25, 5, PRELOAD_STEP * 4] as const;
+/** stable export: a fixed level per leg draws finer tiles mid-leg, so frames between samples reach past their union at the edges */
+export const DENSE = [125, 0.25, 5, PRELOAD_STEP * 2] as const;
 
 export function preloadTimes(tl: Timeline, [px, dz, dp, step]: readonly [number, number, number, number]) {
   const merc = ({ center: [x, y], zoom }: Frame['camera']) =>
