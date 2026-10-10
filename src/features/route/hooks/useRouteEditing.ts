@@ -66,7 +66,7 @@ export function useRouteEditing({ data, update, onSelect }: RouteEditingArgs) {
 
   const setRange = (from: number, to: number) => {
     api.log('range.set', { from, to, whole: from === 0 && to === last });
-    update((d) => ({ ...d, range: from === 0 && to === d.stops.length - 1 ? undefined : { from: d.stops[from].id, to: d.stops[to].id } }));
+    update((d) => ({ ...d, range: { from: d.stops[from].id, to: d.stops[to].id } }));
   };
 
   const clearRange = () => {
