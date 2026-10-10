@@ -25,19 +25,25 @@ test('stable tiles: the export map pins tile levels, so its plan differs from th
         const sat = player.map.getSource('sat');
         const levels = new Set(player.map.coveringTiles({ tileSize: 256, roundZoom: true, maxzoom: 19, terrain: player.map.terrain, calculateTileZoom: sat.calculateTileZoom }).map((t: any) => t.canonical.z)).size;
         const planned = await planTiles(player.map, player.lod, player.tl, () => true, () => {});
-        return { urls: planned.urls as string[], pinned: Object.keys(player.lod.pins ?? {}).length, hits: cursor.hits, levels };
+        const ground = player.tl.legs.find((l: any) => l.mode === 'ground');
+        player.setFrame((ground.start + ground.end) / 2);
+        const groundLevels = new Set(player.map.coveringTiles({ tileSize: 256, roundZoom: true, maxzoom: 19, terrain: player.map.terrain, calculateTileZoom: sat.calculateTileZoom }).map((t: any) => t.canonical.z)).size;
+        return { groundLevels, pitch: player.map.getPitch(), urls: planned.urls as string[], pinned: Object.keys(player.lod.pins ?? {}).length, hits: cursor.hits, levels };
       } finally {
         map.destroy();
         host.remove();
       }
     };
     const live = await plan(false), stable = await plan(true);
-    return { live: live.urls.length, stable: stable.urls.length, pinned: stable.pinned, hits: stable.hits, levels: { live: live.levels, stable: stable.levels }, same: live.urls.join() === stable.urls.join() };
+    return { live: live.urls.length, stable: stable.urls.length, pinned: stable.pinned, hits: stable.hits, levels: { live: live.levels, stable: stable.levels }, ground: { live: live.groundLevels, stable: stable.groundLevels, pitch: stable.pitch }, same: live.urls.join() === stable.urls.join() };
   }, { stops: THREE_LEGS.stops, legs: THREE_LEGS.legs, speed: THREE_LEGS.speed });
   expect(result.pinned, 'every tiled source has pins').toBeGreaterThan(0);
   expect(result.hits, 'the zoom function knew its tile, so the pins applied').toBeGreaterThan(0);
   expect(result.levels.live, 'a pitched live view loads coarser tiles far away').toBeGreaterThan(1);
   expect(result.levels.stable, 'a pitched stable view loads one level, near and far').toBe(1);
+  expect(result.ground.pitch, 'the ground frame is pitched').toBeGreaterThan(40);
+  expect(result.ground.live, 'live mixes levels in that frame').toBeGreaterThan(1);
+  expect(result.ground.stable, 'strict stable loads one level in a pitched ground frame').toBe(1);
   expect(result.stable, 'the stable plan has tiles').toBeGreaterThan(0);
   expect(result.same, `stable (${result.stable} tiles) and live (${result.live}) plans must differ`).toBe(false);
 });
