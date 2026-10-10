@@ -24,4 +24,10 @@ export async function migrate(query: Query) {
     data jsonb not null,
     updated_at timestamptz not null default now()
   )`);
+  // null user_id = the local single user (auth off) and legacy rows waiting to be claimed
+  for (const table of ['trips', 'models', 'settings']) {
+    await query(`alter table ${table} add column if not exists user_id text`);
+    await query(`create index if not exists ${table}_user_id on ${table} (user_id)`);
+  }
+  await query('create table if not exists app_meta (key text primary key, value text not null)');
 }

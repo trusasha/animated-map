@@ -2,14 +2,17 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
+import type { Owner } from './db/index.ts';
 
 export function createUploads(dataDir: string) {
   const dir = `${dataDir}/uploads`;
   mkdirSync(dir, { recursive: true });
   return {
     dir,
-    save(buf: Buffer, ext: string) {
-      const name = `${randomUUID()}.${ext}`;
+    /** a signed-in user's files go in their own folder; the local user keeps the flat layout */
+    save(buf: Buffer, ext: string, owner: Owner = null) {
+      const name = `${owner ? `${owner}/` : ''}${randomUUID()}.${ext}`;
+      if (owner) mkdirSync(`${dir}/${owner}`, { recursive: true });
       writeFileSync(`${dir}/${name}`, buf);
       return `/uploads/${name}`;
     },
