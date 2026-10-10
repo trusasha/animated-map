@@ -167,7 +167,7 @@ test.describe('RangeRail', () => {
   test('End moves the end handle to the last row', async ({ page }) => {
     await handle(page, END).focus();
     await page.keyboard.press('End');
-    await expect(handle(page, END)).toHaveAttribute('aria-valuetext', 'Lisbon');
+    await expect(handle(page, END)).toHaveAttribute('aria-valuetext', 'Budapest');
   });
 
   test('dragging the start handle with the pointer moves it to the row under the cursor', async ({ page }) => {

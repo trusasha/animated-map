@@ -83,6 +83,7 @@ export function SortableItem({ id, handleLabel, children, className }: SortableI
       ref={setActivatorNodeRef}
       className={styles.handle}
       data-sortable-handle=""
+      data-own-drag=""
       {...attributes}
       aria-label={handleLabel}
       onKeyDown={listeners?.onKeyDown as KeyboardEventHandler | undefined}
