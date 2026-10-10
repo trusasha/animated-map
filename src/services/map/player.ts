@@ -6,6 +6,7 @@ import { containerFit, jumpToCamera } from './fit';
 import { setContextPaths, setContextVisible, setHighlight, setRoute, setStops, setTrail, installRouteLayers } from './layers/routeLayers';
 import { installLod, type LodState } from './lod';
 import { preload, type Prefetch, type PreloadTarget } from './preload';
+import { applyStretch } from './stable/levels';
 import type { TripPlayer } from './types';
 
 /** id of the 3D overlay layer; route lines go below it */
@@ -116,6 +117,7 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
     this.time = Math.max(0, Math.min(t, tl.duration));
     const f = (this.frame = sample(tl, this.time));
     this.lod.detail = detailZoom(tl, this.time);
+    applyStretch(this.lod, tl, this.time);
     this.showContext(false);
     setTrail(this.map, tl.legs, f);
     const visited = f.legIndex + (f.progress >= 1 ? 2 : 1);
