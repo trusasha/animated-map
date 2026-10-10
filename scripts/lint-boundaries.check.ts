@@ -35,12 +35,17 @@ const cases: { fixture: string; virtualPath: string; rule: string | null }[] = [
   { fixture: 'features-deep-feature-import.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: PATHS },
   { fixture: 'features-dynamic-import-three.ts', virtualPath: 'src/features/trips/fixture.ts', rule: 'no-restricted-syntax' },
   { fixture: 'server-dynamic-import-pglite.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-syntax' },
+  { fixture: 'imports-supabase.ts', virtualPath: 'src/features/trips/fixture.ts', rule: 'no-restricted-imports' },
+  { fixture: 'imports-supabase.ts', virtualPath: 'src/services/api/fixture.ts', rule: 'no-restricted-imports' },
+  { fixture: 'server-imports-jose.ts', virtualPath: 'server/routes/fixture.ts', rule: 'no-restricted-imports' },
   { fixture: 'new-top-level-any.ts', virtualPath: 'src/newtop.ts', rule: '@typescript-eslint/no-explicit-any' },
   // the same code is legal in the layer that owns it
   { fixture: 'features-imports-feature-index.tsx', virtualPath: 'src/features/trips/fixture.tsx', rule: null },
   { fixture: 'video-global-outside-video.ts', virtualPath: 'src/services/video/fixture.ts', rule: null },
   { fixture: 'server-imports-pglite-outside-db.ts', virtualPath: 'server/db/fixture.ts', rule: null },
   { fixture: 'server-dynamic-import-pglite.ts', virtualPath: 'server/db/fixture.ts', rule: null },
+  { fixture: 'imports-supabase.ts', virtualPath: 'src/services/auth/fixture.ts', rule: null },
+  { fixture: 'server-imports-jose.ts', virtualPath: 'server/auth/fixture.ts', rule: null },
 ];
 
 // realpath: the resolver returns real paths and tmpdir() is a symlink on macOS
