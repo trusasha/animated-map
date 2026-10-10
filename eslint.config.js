@@ -171,34 +171,8 @@ const buildConfig = (root) => tseslint.config(
     }),
   },
   {
-    // Temporary legacy exceptions (added 2026-10-08): remove an entry when its file is deleted or split
-    files: [
-      'src/legacy/**',
-      'src/app/main.tsx',
-    ],
-    rules: {
-      'no-restricted-imports': 'off',
-      'no-restricted-globals': 'off',
-      'no-restricted-syntax': 'off',
-      'import-x/no-restricted-paths': 'off',
-      'react-hooks/refs': 'off', // legacy App.tsx assigns refs during render
-    },
-  },
-  {
-    // Temporary legacy quality debt (files as of 2026-10-08; new top-level files get full errors): demoted to warnings until each file is rewritten under the new layers
-    files: [
-      'src/legacy/LegacyApp.tsx',
-      'src/legacy/api.ts',
-      'src/figures-gallery.ts',
-      'src/legacy/figures.ts',
-      'src/legacy/geo.ts',
-      'src/app/main.tsx',
-      'src/legacy/route.ts',
-      'src/legacy/thumbs.ts',
-      'src/legacy/timeline.ts',
-      'src/legacy/types.ts',
-      'server/ai.ts',
-    ],
+    // Temporary quality debt (as of 2026-10-08): demoted to warnings until the file is rewritten under the new layers
+    files: ['server/ai.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-expressions': 'warn',

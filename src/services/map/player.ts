@@ -26,7 +26,7 @@ export class MapPlayer implements TripPlayer, PreloadTarget {
   prefetch?: Prefetch<Timeline>;
   readonly lod: LodState = { detail: 0 };
   readonly fit: FitFn;
-  /** the overlay layer's draw call; replaceable so the legacy facade can route it through its own method */
+  /** the overlay layer's draw call; replaceable so e2e/baselines/overlay.ts can read the layer's matrices */
   draw = (gl: WebGL2RenderingContext, proj: ProjectionData) => this.overlay.render(gl, proj, this.overlayContext());
   private visited = -1;
   private raf = 0;
