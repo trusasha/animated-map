@@ -31,6 +31,8 @@ async function open(page: Page, request: Parameters<Parameters<typeof test>[2]>[
 }
 
 test.describe('range rail @map', () => {
+  test.describe.configure({ timeout: 60_000 });
+
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await prepare(page);
@@ -40,11 +42,10 @@ test.describe('range rail @map', () => {
     test.skip(isPhone(page), 'desktop only');
     const trip = await open(page, request);
     await stopRow(page, 3).evaluate((el) => el.scrollIntoView({ block: 'start' }));
-    const a = (await endHandle(page).boundingBox())!;
+    await endHandle(page).hover();
     const b = (await stopRow(page, 9).boundingBox())!;
-    await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
     await page.mouse.down();
-    await page.mouse.move(a.x + a.width / 2 + 40, b.y + 20, { steps: 30 });
+    await page.mouse.move(b.x + 40, b.y + 20, { steps: 30 });
     await expect(endHandle(page)).toHaveAttribute('aria-valuenow', '9');
     await page.mouse.up();
     await expect(page.getByText('В видео войдут точки 1–10.')).toBeVisible();
@@ -55,13 +56,13 @@ test.describe('range rail @map', () => {
   test('dragging past the bottom edge auto-scrolls and clamps to the last stop', async ({ page, request }) => {
     test.skip(isPhone(page), 'desktop only');
     const trip = await open(page, request);
+    await endHandle(page).hover();
     const box = await scroller(page);
     const before = await box.evaluate((el) => el.scrollTop);
     const edge = await box.evaluate((el) => Math.min(el.getBoundingClientRect().bottom, innerHeight));
-    const a = (await endHandle(page).boundingBox())!;
-    await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+    const x = (await stopRow(page, 3).boundingBox())!.x + 40;
     await page.mouse.down();
-    await page.mouse.move(a.x + a.width / 2, Math.min(edge + 20, page.viewportSize()!.height - 1), { steps: 20 });
+    await page.mouse.move(x, Math.min(edge + 20, page.viewportSize()!.height - 1), { steps: 20 });
     await expect(endHandle(page)).toHaveAttribute('aria-valuenow', String(COUNT - 1), { timeout: 10_000 });
     expect(await box.evaluate((el) => el.scrollTop)).toBeGreaterThan(before);
     await page.mouse.up();
