@@ -14,6 +14,9 @@ export interface HomeGlobe {
 
 export interface HomeScreenProps { onOpenTrip: (id: string) => void; globe?: HomeGlobe }
 
+/** the signed-in account; null when auth is off */
+export interface HeaderAccount { email: string | null; onSignOut: () => void }
+
 export interface AppHeaderProps {
   /** null on Home */
   tripId: string | null;
@@ -23,6 +26,7 @@ export interface AppHeaderProps {
   onExport: () => void;
   onOpenSettings: () => void;
   onOpenFigures: () => void;
+  account?: HeaderAccount | null;
 }
 
 export interface VideoActionsProps {

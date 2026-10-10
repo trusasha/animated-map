@@ -9,7 +9,7 @@ import { SaveStatusLabel } from './SaveStatusLabel';
 import { VideoActions } from './VideoActions';
 import styles from './AppHeader.module.css';
 
-export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, onOpenSettings, onOpenFigures }: AppHeaderProps) {
+export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, onOpenSettings, onOpenFigures, account }: AppHeaderProps) {
   const { t } = useT();
   const { mode } = useViewportMode();
   const { trip, setTitle, discard } = useTripContext();
@@ -55,7 +55,9 @@ export function AppHeader({ tripId, onGoHome, onOpenTrip, onPreview, onExport, o
       <div className={styles.spacer} />
       {editing && desktop && <Button variant="ghost" size="sm" loading={actions.busy} onClick={newTrip}>{t('trips.header.newTrip')}</Button>}
       {editing && !phone && <VideoActions onPreview={onPreview} onExport={onExport} short={!desktop} />}
-      {editing && <HeaderOverflowMenu onNewTrip={desktop ? undefined : newTrip} onDelete={() => setConfirmingDelete(true)} onOpenFigures={onOpenFigures} />}
+      {editing ? (
+        <HeaderOverflowMenu onNewTrip={desktop ? undefined : newTrip} onDelete={() => setConfirmingDelete(true)} onOpenFigures={onOpenFigures} account={account} />
+      ) : account && <HeaderOverflowMenu account={account} />}
       <IconButton icon="settings" label={t('trips.header.settings')} size={36} onClick={onOpenSettings} />
       <ConfirmDialog
         open={confirmingDelete}

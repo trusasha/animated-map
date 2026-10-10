@@ -1,5 +1,6 @@
 import '../ds/index.css';
 import { ToastProvider } from '../features/toasts';
+import { AuthGate } from './AuthGate';
 import { ErrorBoundary } from './ErrorBoundary';
 import { I18nBridge } from './providers/I18nBridge';
 import { ServicesProvider } from './providers/ServicesProvider';
@@ -17,19 +18,21 @@ function Screens() {
 
 export function App() {
   return (
-    <SettingsProvider>
-      <I18nBridge>
-        <ThemeSync />
-        <ToastProvider>
-          <ErrorBoundary>
-            <div className={styles.app}>
-              <ServicesProvider>
-                <Screens />
-              </ServicesProvider>
-            </div>
-          </ErrorBoundary>
-        </ToastProvider>
-      </I18nBridge>
-    </SettingsProvider>
+    <AuthGate>
+      <SettingsProvider>
+        <I18nBridge>
+          <ThemeSync />
+          <ToastProvider>
+            <ErrorBoundary>
+              <div className={styles.app}>
+                <ServicesProvider>
+                  <Screens />
+                </ServicesProvider>
+              </div>
+            </ErrorBoundary>
+          </ToastProvider>
+        </I18nBridge>
+      </SettingsProvider>
+    </AuthGate>
   );
 }
