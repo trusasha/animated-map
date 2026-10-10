@@ -1,5 +1,6 @@
 import type { Dict } from '../en';
 import type { Shape } from '../keys';
+import { auth } from './auth';
 import { common } from './common';
 import { composer } from './composer';
 import { exportDialog } from './export';
@@ -13,4 +14,4 @@ import { toasts } from './toasts';
 import { trips } from './trips';
 import { video } from './video';
 
-export const ru: Shape<Dict> = { common, home, trips, route, composer, inspector, video, settings, figures, export: exportDialog, preview, toasts };
+export const ru: Shape<Dict> = { common, home, trips, route, composer, inspector, video, settings, figures, export: exportDialog, preview, toasts, auth };
