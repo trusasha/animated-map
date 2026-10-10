@@ -47,10 +47,11 @@ async function mouseDrag(page: Page, from: Locator, to: Locator) {
   await page.mouse.move(a.x, b.top + 2, { steps: 20 });
   await page.mouse.up();
 }
-/** dnd-kit arms its keyboard listeners a tick after pick-up and measures after each step */
+/** dnd-kit adds its arrow-key listener in a setTimeout queued at pick-up; a busy main thread (the map) delays it past the next key */
 async function pickUpAndMove(page: Page, grip: Locator, key: string) {
   await page.keyboard.press('Space');
   await expect(grip).toHaveAttribute('aria-pressed', 'true');
+  await page.evaluate(() => new Promise((r) => setTimeout(r)));
   await page.keyboard.press(key);
   await page.waitForTimeout(250);
 }
@@ -177,7 +178,7 @@ test.describe('route panel @map', () => {
   test('phone: dragging the grip with a finger moves the last stop to the top', async ({ page, request }) => {
     test.skip((page.viewportSize()?.width ?? 0) >= 700, 'phone only');
     const t = await open(page, request, SEED);
-    await expect(handle(page, 'Rome')).toBeVisible();
+    await handle(page, 'Rome').scrollIntoViewIfNeeded();
     await touchDrag(page, handle(page, 'Rome'), page.getByTestId('stop-row').first());
     await expect.poll(async () => (await t.stored()).stops.map((s: { name: string }) => s.name)).toEqual(['Rome', 'Paris', 'Berlin']);
     await t.done();
