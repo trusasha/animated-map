@@ -28,10 +28,10 @@ export async function planTiles(map: MlMap, lod: LodState, tl: Timeline, alive: 
   const terrain = (map as unknown as { terrain?: { tileManager: { tileSize: number } } }).terrain;
   const terrainSource = map.getTerrain()?.source;
   // raster rounds the zoom, vector floors it; DEM serves both hillshade and terrain, which differ, so take both
-  const legacy = (s: TileSource) => (s.type === 'raster' ? [true] : s.type === 'vector' ? [false] : [false, true]).map((roundZoom) => ({ tileSize: s.tileSize ?? 512, roundZoom }));
+  const byType = (s: TileSource) => (s.type === 'raster' ? [true] : s.type === 'vector' ? [false] : [false, true]).map((roundZoom) => ({ tileSize: s.tileSize ?? 512, roundZoom }));
   // exactly what the renderer asks for: terrain floors the zoom at its own tile size
   const exact = (s: TileSource) => [s.id === terrainSource && terrain ? { tileSize: terrain.tileManager.tileSize, roundZoom: false } : { tileSize: s.tileSize ?? 512, roundZoom: s.type !== 'vector' }];
-  const options = lod.stable ? exact : legacy;
+  const options = lod.stable ? exact : byType;
   const covering = map.coveringTiles.bind(map) as unknown as Covering;
   const cover = (s: TileSource, o: { tileSize: number; roundZoom: boolean }) => covering({ ...o, minzoom: s.minzoom, maxzoom: s.maxzoom, terrain, calculateTileZoom: s.calculateTileZoom });
   const detail = lod.detail;
