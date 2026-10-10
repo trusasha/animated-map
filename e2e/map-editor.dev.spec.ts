@@ -12,7 +12,7 @@ const EDITOR = ['seg-casing', 'seg-ground', 'seg-water', 'seg-air', 'seg-pending
 /** a MapService on a bare dev-server page, showing the three-leg trip in editing mode */
 async function mount(page: Page) {
   await stubNet(page);
-  // a page without the legacy app: its own map would compete for the software GL
+  // a page without the app: its own map would compete for the software GL
   await page.goto('/api/config');
   await page.evaluate(async (trip) => {
     const load = (p: string) => import(/* @vite-ignore */ p);

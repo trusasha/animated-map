@@ -1,47 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- page code reaches into untyped app internals */
 import { readFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
-import { emptyTrips } from '../fixtures/api';
 import { stubNet } from '../fixtures/net';
 
 const fixture = (name: string) => JSON.parse(readFileSync(new URL(`../fixtures/trips/${name}.json`, import.meta.url), 'utf8'));
 export const THREE_LEGS = fixture('three-legs');
 export const MIGRATE_INPUTS = ['trip-legs-v1', 'trip-chained', 'trip-broken'].map((n) => [n, fixture(n)] as const);
 
-/** boots the legacy app on the dev server and waits until its Animator has installed the map layers */
-export async function boot(page: Page, path = '/') {
+/** the pre-refactor editor map: a MapPlayer in the map pane the old 1440x900 layout gave it (1060x835 right of a 380px panel) */
+export async function boot(page: Page) {
   await stubNet(page);
-  await emptyTrips(page);
-  // counts the app's own completed setTrip calls without changing what they do
-  await page.addInitScript(() => {
-    let anim: any;
-    (window as any).__setTripDone = 0;
-    Object.defineProperty(window, '__anim', {
-      configurable: true,
-      get: () => anim,
-      set: (a) => {
-        const setTrip = a.setTrip.bind(a);
-        a.setTrip = async (...args: unknown[]) => {
-          try { return await setTrip(...args); } finally { (window as any).__setTripDone++; }
-        };
-        anim = a;
-      },
-    });
+  // a page without the app: its own map would compete for the software GL
+  await page.goto('/api/config');
+  await page.evaluate(async () => {
+    const load = (p: string) => import(/* @vite-ignore */ p);
+    await load('/src/services/map/index.ts');
+    const { MapPlayer } = await load('/src/services/map/player.ts');
+    const { registerDemProtocol } = await load('/src/services/map/styles/dem.ts');
+    const { installImageResolver } = await load('/src/services/map/styles/imageResolver.ts');
+    const { loadStyle } = await load('/src/services/map/styles/loadStyle.ts');
+    const { TILE_CACHE_ZOOM_LEVELS } = await load('/src/services/map/styles/hosts.ts');
+    const { createOverlay3D } = await load('/src/services/scene3d/index.ts');
+    const maplibreUrl = () => performance.getEntriesByType('resource').map((e) => e.name).find((n) => /maplibre-gl\.mjs/.test(n))!;
+    const { Map: MlMap } = await load(maplibreUrl());
+    const host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:380px;top:0;width:1060px;height:835px';
+    document.body.append(host);
+    const map = new MlMap({ container: host, style: await loadStyle('satellite'), center: [20, 30], zoom: 1.4, maxTileCacheZoomLevels: TILE_CACHE_ZOOM_LEVELS, canvasContextAttributes: { antialias: true } });
+    registerDemProtocol();
+    installImageResolver(map);
+    const player = new MapPlayer(map, createOverlay3D());
+    await new Promise((r) => map.once('load', r));
+    // the old editor handed its empty trip to the map before anything else
+    await player.setTrip([], [], 1);
+    player.setContext([]);
+    player.setFrame(null);
+    (window as any).__player = player;
   });
-  await page.goto(path);
-  await page.waitForFunction(() => {
-    const a = (window as any).__anim;
-    return a && a.map.loaded() && a.map.getSource('stops');
-  });
-  // the app's own setTrip for its empty trip must land before ours
-  await page.waitForFunction(() => (window as any).__setTripDone > 0);
 }
 
 export async function captureFrames(page: Page) {
   return page.evaluate(async ({ stops, legs, speed }) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
     const { idle } = await load('/src/services/map/createOffscreenMap.ts');
-    const a = (window as any).__anim;
+    const a = (window as any).__player;
     a.stop();
     await a.setTrip(stops, legs, speed);
     const tl = a.tl;
@@ -59,10 +61,12 @@ export async function captureFrames(page: Page) {
 
 export async function capturePreload(page: Page) {
   return page.evaluate(async ({ stops, legs, speed }) => {
-    const a = (window as any).__anim;
+    const load = (p: string) => import(/* @vite-ignore */ p);
+    const { planTiles } = await load('/src/services/map/preload/plan.ts');
+    const a = (window as any).__player;
     a.stop();
     await a.setTrip(stops, legs, speed);
-    const planned = await a.plannedTiles(a.tl, () => true, () => {});
+    const planned = await planTiles(a.map, a.lod, a.tl, () => true, () => {});
     const urls: string[] = planned.urls;
     return { count: urls.length, first: urls.slice(0, 20), last: urls.slice(-20) };
   }, { stops: THREE_LEGS.stops, legs: THREE_LEGS.legs, speed: THREE_LEGS.speed });

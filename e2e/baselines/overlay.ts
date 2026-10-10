@@ -11,7 +11,10 @@ export interface Sample { name: string; x: number; y: number; rgba: number[] }
 export async function captureOverlay(page: Page, times: { ground: number; air: number } | null, colors?: Record<string, string>) {
   return page.evaluate(async ({ stops, legs, speed, times, colors }) => {
     const load = (p: string) => import(/* @vite-ignore */ p);
-    const { Animator } = await load('/src/legacy/animator.ts');
+    const { MapPlayer } = await load('/src/services/map/player.ts');
+    const { registerDemProtocol } = await load('/src/services/map/styles/dem.ts');
+    const { installImageResolver } = await load('/src/services/map/styles/imageResolver.ts');
+    const { createOverlay3D } = await load('/src/services/scene3d/index.ts');
     const { idle } = await load('/src/services/map/createOffscreenMap.ts');
     const { loadStyle } = await load('/src/services/map/styles/loadStyle.ts');
     const { TILE_CACHE_ZOOM_LEVELS } = await load('/src/services/map/styles/hosts.ts');
@@ -26,10 +29,12 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
       maxTileCacheZoomLevels: TILE_CACHE_ZOOM_LEVELS, canvasContextAttributes: { preserveDrawingBuffer: true, antialias: true },
     });
     try {
-      const anim = new Animator(map);
+      registerDemProtocol();
+      installImageResolver(map);
+      const player = new MapPlayer(map, createOverlay3D());
       await new Promise((r) => map.once('load', r));
-      await anim.setTrip(stops, colors ? legs.map((l: any) => ({ ...l, color: colors[l.mode] })) : legs, speed);
-      const tl = anim.tl;
+      await player.setTrip(stops, colors ? legs.map((l: any) => ({ ...l, color: colors[l.mode] })) : legs, speed);
+      const tl = player.tl;
       const at = (leg: any, progress: number) => leg.start + ((leg.end - leg.start) * Math.acos(1 - 2 * progress)) / Math.PI;
       const airIdx = tl.legs.findIndex((l: any) => l.mode === 'air');
       const groundIdx = tl.legs.findIndex((l: any) => l.mode === 'ground');
@@ -37,8 +42,8 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
 
       // the matrices of the last frame the three layer drew, taken from the layer's own render call
       let last: any;
-      const renderThree = anim.renderThree.bind(anim);
-      anim.renderThree = (gl: unknown, data: unknown) => { last = data; return renderThree(gl, data); };
+      const draw = player.draw;
+      player.draw = (gl: unknown, data: unknown) => { last = data; return draw(gl, data); };
 
       const R = 6371008.8, rad = Math.PI / 180;
       // projects a point at altitude with the same matrices the three layer is rendered with
@@ -72,7 +77,7 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
         return { x: px, y: py, rgba: sum.map((s) => s / (n * n)) };
       };
       const render = async (t: number) => {
-        anim.setFrame(t);
+        player.setFrame(t);
         await idle(map);
         ctx.clearRect(0, 0, W, H);
         ctx.drawImage(map.getCanvas(), 0, 0, W, H);
@@ -81,7 +86,7 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
 
       const out: Record<string, any> = { times: T };
       await render(T.ground);
-      const gf = anim.frame;
+      const gf = player.frame;
       const gLeg = tl.legs[groundIdx];
       const trailPt = gLeg.path[Math.floor(gLeg.path.length * 0.3)];
       out.ground = {
@@ -95,7 +100,7 @@ export async function captureOverlay(page: Page, times: { ground: number; air: n
         png: bytes(),
       };
       await render(T.air);
-      const af = anim.frame;
+      const af = player.frame;
       const aLeg = tl.legs[airIdx];
       const { pointAt } = await load('/src/domain/timeline/index.ts');
       const { pos: midPt, alt: midAlt } = pointAt(aLeg, 0.5);
