@@ -5,6 +5,7 @@ if (existsSync('.env')) process.loadEnvFile('.env');
 process.env.FAL_KEY ||= process.env.FAL_AI_API_KEY;
 
 const { createDb } = await import('./db/index.ts');
+const { createAuth } = await import('./auth/index.ts');
 const { createLogger } = await import('./log.ts');
 const { createUploads } = await import('./files.ts');
 const { aiRoutes } = await import('./routes/ai.ts');
@@ -17,10 +18,12 @@ const DATA = process.env.DATA_DIR ?? 'data';
 const db = await createDb(DATA);
 const logAction = createLogger(DATA);
 const uploads = createUploads(DATA);
+const auth = await createAuth(db, logAction);
 
 const app = express();
 app.use(express.json({ limit: '5mb' }));
-app.use(aiRoutes(logAction), tripsRoutes(db), modelsRoutes(db, uploads), settingsRoutes(db), logRoutes(logAction));
+if (auth.middleware) app.use('/api', auth.middleware);
+app.use(aiRoutes(logAction, auth.config), tripsRoutes(db), modelsRoutes(db, uploads), settingsRoutes(db), logRoutes(logAction));
 app.use('/uploads', express.static(uploads.dir, { maxAge: '1y', immutable: true }));
 
 if (process.env.NODE_ENV === 'production') {

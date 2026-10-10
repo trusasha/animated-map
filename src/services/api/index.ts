@@ -5,5 +5,5 @@ import { settings } from './settings';
 import { trips } from './trips';
 
 export const api = { ...settings, ...trips, ...models, ...ai, ...log };
-export { ApiError } from './http';
+export { ApiError, setTokenSource } from './http';
 export type { TripListItem } from './trips';

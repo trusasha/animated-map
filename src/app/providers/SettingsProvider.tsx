@@ -8,7 +8,7 @@ import { applyTheme, type ThemeMode } from '../../ds';
 
 export const THEME_HINT_KEY = 'theme';
 
-const readHint = (): ThemeMode => {
+export const readThemeHint = (): ThemeMode => {
   try {
     const v = localStorage.getItem(THEME_HINT_KEY);
     return v === 'light' || v === 'dark' ? v : 'system';
@@ -26,7 +26,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [initial, setInitial] = useState<UserSettings | null>(null);
 
   useEffect(() => {
-    applyTheme(readHint());
+    applyTheme(readThemeHint());
     api.settings().then((s) => setInitial(normalizeSettings(s))).catch((e) => {
       reportError(e);
       setInitial(DEFAULT_SETTINGS);

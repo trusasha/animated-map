@@ -18,6 +18,9 @@ const needProd = selected.length === 0 || selected.some((p) => p !== 'dev');
 const needDev = selected.length === 0 || selected.includes('dev');
 if (needDev) process.env.E2E_WARM_DEV = '1';
 
+// a worktree's .env may enable accounts; the suite runs as the single local user
+const AUTH_OFF = { SUPABASE_URL: '', VITE_SUPABASE_URL: '' };
+
 const sizes = {
   desktop: { viewport: { width: 1440, height: 900 } },
   'tablet-l': { viewport: { width: 1024, height: 768 } },
@@ -62,7 +65,7 @@ export default defineConfig({
           url: `${PROD}/api/config`,
           reuseExistingServer: false,
           timeout: 180_000,
-          env: { NODE_ENV: 'production', PORT: PROD_PORT, DATA_DIR: `.e2e-data-${PROD_PORT}`, DATABASE_URL: '' },
+          env: { NODE_ENV: 'production', PORT: PROD_PORT, DATA_DIR: `.e2e-data-${PROD_PORT}`, DATABASE_URL: '', ...AUTH_OFF },
         }]
       : []),
     ...(needDev
@@ -71,7 +74,7 @@ export default defineConfig({
           url: `${DEV}/api/config`,
           reuseExistingServer: false,
           timeout: 60_000,
-          env: { NODE_ENV: 'development', PORT: DEV_PORT, HMR_PORT, DATA_DIR: `.e2e-data-${DEV_PORT}`, DATABASE_URL: '' },
+          env: { NODE_ENV: 'development', PORT: DEV_PORT, HMR_PORT, DATA_DIR: `.e2e-data-${DEV_PORT}`, DATABASE_URL: '', ...AUTH_OFF },
         }]
       : []),
   ],

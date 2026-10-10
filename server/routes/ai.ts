@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import * as ai from '../ai.ts';
+import type { PublicAuthConfig } from '../auth/index.ts';
 import type { LogAction } from '../log.ts';
 import { raw, wrap } from './http.ts';
 
-export const aiRoutes = (logAction: LogAction) => Router()
+export const aiRoutes = (logAction: LogAction, auth: PublicAuthConfig) => Router()
   .get('/api/config', (_req, res) => {
-    res.json({ openai: !!process.env.OPENAI_API_KEY, photo3d: !!process.env.FAL_KEY });
+    res.json({ openai: !!process.env.OPENAI_API_KEY, photo3d: !!process.env.FAL_KEY, auth });
   })
   .get('/api/reverse', wrap(async (req, res) => res.json(await ai.reverse(Number(req.query.lng), Number(req.query.lat)) ?? null)))
   .get('/api/geocode', wrap(async (req, res) => res.json(await ai.geocode(String(req.query.q || '')))))

@@ -18,6 +18,7 @@ const BASE_PACKAGES = [
   'pg',
   '@electric-sql/pglite',
   '@dnd-kit/*',
+  '@supabase/*',
 ];
 const WEBCODECS = ['VideoEncoder', 'VideoFrame', 'EncodedVideoChunk', 'VideoDecoder'];
 const REACT = ['react', 'react/*', 'react-dom', 'react-dom/*'];
@@ -56,6 +57,8 @@ const restrict = ({ packages = BASE_PACKAGES, groups = [], globals: extraGlobals
   // a severity-only entry would inherit the previous block's options, so an empty list must be 'off'
   'no-restricted-globals': restrictedGlobals([...(webcodecs ? WEBCODECS : []), ...extraGlobals]),
 });
+
+const SERVER_PACKAGES = ['three', 'three/*', 'maplibre-gl', 'maplibre-gl/*', 'mp4-muxer', '@base-ui/*', 'lucide-react', '@supabase/*'];
 
 const SERVICE_GROUPS = [layer('features'), layer('app'), layer('ds')];
 
@@ -125,6 +128,10 @@ const buildConfig = (root) => tseslint.config(
     rules: restrict({ packages: [...without('mp4-muxer'), ...REACT], groups: SERVICE_GROUPS, webcodecs: false }),
   },
   {
+    files: ['src/services/auth/**'],
+    rules: restrict({ packages: [...without('@supabase/*'), ...REACT], groups: SERVICE_GROUPS }),
+  },
+  {
     files: ['src/ds/**'],
     rules: restrict({
       packages: without('@base-ui/*', 'lucide-react', '@dnd-kit/*'),
@@ -141,7 +148,7 @@ const buildConfig = (root) => tseslint.config(
   },
   {
     files: ['src/services/**'],
-    ignores: ['src/services/map/**', 'src/services/scene3d/**', 'src/services/video/**'],
+    ignores: ['src/services/map/**', 'src/services/scene3d/**', 'src/services/video/**', 'src/services/auth/**'],
     rules: restrict({ packages: [...BASE_PACKAGES, ...REACT], groups: SERVICE_GROUPS }),
   },
   {
@@ -157,7 +164,7 @@ const buildConfig = (root) => tseslint.config(
   {
     files: ['server/**/*.ts'],
     rules: restrict({
-      packages: ['three', 'three/*', 'maplibre-gl', 'maplibre-gl/*', 'mp4-muxer', '@base-ui/*', 'lucide-react', 'pg', '@electric-sql/pglite'],
+      packages: [...SERVER_PACKAGES, 'pg', '@electric-sql/pglite', 'jose'],
       groups: ['**/src/services/**', '**/src/features/**'],
       webcodecs: false,
     }),
@@ -165,7 +172,15 @@ const buildConfig = (root) => tseslint.config(
   {
     files: ['server/db/**'],
     rules: restrict({
-      packages: ['three', 'three/*', 'maplibre-gl', 'maplibre-gl/*', 'mp4-muxer', '@base-ui/*', 'lucide-react'],
+      packages: [...SERVER_PACKAGES, 'jose'],
+      groups: ['**/src/services/**', '**/src/features/**'],
+      webcodecs: false,
+    }),
+  },
+  {
+    files: ['server/auth/**'],
+    rules: restrict({
+      packages: [...SERVER_PACKAGES, 'pg', '@electric-sql/pglite'],
       groups: ['**/src/services/**', '**/src/features/**'],
       webcodecs: false,
     }),

@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
+import { useAccount } from '../features/auth';
 import { EditorShell } from '../features/editor';
 import { ExportDialog } from '../features/export';
 import { FiguresDialog, useModels } from '../features/figures';
@@ -19,6 +20,7 @@ type Dialog = 'settings' | 'figures' | 'export';
 /** one screen visit: remounted per trip (and for Home) so selection, preview and dialogs reset */
 export function Session({ tripId }: { tripId: string | null }) {
   const { map, setPadding } = useServices();
+  const account = useAccount();
   const { models } = useModels();
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [previewing, setPreviewing] = useState(false);
@@ -46,6 +48,7 @@ export function Session({ tripId }: { tripId: string | null }) {
             onExport={onExport}
             onOpenSettings={() => setDialog('settings')}
             onOpenFigures={onOpenFigures}
+            account={account}
           />
         </Boundary>
       </div>
