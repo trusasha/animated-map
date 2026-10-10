@@ -8,7 +8,7 @@ interface Drag {
   end: (y: number, t: number, cancelled: boolean) => void;
 }
 
-/** Touch drag that starts inside the scrolling content: pull down at scrollTop 0, or pull up before full. */
+/** Touch drag that starts inside the scrolling content: pull down at scrollTop 0, or pull up before full. Never from a `[data-own-drag]` control. */
 export function useContentDrag(content: RefObject<HTMLElement | null>, snap: Snap, drag: Drag) {
   const current = useEffectEvent(() => ({ snap, drag }));
 
@@ -21,7 +21,7 @@ export function useContentDrag(content: RefObject<HTMLElement | null>, snap: Sna
     let lastY = 0;
 
     const onStart = (e: TouchEvent) => {
-      tracking = e.touches.length === 1;
+      tracking = e.touches.length === 1 && !(e.target as Element).closest('[data-own-drag]');
       active = false;
       startY = lastY = e.touches[0]!.clientY;
     };
