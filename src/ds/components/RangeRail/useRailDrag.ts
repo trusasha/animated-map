@@ -3,7 +3,7 @@ import { dragTo, edgeSpeed, nearestRow, type Handle, type Range } from './range'
 
 export type RailDrag = { handle: Handle; range: Range; y: number };
 
-type Live = { handle: Handle; range: Range; startY: number; clientY: number; offset: number; frame: number };
+type Live = { handle: Handle; range: Range; startY: number; clientY: number; offset: number; frame: number; at: number };
 
 type Options = {
   rootRef: RefObject<HTMLElement | null>;
@@ -44,16 +44,18 @@ export function useRailDrag({ rootRef, containerRef, count, nodeY, range, onComm
     setDrag({ handle: d.handle, range: d.range, y: Math.min(Math.max(y, ys[lo]), ys[hi]) });
   };
 
-  const tick = () => {
+  const tick = (now: number) => {
     const d = live.current, root = rootRef.current;
     if (!d || !root) return;
     const box = scrollParent(root);
     const { top, bottom } = visible(box);
     const v = edgeSpeed(d.clientY, top, bottom);
+    const frames = Math.min(now - d.at, 100) / 16;
+    d.at = now;
     // a handle grabbed inside an edge zone scrolls only once the pointer heads towards that edge
     if (v && Math.sign(v) === Math.sign(d.clientY - d.startY)) {
       const before = box.scrollTop;
-      box.scrollTop = before + v;
+      box.scrollTop = before + Math.sign(v) * Math.max(1, Math.round(Math.abs(v) * frames));
       if (box.scrollTop !== before) track();
     }
     d.frame = requestAnimationFrame(tick);
@@ -77,7 +79,7 @@ export function useRailDrag({ rootRef, containerRef, count, nodeY, range, onComm
     const root = rootRef.current;
     if (e.button !== 0 || live.current || !root) return;
     root.setPointerCapture(e.pointerId);
-    live.current = { handle, range, startY: e.clientY, clientY: e.clientY, offset, frame: requestAnimationFrame(tick) };
+    live.current = { handle, range, startY: e.clientY, clientY: e.clientY, offset, frame: requestAnimationFrame(tick), at: performance.now() };
     track();
   };
 

@@ -41,7 +41,7 @@ export const nearestRow = (ys: number[], y: number): number => {
   return best;
 };
 
-/** px per frame to scroll when the pointer is within `zone` of an edge of [top, bottom]; full speed past it */
+/** px per 16 ms frame to scroll when the pointer is within `zone` of an edge of [top, bottom]; full speed past it */
 export const edgeSpeed = (y: number, top: number, bottom: number, zone = 48, max = 16): number => {
   const depth = y < top + zone ? y - top - zone : y > bottom - zone ? y - bottom + zone : 0;
   const v = max * Math.max(-1, Math.min(1, depth / zone));
