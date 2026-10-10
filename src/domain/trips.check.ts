@@ -45,14 +45,34 @@ assert.ok(rangeWasReset(ranged, removeStop(ranged, 3)));
 assert.equal(removeStop(trip({ stops: trip().stops.slice(0, 3), range: { from: 'a', to: 'c' } }), 1).range, undefined, 'under 3 stops');
 assert.ok(!rangeWasReset(trip(), removeStop(trip(), 1)));
 
-const mv = moveStop(trip(), 1, 1);
+const mv = moveStop(trip(), 1, 2);
 assert.equal(ids(mv), 'acbd');
 assert.deepEqual(mv.stops.map((s) => s.leg?.mode), [undefined, 'air', 'ground', 'water'], 'legs keep their positions');
-assert.equal(ids(moveStop(trip(), 1, -1)), 'bacd');
-assert.deepEqual(moveStop(trip(), 1, -1).stops.map((s) => s.leg?.mode), [undefined, 'air', 'ground', 'water'], 'swap with the first stop keeps the leg');
+assert.equal(ids(moveStop(trip(), 1, 0)), 'bacd');
+assert.deepEqual(moveStop(trip(), 1, 0).stops.map((s) => s.leg?.mode), [undefined, 'air', 'ground', 'water'], 'swap with the first stop keeps the leg');
 assert.equal(moveStop(trip(), 0, -1).stops.length, 4, 'out of bounds is a no-op');
 const edge = trip();
-assert.equal(moveStop(edge, 3, 1), edge);
+assert.equal(moveStop(edge, 3, 4), edge);
+assert.equal(moveStop(edge, 2, 2), edge, 'same place is a no-op');
+
+const lastFirst = moveStop(trip(), 3, 0);
+assert.equal(ids(lastFirst), 'dabc', 'last → first');
+assert.deepEqual(lastFirst.stops.map((s) => s.leg?.mode), [undefined, 'air', 'ground', 'water']);
+assert.equal(legsOf(lastFirst).length, 3, 'chain intact');
+assert.equal(ids(moveStop(trip(), 0, 3)), 'bcda', 'first → last');
+assert.equal(moveStop(trip(), 0, 3).stops[0].leg, undefined, 'new first stop has no leg');
+assert.equal(ids(moveStop(trip({ stops: [...trip().stops, st('e', 4, 'air')] }), 1, 3)), 'acdbe', 'middle → middle');
+const stepwise = (d: TripData, from: number, to: number) => {
+  for (let k = from; k !== to; k += Math.sign(to - from)) d = moveStop(d, k, k + Math.sign(to - from));
+  return d;
+};
+for (let a = 0; a < 4; a++) for (let b = 0; b < 4; b++) assert.deepEqual(moveStop(trip(), a, b), stepwise(trip(), a, b), `${a} → ${b} = repeated swaps`);
+
+const rangedMove = trip({ range: { from: 'b', to: 'c' } });
+assert.deepEqual(moveStop(rangedMove, 0, 3).range, { from: 'b', to: 'c' }, 'range follows its stops');
+assert.deepEqual(span(moveStop(rangedMove, 0, 3)), [0, 1]);
+assert.equal(moveStop(rangedMove, 2, 0).range, undefined, 'range end moved before its start: whole route');
+assert.ok(rangeWasReset(rangedMove, moveStop(rangedMove, 2, 0)));
 
 const withSub = trip({ stops: trip().stops.map((s) => ({ ...s, sub: 'x', approx: true })) });
 const to = moveStopTo(withSub, 1, [9, 8]);

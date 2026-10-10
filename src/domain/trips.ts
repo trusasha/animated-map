@@ -40,12 +40,13 @@ const fixRange = (d: TripData): TripData => (d.stops.length < 3 && d.range ? { .
 export const removeStop = (d: TripData, i: number, settings: UserSettings = DEFAULT_SETTINGS): TripData =>
   fixRange(chain({ ...d, stops: d.stops.filter((_, k) => k !== i) }, settings));
 
-/** places swap, legs keep their positions: otherwise a swap with the first stop throws its leg away */
-export function moveStop(d: TripData, i: number, dir: -1 | 1, settings: UserSettings = DEFAULT_SETTINGS): TripData {
-  const j = Math.min(i, i + dir);
-  if (j < 0 || j + 1 >= d.stops.length) return d;
-  const stops = d.stops.map((s, k) => (k === j ? { ...d.stops[j + 1], leg: s.leg } : k === j + 1 ? { ...d.stops[j], leg: s.leg } : s));
-  return chain({ ...d, stops }, settings);
+/** places reorder, legs keep their positions: the same as repeated swaps with a neighbour, so a move to the top doesn't throw a leg away */
+export function moveStop(d: TripData, from: number, to: number, settings: UserSettings = DEFAULT_SETTINGS): TripData {
+  const n = d.stops.length;
+  if (from === to || Math.min(from, to) < 0 || Math.max(from, to) >= n) return d;
+  const places = d.stops.slice();
+  places.splice(to, 0, ...places.splice(from, 1));
+  return chain({ ...d, stops: places.map((s, k) => (s === d.stops[k] ? s : { ...s, leg: d.stops[k].leg })) }, settings);
 }
 
 /** moving a stop re-routes both legs that touch it: they share it as finish and start */

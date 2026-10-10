@@ -23,6 +23,7 @@ export * from './components/SearchCombobox';
 export * from './components/Segmented';
 export * from './components/Select';
 export * from './components/Slider';
+export * from './components/SortableList';
 export * from './components/Spinner';
 export * from './components/StatusPill';
 export * from './components/Stepper';

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { stubNet } from '../fixtures/net';
 
 const EMPTY = { stops: [], style: 'satellite', speed: 1, format: '9:16' };
@@ -33,6 +33,39 @@ const addPlace = async (page: Page, query: string) => {
   await box.press('Enter');
 };
 const row = (page: Page, name: string) => page.getByTestId('stop-row').filter({ hasText: name });
+const handle = (page: Page, name: string) => row(page, name).getByRole('button', { name: `Перетащите, чтобы переставить «${name}»` });
+const center = async (l: Locator) => {
+  const b = (await l.boundingBox())!;
+  return { x: b.x + b.width / 2, y: b.y + b.height / 2, top: b.y };
+};
+/** dnd-kit needs a few intermediate moves to pass its activation distance and track the pointer */
+async function mouseDrag(page: Page, from: Locator, to: Locator) {
+  const a = await center(from), b = await center(to);
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(a.x, a.y - 8, { steps: 4 });
+  await page.mouse.move(a.x, b.top + 2, { steps: 20 });
+  await page.mouse.up();
+}
+/** dnd-kit arms its keyboard listeners a tick after pick-up and measures after each step */
+async function pickUpAndMove(page: Page, grip: Locator, key: string) {
+  await page.keyboard.press('Space');
+  await expect(grip).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press(key);
+  await page.waitForTimeout(250);
+}
+async function touchDrag(page: Page, from: Locator, to: Locator) {
+  const a = await center(from), b = await center(to);
+  const cdp = await page.context().newCDPSession(page);
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
+    cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
+  await touch('touchStart', a.x, a.y);
+  for (let k = 1; k <= 20; k++) {
+    await touch('touchMove', a.x, a.y + ((b.top + 2 - a.y) * k) / 20);
+    await page.waitForTimeout(16);
+  }
+  await touch('touchEnd', a.x, b.top + 2);
+}
 
 test.describe('route panel @map', () => {
   test.beforeEach(({ page }, info) => {
@@ -82,18 +115,39 @@ test.describe('route panel @map', () => {
     await t.done();
   });
 
-  test('F4: reorder keeps segment settings by position', async ({ page, request }) => {
+  test('F4: dragging the last stop to the top keeps segment settings by position and survives reload', async ({ page, request }) => {
     const t = await open(page, request, SEED);
     await expect(page.getByText('Строю…')).toHaveCount(0);
     await expect(page.getByTestId('segment-row').first()).toContainText('×2');
-    await row(page, 'Berlin').hover();
-    await row(page, 'Berlin').getByRole('button', { name: 'Выше' }).click();
-    await expect(page.getByTestId('stop-row').first()).toContainText('Berlin');
+    await mouseDrag(page, row(page, 'Rome'), page.getByTestId('stop-row').first());
+    await expect(page.getByTestId('stop-row').first()).toContainText('Rome');
     await expect(page.getByTestId('segment-row').first()).toContainText('Воздух · Самолёт');
     await expect(page.getByTestId('segment-row').first()).toContainText('×2');
     await expect(page.getByTestId('segment-row').last()).toContainText('Земля · Машина');
+    await expect.poll(async () => (await t.stored()).stops.map((s: { name: string }) => s.name)).toEqual(['Rome', 'Paris', 'Berlin']);
+    expect(t.logged.find((l) => l.type === 'stop.reorder')?.data).toMatchObject({ from: 2, to: 0, name: 'Rome' });
+    await page.reload();
+    await expect(page.getByTestId('stop-row')).toHaveCount(3);
+    await expect(page.getByTestId('stop-row').nth(0)).toContainText('Rome');
+    await expect(page.getByTestId('stop-row').nth(1)).toContainText('Paris');
+    await expect(page.getByTestId('stop-row').nth(2)).toContainText('Berlin');
+    await t.done();
+  });
+
+  test('F4: the grip handle reorders with the keyboard', async ({ page, request }) => {
+    const t = await open(page, request, SEED);
+    await expect(page.getByText('Строю…')).toHaveCount(0);
+    await handle(page, 'Paris').focus();
+    await expect(handle(page, 'Paris')).toBeVisible();
+    await pickUpAndMove(page, handle(page, 'Paris'), 'ArrowDown');
+    await page.keyboard.press('Space');
+    await expect(page.getByTestId('stop-row').first()).toContainText('Berlin');
+    await expect(page.getByTestId('stop-row').nth(1)).toContainText('Paris');
+    await expect(handle(page, 'Paris')).toBeFocused();
     await expect.poll(async () => (await t.stored()).stops.map((s: { name: string }) => s.name)).toEqual(['Berlin', 'Paris', 'Rome']);
-    expect(t.logged.map((l) => l.type)).toContain('stop.reorder');
+    await pickUpAndMove(page, handle(page, 'Paris'), 'ArrowDown');
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('stop-row').nth(1)).toContainText('Paris');
     await t.done();
   });
 
@@ -116,6 +170,16 @@ test.describe('route panel @map', () => {
     await page.getByTestId('stop-row').first().getByRole('button', { name: 'Действия с точкой' }).click();
     await expect(page.getByRole('menuitem', { name: 'Удалить точку' })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: 'Перенести на карте' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Выше' })).toHaveCount(0);
+    await t.done();
+  });
+
+  test('phone: dragging the grip with a finger moves the last stop to the top', async ({ page, request }) => {
+    test.skip((page.viewportSize()?.width ?? 0) >= 700, 'phone only');
+    const t = await open(page, request, SEED);
+    await expect(handle(page, 'Rome')).toBeVisible();
+    await touchDrag(page, handle(page, 'Rome'), page.getByTestId('stop-row').first());
+    await expect.poll(async () => (await t.stored()).stops.map((s: { name: string }) => s.name)).toEqual(['Rome', 'Paris', 'Berlin']);
     await t.done();
   });
 });

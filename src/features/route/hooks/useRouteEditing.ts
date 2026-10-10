@@ -40,10 +40,10 @@ export function useRouteEditing({ data, update, onSelect }: RouteEditingArgs) {
     });
   };
 
-  const move = (i: number, dir: -1 | 1) => {
-    const after = moveStop(data, i, dir, settings);
-    api.log('stop.reorder', { index: i, dir, name: data.stops[i].name });
-    update((d) => moveStop(d, i, dir, settings));
+  const move = (from: number, to: number) => {
+    const after = moveStop(data, from, to, settings);
+    api.log('stop.reorder', { from, to, name: data.stops[from].name });
+    update((d) => moveStop(d, from, to, settings));
     if (rangeWasReset(data, after)) push({ tone: 'info', message: t('toasts.rangeReset') });
   };
 
