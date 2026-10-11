@@ -27,8 +27,9 @@ app.use(aiRoutes(logAction, auth.config), tripsRoutes(db), modelsRoutes(db, uplo
 app.use('/uploads', express.static(uploads.dir, { maxAge: '1y', immutable: true }));
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('dist'));
-  app.get(/^(?!\/api).*/, (_req, res) => res.sendFile('index.html', { root: 'dist' }));
+  app.use(express.static('dist', { index: false }));
+  // a stale tab asking for an old hashed chunk must get 404, not index.html served as JS
+  app.get(/^(?!\/api|\/assets\/).*/, (_req, res) => res.sendFile('index.html', { root: 'dist', headers: { 'Cache-Control': 'no-cache' } }));
 } else {
   const { createServer } = await import('vite');
   const vite = await createServer({ server: { middlewareMode: true }, appType: 'spa' });
