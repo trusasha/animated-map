@@ -37,7 +37,7 @@ export function createMapService(container: HTMLElement, overlay: MapOverlay3D):
   const loaded = new Promise<void>((r) => map.once('load', () => r()));
 
   const on = { segment: new Set<(i: number) => void>(), empty: new Set<() => void>(), drag: new Set<(i: number, p: LngLat) => void>() };
-  const markers = createMarkers(map, (i, p) => on.drag.forEach((cb) => cb(i, p)));
+  const markers = createMarkers(map, (i, p) => on.drag.forEach((cb) => cb(i, p)), (pts) => void camera.fitTo(pts, { maxZoom: 15, duration: 700 }));
   let mode: MapMode = 'editor';
   let editing = true;
   let route = NO_ROUTE;

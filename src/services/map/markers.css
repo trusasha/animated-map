@@ -20,3 +20,4 @@
 .ta-marker--approx { border-style: dashed; border-color: var(--color-orange); }
 .ta-marker--out { opacity: 0.45; }
 .ta-marker--drag { cursor: grab; }
+.ta-marker--group { width: auto; min-width: 24px; padding: 0 var(--space-7); border-radius: var(--radius-pill); cursor: zoom-in; white-space: nowrap; }
