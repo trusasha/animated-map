@@ -22,7 +22,7 @@ const VIEW = new THREE.Vector3(-1.4, 0.8, 0.55).normalize();
 /** flat arrow on the ground along +Z, the way the figure travels in the video */
 function travelArrow(color: string) {
   const s = new THREE.Shape();
-  s.moveTo(-0.03, -1.2).lineTo(0.03, -1.2).lineTo(0.03, 1.0).lineTo(0.12, 1.0).lineTo(0, 1.3).lineTo(-0.12, 1.0).lineTo(-0.03, 1.0).closePath();
+  s.moveTo(-0.03, -1.0).lineTo(0.03, -1.0).lineTo(0.03, 0.85).lineTo(0.11, 0.85).lineTo(0, 1.12).lineTo(-0.11, 0.85).lineTo(-0.03, 0.85).closePath();
   const mesh = new THREE.Mesh(new THREE.ShapeGeometry(s), new THREE.MeshBasicMaterial({ color: new THREE.Color(color), side: THREE.DoubleSide }));
   mesh.rotation.x = Math.PI / 2;
   mesh.position.y = 0.004;
@@ -30,7 +30,7 @@ function travelArrow(color: string) {
 }
 
 function groundGrid(color: string) {
-  const grid = new THREE.GridHelper(3, 12, new THREE.Color(color), new THREE.Color(color));
+  const grid = new THREE.GridHelper(2.4, 12, new THREE.Color(color), new THREE.Color(color));
   const material = grid.material as THREE.Material;
   material.transparent = true;
   material.opacity = 0.35;
@@ -46,7 +46,7 @@ export function mountOrientationViewer(el: HTMLElement, url: string, pose: Model
   scene.add(groundGrid(opts.colors.grid), travelArrow(opts.colors.travel));
 
   const size = pose.scale;
-  const dist = (1.05 * size) / Math.sin((camera.fov * Math.PI) / 360);
+  const dist = (0.8 * size) / Math.sin((camera.fov * Math.PI) / 360);
   controls.target.set(0, 0.25 * size, 0);
   controls.minDistance = dist * 0.4;
   controls.maxDistance = dist * 3;
