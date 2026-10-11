@@ -48,16 +48,19 @@ function loadGlb(url: string) {
 }
 
 
+/** re-poses a figure made by createModelFigure in place */
+export function applyModelPose(g: THREE.Object3D, pose: ModelPose) {
+  const inner = g.children[0];
+  inner.rotation.set(pose.rx * DEG, pose.ry * DEG, pose.rz * DEG, 'YXZ');
+  normalize(inner);
+  inner.scale.multiplyScalar(pose.scale);
+  inner.position.multiplyScalar(pose.scale);
+}
+
 /** custom `model:<url>` figure with its pose applied; rejects when the GLB fails to load */
 export async function createModelFigure(url: string, pose?: ModelPose) {
   const g = await loadGlb(url);
   pose ??= poses.get(url);
-  if (pose) {
-    const inner = g.children[0];
-    inner.rotation.set(pose.rx * DEG, pose.ry * DEG, pose.rz * DEG, 'YXZ');
-    normalize(inner);
-    inner.scale.multiplyScalar(pose.scale);
-    inner.position.multiplyScalar(pose.scale);
-  }
+  if (pose) applyModelPose(g, pose);
   return g;
 }

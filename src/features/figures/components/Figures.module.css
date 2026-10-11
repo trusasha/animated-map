@@ -19,3 +19,12 @@
   background: var(--surface-alt); overflow: hidden;
 }
 .pose > :last-child { align-self: stretch; }
+
+.orientStage {
+  width: 100%; aspect-ratio: 4 / 3; max-height: 340px; border-radius: var(--radius-large);
+  background: var(--surface-alt); overflow: hidden;
+}
+.angles { display: flex; flex-direction: column; gap: var(--space-12); }
+.angleRow { display: flex; align-items: flex-end; gap: var(--space-8); }
+.angleInput { flex: 1; min-width: 0; }
+.pushLeft { margin-right: auto; }

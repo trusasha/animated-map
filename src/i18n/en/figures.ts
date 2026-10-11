@@ -44,4 +44,17 @@ export const figures = {
     save: 'Save',
     delete: 'Delete figure',
   },
+  orient: {
+    title: 'Orientation',
+    open: 'Orientation',
+    hint: 'Drag to turn the figure. Right-drag or two fingers to look around. The arrow is the direction of travel.',
+    rx: 'Tilt (X)',
+    ry: 'Turn (Y)',
+    rz: 'Roll (Z)',
+    turn: '{axis} {deg}°',
+    reset: 'Reset',
+    note: 'The figure moves along the route exactly as it stands here: in the editor, the preview and the video.',
+    cancel: 'Cancel',
+    save: 'Save',
+  },
 };
