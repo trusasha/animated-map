@@ -20,7 +20,7 @@ export function modelsRoutes({ models }: DbService, uploads: Uploads) {
       const glb = await fetch(s.glb);
       if (!glb.ok) throw new Error(`3D download failed: ${glb.status}`);
       const buf = Buffer.from(await glb.arrayBuffer());
-      return res.json(await models.setState(owner, model.id, uploads.save(buf, 'glb', owner), 'ready'));
+      return res.json(await models.setState(owner, model.id, await uploads.save(buf, 'glb', owner), 'ready'));
     }
     const status = s.status === 'IN_QUEUE' ? 'pending: в очереди' : 'pending: генерация';
     res.json(await models.setState(owner, model.id, null, status));
@@ -29,7 +29,7 @@ export function modelsRoutes({ models }: DbService, uploads: Uploads) {
   return Router()
     .get('/api/models', wrap(async (_req, res) => res.json(await models.list(ownerOf(res)))))
     .post('/api/models/upload', raw, wrap(async (req, res) => {
-      const url = uploads.save(req.body, 'glb', ownerOf(res));
+      const url = await uploads.save(req.body, 'glb', ownerOf(res));
       res.json(await models.create(ownerOf(res), { name: String(req.query.name || 'Моя модель'), url, status: 'ready', task_id: null, mode: modeOf(req.query.mode) }));
     }))
     .post('/api/models/generate', raw, wrap(async (req, res) => {

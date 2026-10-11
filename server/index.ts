@@ -25,6 +25,8 @@ app.use(express.json({ limit: '5mb' }));
 if (auth.middleware) app.use('/api', auth.middleware);
 app.use(aiRoutes(logAction, auth.config), tripsRoutes(db), modelsRoutes(db, uploads), settingsRoutes(db), logRoutes(logAction));
 app.use('/uploads', express.static(uploads.dir, { maxAge: '1y', immutable: true }));
+const remote = uploads.remote;
+if (remote) app.use('/uploads', (req, res) => res.redirect(301, remote(req.path.slice(1))));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('dist', { index: false }));
