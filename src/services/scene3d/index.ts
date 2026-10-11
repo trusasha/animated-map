@@ -4,3 +4,4 @@ export { createOverlay3D } from './overlay/createOverlay3D';
 export { createFigure, FIGURE_IDS } from './figures/registry';
 export { figureThumb } from './thumbs';
 export { mountModelViewer, type ModelViewer } from './modelViewer';
+export { mountOrientationViewer, type OrientationViewer } from './orientationViewer';
