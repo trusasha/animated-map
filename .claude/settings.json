@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Supabase__*",
+      "mcp__Notion__*",
+      "Bash(curl:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(git:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}
