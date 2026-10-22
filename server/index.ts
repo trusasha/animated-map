@@ -9,6 +9,7 @@ const { createAuth } = await import('./auth/index.ts');
 const { createLogger } = await import('./log.ts');
 const { createUploads } = await import('./files.ts');
 const { aiRoutes } = await import('./routes/ai.ts');
+const { healthRoutes } = await import('./routes/health.ts');
 const { logRoutes } = await import('./routes/log.ts');
 const { modelsRoutes } = await import('./routes/models.ts');
 const { settingsRoutes } = await import('./routes/settings.ts');
@@ -16,14 +17,15 @@ const { tripsRoutes } = await import('./routes/trips.ts');
 
 const DATA = process.env.DATA_DIR ?? 'data';
 const db = await createDb(DATA);
-const logAction = createLogger(DATA);
+const logAction = createLogger(DATA, db.events);
+void db.events.prune().catch((e) => console.error('events prune failed:', e.message));
 const uploads = createUploads(DATA);
 const auth = await createAuth(db, logAction);
 
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 if (auth.middleware) app.use('/api', auth.middleware);
-app.use(aiRoutes(logAction, auth.config), tripsRoutes(db), modelsRoutes(db, uploads), settingsRoutes(db), logRoutes(logAction));
+app.use(healthRoutes(db, !!auth.middleware), aiRoutes(logAction, auth.config), tripsRoutes(db), modelsRoutes(db, uploads), settingsRoutes(db), logRoutes(logAction));
 app.use('/uploads', express.static(uploads.dir, { maxAge: '1y', immutable: true }));
 const remote = uploads.remote;
 if (remote) app.use('/uploads', (req, res) => res.redirect(301, remote(req.path.slice(1))));

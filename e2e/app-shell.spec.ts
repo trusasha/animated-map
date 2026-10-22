@@ -74,4 +74,21 @@ test.describe('app shell @map', () => {
     await log.waitFor('error', (d) => String(d.message).includes('video-panel crashed'));
     await removeTrip(request, trip.id);
   });
+
+  test('a visit reports its device, and an export the previous visit died in', async ({ page }) => {
+    const log = await collectLog(page);
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem('seeded')) return;
+      sessionStorage.setItem('seeded', '1');
+      const t = Date.now() - 60_000;
+      localStorage.setItem('ta.job', JSON.stringify({ job: 'export', session: 'earlier-visit', startedAt: t, beatAt: t + 30_000, trip: 't1', stage: 'render', progress: 0.42 }));
+    });
+    await openHome(page);
+    expect((await log.waitFor('session.start')).data).toMatchObject({ mobile: expect.any(Boolean), dpr: expect.any(Number) });
+    expect((await log.waitFor('export.crashed')).data).toMatchObject({ trip: 't1', stage: 'render', progress: 0.42, ranS: 30 });
+    expect(await page.evaluate(() => localStorage.getItem('ta.job'))).toBeNull();
+    await page.reload();
+    await expect(page.getByTestId('home-screen')).toBeVisible();
+    expect(log.ofType('export.crashed')).toHaveLength(1);
+  });
 });

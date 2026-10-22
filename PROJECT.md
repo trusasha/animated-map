@@ -35,15 +35,24 @@ npm run build && npm start
 | `FAL_KEY` (или `FAL_AI_API_KEY`) | 3D по фото (~$0.375 за модель, оплата по факту) |
 | `DATABASE_URL` | пусто — локальный Postgres (PGlite); строка Supabase — переезд |
 | `HOST` | `0.0.0.0` открывает сервер в LAN (вместе с ключами!) |
+| `HEALTH_TOKEN` | открывает `/api/health/stats` (`?token=` или заголовок `x-health-token`); без него статистика открыта только при выключенной авторизации |
+
+## Мониторинг
+
+- `GET /api/health` — для uptime-мониторов: без авторизации, пингует БД; 200 или 503, версия, аптайм, память сервера.
+- `GET /api/health/stats?hours=24` — что происходило у пользователей: визиты, воронка экспорта (open → start → done / error / **crashed**), ошибки клиента и сервера, последние проблемы с данными.
+- События пишутся и в `data/logs/actions.jsonl`, и в таблицу `events` (хранятся 90 дней, RLS включён — читает только сервер).
+- Каждый визит шлёт `session.start` с устройством (UA, память, ядра, экран); необработанные ошибки — `client.error`.
+- **Вылеты экспорта:** пока идёт экспорт, в `localStorage` лежит метка с прогрессом и памятью. Если вкладку убила ОС (нехватка памяти), метку никто не стёр — следующий визит шлёт `export.crashed` (или `export.abandoned`, если вкладку перед этим свернули).
 
 ## Архитектура
 
 ```
 server/                 Express (в dev — с Vite middleware, один порт)
   index.ts              сборка: Vite middleware (dev) / dist (prod), /uploads, роуты
-  routes/               trips (GET /api/trips — лёгкие сводки), models, ai (config, voice, parse, geocode, reverse), settings (GET/PUT), log
+  routes/               trips (GET /api/trips — лёгкие сводки), models, ai (config, voice, parse, geocode, reverse), settings (GET/PUT), log, health
   db/                   DbService: query + репозитории trips/models/settings; провайдеры pglite (локально) / postgres (DATABASE_URL); миграции
-  log.ts, files.ts      actions.jsonl; uploads и HEIC→JPEG (sips)
+  log.ts, files.ts      actions.jsonl + таблица events; uploads и HEIC→JPEG (sips)
   ai.ts                 OpenAI (transcribe, structured parse), Nominatim + Photon geocode/reverse, fal.ai photo→3D
 src/
   route.ts              цепочка маршрута: chain() / migrate() / legsOf(); self-check в route.check.ts

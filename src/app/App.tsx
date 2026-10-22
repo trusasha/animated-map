@@ -8,6 +8,7 @@ import { SettingsProvider } from './providers/SettingsProvider';
 import { ThemeSync } from './providers/ThemeSync';
 import { useRoute } from './router';
 import { Session } from './Session';
+import { Telemetry } from './Telemetry';
 import styles from './App.module.css';
 
 function Screens() {
@@ -19,6 +20,7 @@ function Screens() {
 export function App() {
   return (
     <AuthGate>
+      <Telemetry />
       <SettingsProvider>
         <I18nBridge>
           <ThemeSync />
