@@ -1,4 +1,4 @@
-import { createMp4Encoder } from './encoder';
+import { createMp4Encoder, type EncoderStats } from './encoder';
 import { VideoError } from './errors';
 
 export interface RenderVideoOptions {
@@ -9,8 +9,8 @@ export interface RenderVideoOptions {
   fps?: number;
   /** draws timeline second `t` into `ctx` (a width x height canvas); `progress` is 0..1 across the video */
   renderFrame(ctx: CanvasRenderingContext2D, t: number, progress: number): Promise<void>;
-  /** called after each encoded frame with 0..1 */
-  onProgress?: (p: number) => void;
+  /** called after each encoded frame with 0..1 and how far the encoder lags */
+  onProgress?: (p: number, encoder: EncoderStats) => void;
   signal?: AbortSignal;
 }
 
@@ -28,7 +28,7 @@ export async function renderVideo({ width, height, duration, fps = FPS, renderFr
       if (signal?.aborted) throw new VideoError('aborted');
       await renderFrame(ctx, i / fps, i / (frames - 1));
       await encoder.encode(canvas, i);
-      onProgress?.((i + 1) / frames);
+      onProgress?.((i + 1) / frames, encoder.stats());
     }
     return await encoder.finish();
   } finally {

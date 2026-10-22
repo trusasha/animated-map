@@ -6,7 +6,7 @@ import type { Format, LngLat, Mode, Overlay, Trip, UserSettings } from '../../..
 import { api } from '../../../services/api';
 import { createOffscreenMap } from '../../../services/map';
 import { createOverlay3D } from '../../../services/scene3d';
-import { attributionOf, drawOverlay, isVideoError, renderVideo } from '../../../services/video';
+import { attributionOf, drawOverlay, isVideoError, renderVideo, type EncoderStats } from '../../../services/video';
 
 export type ExportErrorCode = 'codec-unsupported' | 'failed';
 export interface ExportFrame { label: string; mode: Mode }
@@ -23,7 +23,7 @@ export interface PreparedExport {
   frame: ExportFrame;
   /** back to the preview frame, e.g. after a cancelled render */
   showStill(): Promise<void>;
-  render(o: { overlay: Overlay; onProgress: (p: number) => void; signal: AbortSignal; onProbe?: (p: FrameProbe) => void }): Promise<Blob>;
+  render(o: { overlay: Overlay; onProgress: (p: number, encoder: EncoderStats) => void; signal: AbortSignal; onProbe?: (p: FrameProbe) => void }): Promise<Blob>;
   destroy(): void;
 }
 
