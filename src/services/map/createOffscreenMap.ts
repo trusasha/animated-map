@@ -26,7 +26,7 @@ export async function createOffscreenMap(host: HTMLElement, opts: { style: MapSt
     installImageResolver(map);
     const player = new MapPlayer(map, overlay, { stableTiles: opts.stableTiles });
     await new Promise((r) => map.once('load', r));
-    return { player, idle: (ms) => idle(map, ms), canvas: () => map.getCanvas(), destroy };
+    return { player, idle: (ms) => idle(map, ms), canvas: () => map.getCanvas(), view: () => ({ zoom: map.getZoom(), pitch: map.getPitch() }), destroy };
   } catch (e) {
     destroy();
     throw e;

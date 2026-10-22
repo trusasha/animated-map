@@ -128,5 +128,7 @@ export interface OffscreenMap {
   /** resolves when the map has rendered everything it needs, or after `ms` */
   idle(ms?: number): Promise<void>;
   canvas(): HTMLCanvasElement;
+  /** camera of the last frame, for crash breadcrumbs */
+  view(): { zoom: number; pitch: number };
   destroy(): void;
 }

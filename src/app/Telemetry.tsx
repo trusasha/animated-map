@@ -11,7 +11,7 @@ const seconds = (ms: number) => Math.round(ms / 1000);
 export function Telemetry() {
   useEffect(() => {
     const device = deviceInfo();
-    api.log('session.start', { ...device, path: location.pathname });
+    api.log('session.start', { ...device, path: location.pathname, build: __BUILD__ });
     const orphan = takeOrphanJob(SESSION);
     if (orphan) {
       const { job, hidden, startedAt, beatAt, ...state } = orphan;

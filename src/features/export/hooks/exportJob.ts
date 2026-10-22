@@ -6,10 +6,13 @@ import type { Format, LngLat, Mode, Overlay, Trip, UserSettings } from '../../..
 import { api } from '../../../services/api';
 import { createOffscreenMap } from '../../../services/map';
 import { createOverlay3D } from '../../../services/scene3d';
-import { attributionOf, drawOverlay, isVideoError, renderVideo, type EncoderStats } from '../../../services/video';
+import { attributionOf, drawOverlay, FPS, isVideoError, renderVideo, type EncoderStats } from '../../../services/video';
 
 export type ExportErrorCode = 'codec-unsupported' | 'failed';
 export interface ExportFrame { label: string; mode: Mode }
+/** where a frame is at: a tab killed mid-render reports the last one */
+/** camera: set, waiting for tiles; draw: map ready, copying into the video frame; encode: handing it to the encoder */
+export interface FrameStep { step: 'camera' | 'draw' | 'encode'; frame: number; t: number; leg?: number; zoom?: number; pitch?: number }
 /** mid-render sample of the map canvas: a blank map has one colour */
 export interface FrameProbe { distinct: number; progress: number }
 
@@ -23,7 +26,7 @@ export interface PreparedExport {
   frame: ExportFrame;
   /** back to the preview frame, e.g. after a cancelled render */
   showStill(): Promise<void>;
-  render(o: { overlay: Overlay; onProgress: (p: number, encoder: EncoderStats) => void; signal: AbortSignal; onProbe?: (p: FrameProbe) => void }): Promise<Blob>;
+  render(o: { overlay: Overlay; onProgress: (p: number, encoder: EncoderStats) => void; onStep?: (s: FrameStep) => void; signal: AbortSignal; onProbe?: (p: FrameProbe) => void }): Promise<Blob>;
   destroy(): void;
 }
 
@@ -74,14 +77,20 @@ export async function prepareExport(o: {
     const attribution = attributionOf(d.style);
     return {
       width, height, hostWidth, hostHeight, frame: { label: f.label, mode: f.mode }, destroy: map.destroy, showStill: still,
-      async render({ overlay, onProgress, signal, onProbe }) {
-        let probed = !onProbe;
+      async render({ overlay, onProgress, onStep, signal, onProbe }) {
+        let probed = !onProbe, frame = 0, t = 0;
+        const step = (s: FrameStep['step'], extra: Partial<FrameStep> = {}) => onStep?.({ step: s, frame, t: Math.round(t * 100) / 100, ...extra });
         return renderVideo({
-          width, height, duration, signal, onProgress,
-          renderFrame: async (ctx, t, progress) => {
-            player.setFrame(t);
+          width, height, duration, signal, onProgress, onEncode: (i) => step('encode', { frame: i }),
+          renderFrame: async (ctx, time, progress) => {
+            t = time;
+            frame = Math.round(time * FPS);
+            player.setFrame(time);
+            step('camera');
             await idle();
             const fr = player.currentFrame()!;
+            const { zoom, pitch } = map.view();
+            step('draw', { leg: fr.legIndex, zoom: Math.round(zoom * 10) / 10, pitch: Math.round(pitch) });
             ctx.drawImage(canvas(), 0, 0, width, height);
             if (!probed && progress >= 0.5) { probed = true; onProbe!({ distinct: distinctColors(ctx, width, height), progress }); }
             drawOverlay(ctx, width, height, overlay, o.trip.title, fr.label, fr.mode, progress, attribution);
