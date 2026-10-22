@@ -53,6 +53,7 @@ server/                 Express (в dev — с Vite middleware, один пор�
   routes/               trips (GET /api/trips — лёгкие сводки), models, ai (config, voice, parse, geocode, reverse), settings (GET/PUT), log, health
   db/                   DbService: query + репозитории trips/models/settings; провайдеры pglite (локально) / postgres (DATABASE_URL); миграции
   log.ts, files.ts      actions.jsonl + таблица events; uploads и HEIC→JPEG (sips)
+  models3d.ts           облегчение каждой новой GLB (загрузка и фото→3D): ≤75k треугольников (meshoptimizer), текстуры ≤1024 px в JPEG (sharp)
   ai.ts                 OpenAI (transcribe, structured parse), Nominatim + Photon geocode/reverse, fal.ai photo→3D
 src/
   route.ts              цепочка маршрута: chain() / migrate() / legsOf(); self-check в route.check.ts
