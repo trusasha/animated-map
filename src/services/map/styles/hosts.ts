@@ -7,3 +7,9 @@ export const ESRI_HOSTS = ['server', 'services'].map((h) => `https://${h}.arcgis
 
 /** the default (5) evicts most of a route's warm-up before playback reaches it */
 export const TILE_CACHE_ZOOM_LEVELS = 200;
+/**
+ * export renders frames in order from tiles already prefetched into the HTTP cache, so its in-memory cache only has
+ * to bridge short camera back-and-forths; unbounded, it kept every tile of the route (≈0.6 MB/frame) and phones
+ * killed the tab mid-render
+ */
+export const EXPORT_TILE_CACHE_SIZE = 150;
