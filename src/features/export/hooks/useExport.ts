@@ -124,7 +124,7 @@ export function useExport(trip: Trip): ExportController {
     api.log('export.start', { ...job, heapMb: heapMb() });
     guard.begin('export', { ...job, stage: 'render', progress: 0 });
     const onProgress = (x: number, encoder: EncoderStats) => { setProgress(x); guard.beat({ progress: Math.round(x * 1000) / 1000, encoder }); };
-    p.render({ overlay, onProgress, signal: ctrl.signal, onProbe: probeForTests }).then((blob) => {
+    p.render({ overlay, onProgress, onStep: (s) => guard.mark(s), signal: ctrl.signal, onProbe: probeForTests }).then((blob) => {
       guard.end();
       const file = new File([blob], videoFileName(trip.title, format), { type: 'video/mp4' });
       api.log('export.done', { ...job, bytes: blob.size, ms: Math.round(performance.now() - started.current), heapMb: heapMb() });

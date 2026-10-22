@@ -41,6 +41,12 @@ export function createCrashGuard(session: string) {
       current = { ...current, ...data, beatAt: last, heapMb: heapMb() };
       write(current);
     },
+    /** unthrottled, for where-exactly breadcrumbs (which step of which frame) */
+    mark(data: object) {
+      if (!current) return;
+      current = { ...current, ...data, beatAt: Date.now() };
+      write(current);
+    },
     end() {
       current = null;
       write(null);
