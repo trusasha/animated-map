@@ -5,6 +5,7 @@ import { createCrashGuard, heapMb } from '../../../services/telemetry';
 import { DEFAULT_OVERLAY } from '../../../services/video';
 import { useSettings } from '../../settings';
 import { useTripContext } from '../../trips';
+import type { EncoderStats } from '../../../services/video';
 import { errorCode, isAbort, prepareExport, videoFileName, type ExportErrorCode, type FrameProbe, type PreparedExport } from './exportJob';
 
 export type ExportPhase = 'prepare' | 'captions' | 'render' | 'done' | 'error';
@@ -122,7 +123,7 @@ export function useExport(trip: Trip): ExportController {
     const job = { trip: trip.id, format, width: p.width, height: p.height };
     api.log('export.start', { ...job, heapMb: heapMb() });
     guard.begin('export', { ...job, stage: 'render', progress: 0 });
-    const onProgress = (x: number) => { setProgress(x); guard.beat({ progress: Math.round(x * 1000) / 1000 }); };
+    const onProgress = (x: number, encoder: EncoderStats) => { setProgress(x); guard.beat({ progress: Math.round(x * 1000) / 1000, encoder }); };
     p.render({ overlay, onProgress, signal: ctrl.signal, onProbe: probeForTests }).then((blob) => {
       guard.end();
       const file = new File([blob], videoFileName(trip.title, format), { type: 'video/mp4' });
