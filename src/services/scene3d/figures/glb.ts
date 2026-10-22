@@ -4,6 +4,8 @@ import type { CustomModel, ModelPose } from '../../../domain/types';
 import { group } from './materials';
 
 const DEG = Math.PI / 180;
+/** longest texture side kept: a figure is ~100 px on screen, photo→3D models ship 4096² (~90 MB of GPU memory per map) */
+const MAX_TEXTURE = 1024;
 const loader = new GLTFLoader();
 const glbCache = new Map<string, Promise<THREE.Group>>();
 const poses = new Map<string, ModelPose>();
@@ -32,11 +34,36 @@ function normalize(obj: THREE.Object3D) {
   obj.scale.setScalar(s);
 }
 
+/** draws every oversized texture image into a MAX_TEXTURE canvas once, before anything uploads it to the GPU */
+function shrinkTextures(root: THREE.Object3D) {
+  const done = new Set<THREE.Texture>();
+  root.traverse((o) => {
+    const mats = (o as THREE.Mesh).material;
+    for (const m of Array.isArray(mats) ? mats : mats ? [mats] : []) {
+      for (const v of Object.values(m)) {
+        if (!(v instanceof THREE.Texture) || done.has(v)) continue;
+        done.add(v);
+        const img = v.image as { width: number; height: number; close?: () => void } | undefined;
+        const side = Math.max(img?.width ?? 0, img?.height ?? 0);
+        if (!img || side <= MAX_TEXTURE) continue;
+        const k = MAX_TEXTURE / side, canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * k);
+        canvas.height = Math.round(img.height * k);
+        canvas.getContext('2d')!.drawImage(img as CanvasImageSource, 0, 0, canvas.width, canvas.height);
+        img.close?.();
+        v.image = canvas;
+        v.needsUpdate = true;
+      }
+    }
+  });
+}
+
 /** Normalizes any GLB into the figure convention: Y up, longest horizontal side along Z, ~1 unit long. */
 function loadGlb(url: string) {
   if (!glbCache.has(url)) {
     glbCache.set(url, loader.loadAsync(url).then((gltf) => {
       const root = gltf.scene;
+      shrinkTextures(root);
       const size = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());
       // ponytail: photo→3D models face the camera, so a side photo yields a vehicle lying along X; nose direction is a guess (+X), the editor flips it
       if (size.x > size.z * 1.1) root.rotation.y = -Math.PI / 2;

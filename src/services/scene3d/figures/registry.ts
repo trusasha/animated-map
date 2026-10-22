@@ -12,12 +12,18 @@ const builders: Record<string, () => THREE.Group> = Object.fromEntries(ORDER.map
 
 export const FIGURE_IDS = Object.keys(builders);
 
-/** figure id → object; custom ids are `model:<url>` */
-export async function createFigure(id: string, pose?: ModelPose): Promise<THREE.Group> {
+/**
+ * figure id → object; custom ids are `model:<url>`. A custom model that fails to load becomes `fallback` (the leg
+ * mode's default: a car on the road, not an airplane) and `onError` hears why.
+ */
+export async function createFigure(id: string, pose?: ModelPose, fallback = 'airplane', onError?: (e: unknown) => void): Promise<THREE.Group> {
   if (id.startsWith('model:')) {
     try {
       return await createModelFigure(id.slice(6), pose);
-    } catch (e) { console.warn('GLB failed', e); }
+    } catch (e) {
+      console.warn('GLB failed', e);
+      onError?.(e);
+    }
   }
-  return (builders[id] ?? builders.airplane)();
+  return (builders[id] ?? builders[fallback] ?? builders.airplane)();
 }
