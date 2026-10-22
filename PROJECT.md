@@ -65,7 +65,7 @@ src/
   ukiyoe.ts             стиль «Японская гравюра» + текстура бумаги
   figures.ts            процедурные 3D-модели + загрузка GLB (авто-ориентация, поза)
   thumbs.ts             рендер миниатюр фигурок в PNG
-  exporter.ts           offscreen-карта → WebCodecs H.264 → mp4-muxer, оверлей подписей
+  exporter.ts           offscreen-карта → WebCodecs H.264 → mp4-muxer (fast-start, поток в Blob-части, не в память вкладки), оверлей подписей
   figures-gallery.ts    dev-страница /figures.html — все модели с 3 ракурсов
 ```
 

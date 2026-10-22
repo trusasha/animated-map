@@ -1,5 +1,6 @@
-import { ArrayBufferTarget, Muxer } from 'mp4-muxer';
+import { Muxer, StreamTarget } from 'mp4-muxer';
 import { avcLevel } from '../../domain/video';
+import { BlobSink } from './blobSink';
 import { VideoError } from './errors';
 
 export interface Mp4Encoder {
@@ -22,10 +23,18 @@ async function pickConfig(width: number, height: number, fps: number) {
   throw new VideoError('codec-unsupported');
 }
 
-/** H.264 in an in-memory MP4 */
-export async function createMp4Encoder(width: number, height: number, fps: number): Promise<Mp4Encoder> {
+/**
+ * H.264 in a regular fast-start MP4 (moov first, so players and uploads start without reading the whole file). The
+ * moov space is reserved up front from the frame count, so encoded frames stream out to a BlobSink as they come
+ * instead of piling up in the tab's memory until the end.
+ */
+export async function createMp4Encoder(width: number, height: number, fps: number, frames: number): Promise<Mp4Encoder> {
   const cfg = await pickConfig(width, height, fps);
-  const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: 'avc', width, height, frameRate: fps }, fastStart: 'in-memory' });
+  const sink = new BlobSink();
+  const muxer = new Muxer({
+    target: new StreamTarget({ onData: (data, position) => sink.write(data, position) }),
+    video: { codec: 'avc', width, height, frameRate: fps }, fastStart: { expectedVideoChunks: frames },
+  });
   let failure: unknown;
   const encoder = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { failure = e; } });
   encoder.configure(cfg);
@@ -40,7 +49,7 @@ export async function createMp4Encoder(width: number, height: number, fps: numbe
     async finish() {
       await encoder.flush();
       muxer.finalize();
-      return new Blob([muxer.target.buffer], { type: 'video/mp4' });
+      return sink.blob('video/mp4');
     },
     close() {
       if (encoder.state !== 'closed') encoder.close();
