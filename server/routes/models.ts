@@ -2,12 +2,22 @@ import { Router, type Response } from 'express';
 import type { CustomModel } from '../../src/domain/types.ts';
 import * as ai from '../ai.ts';
 import type { DbService } from '../db/index.ts';
+import type { LogAction } from '../log.ts';
+import { BadModelError, lightenGlb } from '../models3d.ts';
 import { heicToJpeg, type Uploads } from '../files.ts';
 import { ownerOf, raw, tokenOf, wrap } from './http.ts';
 
 const modeOf = (mode: unknown) => (['air', 'ground', 'water'] as const).find((m) => m === mode) ?? null;
 
-export function modelsRoutes({ models }: DbService, uploads: Uploads) {
+export function modelsRoutes({ models }: DbService, uploads: Uploads, logAction: LogAction) {
+  /** every model is stored lightened: phones can't load photo→3D output as is */
+  async function lighten(buf: Buffer, res: Response, source: 'upload' | 'generate') {
+    const t = performance.now();
+    const { glb, before, after } = await lightenGlb(buf);
+    logAction('model.lighten', { source, before, after, ms: Math.round(performance.now() - t) }, { owner: ownerOf(res) });
+    return glb;
+  }
+
   // polls overlap with the 35 MB GLB download; a second download would swap the url under saved trips
   const refreshing = new Set<string>();
 
@@ -19,7 +29,7 @@ export function modelsRoutes({ models }: DbService, uploads: Uploads) {
       // provider URLs expire, keep our own copy
       const glb = await fetch(s.glb);
       if (!glb.ok) throw new Error(`3D download failed: ${glb.status}`);
-      const buf = Buffer.from(await glb.arrayBuffer());
+      const buf = await lighten(Buffer.from(await glb.arrayBuffer()), res, 'generate');
       return res.json(await models.setState(owner, model.id, await uploads.save(buf, 'glb', owner, tokenOf(res)), 'ready'));
     }
     const status = s.status === 'IN_QUEUE' ? 'pending: в очереди' : 'pending: генерация';
@@ -29,7 +39,12 @@ export function modelsRoutes({ models }: DbService, uploads: Uploads) {
   return Router()
     .get('/api/models', wrap(async (_req, res) => res.json(await models.list(ownerOf(res)))))
     .post('/api/models/upload', raw, wrap(async (req, res) => {
-      const url = await uploads.save(req.body, 'glb', ownerOf(res), tokenOf(res));
+      let buf: Buffer;
+      try { buf = await lighten(req.body, res, 'upload'); } catch (e) {
+        if (e instanceof BadModelError) return void res.status(400).json({ error: e.message });
+        throw e;
+      }
+      const url = await uploads.save(buf, 'glb', ownerOf(res), tokenOf(res));
       res.json(await models.create(ownerOf(res), { name: String(req.query.name || 'Моя модель'), url, status: 'ready', task_id: null, mode: modeOf(req.query.mode) }));
     }))
     .post('/api/models/generate', raw, wrap(async (req, res) => {
