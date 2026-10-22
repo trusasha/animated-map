@@ -3,6 +3,7 @@ import { withColors } from '../../../domain/legs';
 import { legsOf } from '../../../domain/route';
 import { videoSize } from '../../../domain/video';
 import type { Format, LngLat, Mode, Overlay, Trip, UserSettings } from '../../../domain/types';
+import { api } from '../../../services/api';
 import { createOffscreenMap } from '../../../services/map';
 import { createOverlay3D } from '../../../services/scene3d';
 import { attributionOf, drawOverlay, isVideoError, renderVideo } from '../../../services/video';
@@ -56,7 +57,8 @@ export async function prepareExport(o: {
   o.host.style.width = `${hostWidth}px`;
   o.host.style.height = `${hostHeight}px`;
 
-  const map = await createOffscreenMap(o.host, { style: d.style, pixelRatio: pr, stableTiles: o.stableTiles }, createOverlay3D());
+  const onFigureError = (figure: string, e: unknown) => api.log('figure.error', { figure, where: 'export', message: e instanceof Error ? e.message : String(e) });
+  const map = await createOffscreenMap(o.host, { style: d.style, pixelRatio: pr, stableTiles: o.stableTiles }, createOverlay3D({ onFigureError }));
   try {
     if (o.signal.aborted) throw aborted();
     const { player, idle, canvas } = map;

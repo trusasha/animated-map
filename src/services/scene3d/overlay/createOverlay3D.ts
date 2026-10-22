@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { FIGURES } from '../../../domain/figures';
 import type { MapOverlay3D } from '../../../domain/overlay3d';
 import type { TLeg } from '../../../domain/timeline';
 import { figureKey } from '../figures/glb';
@@ -7,7 +8,7 @@ import { createArcs, removeArcs } from './arcs';
 import { renderOverlay, type OverlayScene } from './render';
 
 /** figures and air arcs drawn into a map's GL context; the map service hosts it as a custom layer */
-export function createOverlay3D(): MapOverlay3D {
+export function createOverlay3D(opts: { onFigureError?: (figure: string, error: unknown) => void } = {}): MapOverlay3D {
   const s: OverlayScene = {
     figures: new Map(), figScene: new THREE.Scene(), arcScene: new THREE.Scene(), camera: new THREE.Camera(),
     occluder: new THREE.Mesh(new THREE.SphereGeometry(1, 96, 48), new THREE.MeshBasicMaterial({ colorWrite: false })),
@@ -28,9 +29,10 @@ export function createOverlay3D(): MapOverlay3D {
       s.renderer.autoClear = false;
     },
     async setLegs(legs: TLeg[]) {
-      for (const { figure } of legs) {
+      for (const { figure, mode } of legs) {
         const key = figureKey(figure);
-        if (!loading.has(key)) loading.set(key, createFigure(figure).then((g) => {
+        const onError = (e: unknown) => opts.onFigureError?.(figure, e);
+        if (!loading.has(key)) loading.set(key, createFigure(figure, undefined, FIGURES[mode][0], onError).then((g) => {
           g.matrixAutoUpdate = false;
           g.visible = false;
           g.traverse((o) => { o.frustumCulled = false; });
