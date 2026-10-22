@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { Format, Overlay, Trip } from '../../../domain/types';
-import { api } from '../../../services/api';
+import { api, SESSION } from '../../../services/api';
+import { createCrashGuard, heapMb } from '../../../services/telemetry';
 import { DEFAULT_OVERLAY } from '../../../services/video';
 import { useSettings } from '../../settings';
 import { useTripContext } from '../../trips';
@@ -41,6 +42,9 @@ const probeForTests = exposeForTests
   ? (p: FrameProbe) => { const w = window as unknown as { __ta?: Record<string, unknown> }; (w.__ta ??= {}).exportProbe = p; }
   : undefined;
 
+/** one export runs at a time; its marker tells the next visit if the tab died mid-way */
+const guard = createCrashGuard(SESSION);
+
 function canShareFile(file: File) {
   try { return !!navigator.canShare?.({ files: [file] }); } catch { return false; }
 }
@@ -65,15 +69,18 @@ export function useExport(trip: Trip): ExportController {
 
   const fail = (e: unknown, stage: 'prepare' | 'render') => {
     const code = errorCode(e);
-    api.log('export.error', { trip: trip.id, format, stage, code, message: e instanceof Error ? e.message : String(e) });
+    guard.end();
+    api.log('export.error', { trip: trip.id, format, stage, code, message: e instanceof Error ? e.message : String(e), heapMb: heapMb() });
     prepared.current?.destroy();
     prepared.current = null;
     setError(code);
     setPhase('error');
   };
 
-  const prepare = useEffectEvent((el: HTMLDivElement, signal: AbortSignal) =>
-    prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, settings, onProgress: setProgress, signal, stableTiles }));
+  const prepare = useEffectEvent((el: HTMLDivElement, signal: AbortSignal) => {
+    guard.begin('export', { trip: trip.id, format, stage: 'prepare', longSide: settings.exportLongSide });
+    return prepareExport({ host: el, trip, format, longSide: settings.exportLongSide, settings, onProgress: setProgress, signal, stableTiles });
+  });
   const onPrepareError = useEffectEvent((e: unknown) => fail(e, 'prepare'));
 
   useEffect(() => {
@@ -84,6 +91,7 @@ export function useExport(trip: Trip): ExportController {
     if (!host) return;
     const ctrl = new AbortController();
     prepare(host, ctrl.signal).then((p) => {
+      guard.end();
       if (ctrl.signal.aborted) { p.destroy(); return; }
       prepared.current = p;
       setJob({ width: p.width, height: p.height, hostWidth: p.hostWidth, hostHeight: p.hostHeight, frame: p.frame });
@@ -98,6 +106,7 @@ export function useExport(trip: Trip): ExportController {
   }, [host, format, attempt]);
 
   useEffect(() => () => {
+    guard.end();
     rendering.current?.abort();
     if (videoUrl.current) URL.revokeObjectURL(videoUrl.current);
   }, []);
@@ -110,15 +119,21 @@ export function useExport(trip: Trip): ExportController {
     started.current = performance.now();
     setProgress(0);
     setPhase('render');
-    p.render({ overlay, onProgress: setProgress, signal: ctrl.signal, onProbe: probeForTests }).then((blob) => {
+    const job = { trip: trip.id, format, width: p.width, height: p.height };
+    api.log('export.start', { ...job, heapMb: heapMb() });
+    guard.begin('export', { ...job, stage: 'render', progress: 0 });
+    const onProgress = (x: number) => { setProgress(x); guard.beat({ progress: Math.round(x * 1000) / 1000 }); };
+    p.render({ overlay, onProgress, signal: ctrl.signal, onProbe: probeForTests }).then((blob) => {
+      guard.end();
       const file = new File([blob], videoFileName(trip.title, format), { type: 'video/mp4' });
-      api.log('export.done', { trip: trip.id, format, width: p.width, height: p.height, bytes: blob.size, ms: Math.round(performance.now() - started.current) });
+      api.log('export.done', { ...job, bytes: blob.size, ms: Math.round(performance.now() - started.current), heapMb: heapMb() });
       p.destroy();
       prepared.current = null;
       videoUrl.current = URL.createObjectURL(blob);
       setVideo({ url: videoUrl.current, file, canShare: canShareFile(file) });
       setPhase('done');
     }).catch((e) => {
+      guard.end();
       if (ctrl.signal.reason === CANCEL) { setPhase('captions'); void p.showStill(); } else if (!ctrl.signal.aborted) fail(e, 'render');
     });
   };

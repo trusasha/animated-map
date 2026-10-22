@@ -39,10 +39,19 @@ export interface ClaimRepo {
   claimLegacy(owner: string, label: string): Promise<Claimed | null>;
 }
 
+export interface EventsRepo {
+  add(owner: Owner, type: string, session: string | null, data: object): Promise<void>;
+  /** events per type over the last `hours` */
+  counts(hours: number): Promise<Record<string, number>>;
+  recent(types: string[], limit: number): Promise<{ t: string; type: string; user_id: string | null; data: Record<string, unknown> }[]>;
+  prune(): Promise<void>;
+}
+
 export interface DbService {
   query: Query;
   trips: TripsRepo;
   models: ModelsRepo;
   settings: SettingsRepo;
   claim: ClaimRepo;
+  events: EventsRepo;
 }

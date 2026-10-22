@@ -46,6 +46,18 @@ test('models, config and log routes', async ({ request }, info) => {
   expect(readFileSync(`.e2e-data-${new URL(info.project.use.baseURL!).port}/logs/actions.jsonl`, 'utf8')).toContain(type);
 });
 
+test('health: liveness with a db ping, stats count logged events', async ({ request }) => {
+  const health = await request.get('/api/health');
+  expect(health.status()).toBe(200);
+  expect(await health.json()).toMatchObject({ ok: true, db: { ok: true } });
+  await request.post('/api/log', { data: { type: 'export.start', data: { trip: 'x' }, session: 's1' } });
+  await request.post('/api/log', { data: { type: 'export.crashed', data: { trip: 'x', progress: 0.4 }, session: 's2' } });
+  await expect.poll(async () => (await (await request.get('/api/health/stats?hours=1')).json()).export.crashed).toBeGreaterThan(0);
+  const stats = await (await request.get('/api/health/stats?hours=1')).json();
+  expect(stats.export.started).toBeGreaterThan(0);
+  expect(stats.recentProblems.some((p: { type: string; data: { progress?: number } }) => p.type === 'export.crashed' && p.data.progress === 0.4)).toBe(true);
+});
+
 test('HEIC converts to JPEG', async () => {
   try { execFileSync('sips', ['--version'], { stdio: 'ignore' }); } catch {
     test.skip(true, 'macOS sips is not available: HEIC conversion is macOS-only by design');

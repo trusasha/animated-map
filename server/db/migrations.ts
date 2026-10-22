@@ -30,4 +30,15 @@ export async function migrate(query: Query) {
     await query(`create index if not exists ${table}_user_id on ${table} (user_id)`);
   }
   await query('create table if not exists app_meta (key text primary key, value text not null)');
+  // telemetry: client and server events, read back by /api/health/stats; only the server (table owner) touches it
+  await query(`create table if not exists events (
+    id bigserial primary key,
+    t timestamptz not null default now(),
+    type text not null,
+    user_id text,
+    session text,
+    data jsonb not null default '{}'
+  )`);
+  await query('create index if not exists events_type_t on events (type, t)');
+  await query('alter table events enable row level security');
 }
