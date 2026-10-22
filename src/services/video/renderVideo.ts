@@ -18,12 +18,12 @@ export const FPS = 30;
 
 /** frame loop independent of any map: renderFrame paints, the encoder muxes */
 export async function renderVideo({ width, height, duration, fps = FPS, renderFrame, onProgress, signal }: RenderVideoOptions): Promise<Blob> {
-  const encoder = await createMp4Encoder(width, height, fps);
+  const frames = Math.ceil(duration * fps) + 1;
+  const encoder = await createMp4Encoder(width, height, fps, frames);
   try {
     const canvas = document.createElement('canvas');
     canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext('2d')!;
-    const frames = Math.ceil(duration * fps) + 1;
     for (let i = 0; i < frames; i++) {
       if (signal?.aborted) throw new VideoError('aborted');
       await renderFrame(ctx, i / fps, i / (frames - 1));
